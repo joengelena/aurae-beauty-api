@@ -1,0 +1,19 @@
+{
+	"extends": ["tslint:recommended"],
+	"rules": {
+		"indent": [true, "spaces-4"],
+		"no-trailing-whitespace": true,
+		"one-line": [
+			true,
+			"check-open-brace",
+			"check-closing-brace",
+			"check-colon"
+		],
+		"interface-name": [true, "PascalCase"],
+		"variable-name": [true, "camelCase"],
+		"no-var-keyword": true,
+		"prefer-const": true,
+		"no-empty": true,
+		"trailing-comma": true
+	}
+}
