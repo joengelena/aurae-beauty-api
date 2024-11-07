@@ -8,7 +8,7 @@ let pool: mysql.Pool = null;
 
 const connect = async () => {
 	pool = mysql.createPool({
-		// Might have to get ride of the limitation of 100 connections
+		// Might have to get rid of the limitation of 100 connections
 		connectionLimit: 100,
 		multipleStatements: true,
 		host: process.env.MYSQL_HOST,
