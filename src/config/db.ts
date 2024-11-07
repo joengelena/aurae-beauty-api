@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-import logger from './logger';
+import Logger from './logger';
 
 dotenv.config();
 
@@ -17,9 +17,9 @@ const connect = async () => {
 		database: process.env.MYSQL_DATABASE,
 		port: 3306,
 	});
-	logger.info(`Created pool`);
+	Logger.info(`Created pool`);
 	await pool.getConnection(); // Check connection
-	logger.info(`Successfully connected to database`);
+	Logger.info(`Successfully connected to database`);
 	return;
 };
 
