@@ -107,7 +107,7 @@ async function updateUser(params: Partial<User>): Promise<QueryResult> {
 	}
 }
 
-async function deleteUser(id: string): Promise<QueryResult> {
+async function deleteUserWithId(id: string): Promise<QueryResult> {
 	Logger.info(`Deleting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
@@ -124,4 +124,10 @@ async function deleteUser(id: string): Promise<QueryResult> {
 	}
 }
 
-export { signUpUser, checkIfEmailExists, getUserById };
+export {
+	signUpUser,
+	checkIfEmailExists,
+	getUserById,
+	updateUser,
+	deleteUserWithId,
+};
