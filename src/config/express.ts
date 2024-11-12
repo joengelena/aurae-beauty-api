@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import allowCrossOriginRequestsMiddleware from '../app/middleware/cors.middleware';
+import allowCrossOriginRequestsMiddleware from '../app/middleware/cors';
 import Logger from './logger';
 
 export default () => {
