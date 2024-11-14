@@ -1,0 +1,37 @@
+{
+	"userSignUp": {
+		"type": "object",
+		"properties": {
+			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"username": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"phoneNumber": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 12
+			},
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"password": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"emailValidated": { "type": "integer", "enum": [0, 1] },
+			"PhoneNumberValidated": { "type": "integer", "enum": [0, 1] }
+		},
+		"required": [
+			"firstName",
+			"lastName",
+			"username",
+			"email",
+			"password",
+			"phoneNumber"
+		],
+		"additionalProperties": false
+	},
+	"userSignIn": {
+		"type": "object",
+		"properties": {
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
+		},
+		"required": ["email", "password"],
+		"additionalProperties": false
+	}
+}
