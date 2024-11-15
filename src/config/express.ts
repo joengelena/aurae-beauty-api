@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import allowCrossOriginRequestsMiddleware from '../app/middleware/cors';
-import Logger from './logger';
+import allowCrossOriginRequestsMiddleware from '../app/middlewares/cors';
+import logger from './logger';
 
 export default () => {
 	const app = express();
@@ -15,7 +15,7 @@ export default () => {
 	// Debug
 	app.use((req, res, next) => {
 		if (req.path !== '/') {
-			Logger.http(`##### ${req.method} ${req.path} #####`);
+			logger.http(`##### ${req.method} ${req.path} #####`);
 		}
 		next();
 	});

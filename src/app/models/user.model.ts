@@ -1,39 +1,39 @@
 import { getPool } from '../../config/db';
-import Logger from '../../config/logger';
+import logger from '../../config/logger';
 import { QueryResult } from 'mysql2';
 
 type User = {
 	id: string;
 	firstName: string;
 	lastName: string;
-	userName: string;
+	username: string;
 	email: string;
 	password: string;
 	phoneNumber: string;
 };
 
 async function signUpUser(params: User): Promise<QueryResult> {
-	const { id, firstName, lastName, userName, email, password, phoneNumber } =
+	const { id, firstName, lastName, username, email, password, phoneNumber } =
 		params;
-	Logger.info(`Signing up new user with email '${email}' to the database`);
+	logger.info(`Signing up new user with email '${email}' to the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `INSERT into User 
+		const query = `INSERT into User
         (Id, Firstname, Lastname, Username, PhoneNumber, Email, Password, EmailValidated, PhoneNumberValidated) values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 		const [result] = await connection.query(query, [
 			id,
 			firstName,
 			lastName,
-			userName,
+			username,
 			email,
 			password,
 			phoneNumber,
 		]);
 		return result;
 	} catch (error) {
-		Logger.error(
+		logger.error(
 			`Error signing up new user with email '${email}': ${error.message}`
 		);
 		throw error;
@@ -43,7 +43,7 @@ async function signUpUser(params: User): Promise<QueryResult> {
 }
 
 async function checkIfEmailExists(email: string): Promise<QueryResult> {
-	Logger.info(`Checking if email '${email}' is already in the database`);
+	logger.info(`Checking if email '${email}' is already in the database`);
 	const connection = await getPool().getConnection();
 
 	try {
@@ -51,7 +51,7 @@ async function checkIfEmailExists(email: string): Promise<QueryResult> {
 		const [result] = await connection.query(query, [email]);
 		return result;
 	} catch (error) {
-		Logger.error(
+		logger.error(
 			`Error checking to see if there exists a user with email '${email}': ${error.message}`
 		);
 		throw error;
@@ -61,7 +61,7 @@ async function checkIfEmailExists(email: string): Promise<QueryResult> {
 }
 
 async function getUserById(id: string): Promise<QueryResult> {
-	Logger.info(`Getting user with id '${id}' from the database`);
+	logger.info(`Getting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
@@ -69,7 +69,7 @@ async function getUserById(id: string): Promise<QueryResult> {
 		const [result] = await connection.query(query, [id]);
 		return result;
 	} catch (error) {
-		Logger.error(`Error getting user with id '${id}': ${error.message}`);
+		logger.error(`Error getting user with id '${id}': ${error.message}`);
 		throw error;
 	} finally {
 		connection.release();
@@ -84,7 +84,7 @@ async function updateUser(params: Partial<User>): Promise<QueryResult> {
 	if (Object.keys(updateFields).length === 0) {
 		throw new Error('No fields provided to update');
 	}
-	Logger.info(`Updating user with id: '${id}' in the database`);
+	logger.info(`Updating user with id: '${id}' in the database`);
 	const connection = await getPool().getConnection();
 
 	try {
@@ -97,10 +97,10 @@ async function updateUser(params: Partial<User>): Promise<QueryResult> {
 		const query = `UPDATE User SET ${fields} WHERE Id = ?`;
 		const [result] = await connection.query(query, values);
 
-		Logger.info(`User with id '${id}' successfully updated`);
+		logger.info(`User with id '${id}' successfully updated`);
 		return result;
 	} catch (error) {
-		Logger.error(`Error updating user with id '${id}': ${error.message}`);
+		logger.error(`Error updating user with id '${id}': ${error.message}`);
 		throw error;
 	} finally {
 		connection.release();
@@ -108,16 +108,16 @@ async function updateUser(params: Partial<User>): Promise<QueryResult> {
 }
 
 async function deleteUserWithId(id: string): Promise<QueryResult> {
-	Logger.info(`Deleting user with id '${id}' from the database`);
+	logger.info(`Deleting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
 		const query = `DELETE FROM User WHERE Id = ?`;
 		const [result] = await connection.query(query, [id]);
-		Logger.info(`User with id '${id}' successfully deleted`);
+		logger.info(`User with id '${id}' successfully deleted`);
 		return result;
 	} catch (error) {
-		Logger.error(`Error deleting user with id '${id}': ${error.message}`);
+		logger.error(`Error deleting user with id '${id}': ${error.message}`);
 		throw error;
 	} finally {
 		connection.release();
