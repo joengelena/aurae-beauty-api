@@ -17,6 +17,8 @@ async function signUpUser(params: User): Promise<QueryResult> {
 		params;
 	logger.info(`Signing up new user with email '${email}' to the database`);
 	const connection = await getPool().getConnection();
+	const emailNotValidated = 0;
+	const phoneNumberNotValidated = 0;
 
 	try {
 		const query = `INSERT into User
@@ -27,9 +29,11 @@ async function signUpUser(params: User): Promise<QueryResult> {
 			firstName,
 			lastName,
 			username,
+			phoneNumber,
 			email,
 			password,
-			phoneNumber,
+			emailNotValidated,
+			phoneNumberNotValidated,
 		]);
 		return result;
 	} catch (error) {

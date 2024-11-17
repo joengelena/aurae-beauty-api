@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import allowCrossOriginRequestsMiddleware from '../app/middlewares/cors';
 import logger from './logger';
+import usersRoutes from '../app/routes/user.routes';
 
 export default () => {
 	const app = express();
@@ -25,8 +26,7 @@ export default () => {
 	});
 
 	// ROUTES
-	// require('../app/routes/backdoor.server.routes')(app);
-	// require('../app/routes/user.server.routes')(app);
-	// require('../app/routes/film.server.routes')(app);
+	usersRoutes(app);
+
 	return app;
 };
