@@ -1,32 +1,33 @@
 import { Request, Response } from 'express';
-import { validate } from '../middlewares/validator';
+import requestIsValid from '../middlewares/validator';
 import ajvSchema from '../resources/ajvSchema.json';
 import * as userModel from '../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
+import { hashPassword } from '../middlewares/passwordHash';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
-	const validation = validate(ajvSchema.userSignUp, req.body);
-
-	if (!validation) {
-		res.status(400).send({
-			message: `Invalid request: ${validation.toString()}`,
-		});
+	if (!requestIsValid(ajvSchema.userSignUp, req.body, res)) {
 		return;
 	}
 
 	try {
 		const { firstName, lastName, username, email, password, phoneNumber } =
 			req.body;
+
 		const id = uuidv4();
+
+		const hashedPassword = await hashPassword(password);
+
 		await userModel.signUpUser({
 			id,
 			firstName,
 			lastName,
 			username,
 			email,
-			password,
+			password: hashedPassword,
 			phoneNumber,
 		});
+
 		res.statusMessage = 'User created successfully';
 		res.status(201).send({
 			message: 'User created successfully',
