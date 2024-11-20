@@ -3,7 +3,8 @@ import requestIsValid from '../middlewares/validator';
 import ajvSchema from '../resources/ajvSchema.json';
 import * as userModel from '../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { hashPassword } from '../middlewares/passwordHash';
+import { comparePassword, hashPassword } from '../middlewares/passwordHash';
+import { generateJwtToken } from '../middlewares/jwtUtil';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
 	if (!requestIsValid(ajvSchema.userSignUp, req.body, res)) {
@@ -44,4 +45,41 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 	}
 }
 
-export { signUpUser };
+async function signInUser(req: Request, res: Response): Promise<void> {
+	if (!requestIsValid(ajvSchema.userSignIn, req.body, res)) {
+		return;
+	}
+
+	try {
+		const { email, password } = req.body;
+		const user = await userModel.getUserByEmail(email);
+
+		if (user.length === 0) {
+			res.statusMessage = 'Forbidden. Email does not exist';
+			res.status(403).send();
+			return;
+		}
+
+		if (comparePassword(password, user[0].password)) {
+			const jwtToken = generateJwtToken({
+				email: user[0].email,
+				username: user[0].username,
+			});
+
+			res.cookie('jwt', jwtToken, { httpOnly: true, secure: true });
+			res.statusMessage = 'User logged in successfully';
+			res.status(200).send({
+				message: 'User logged in successfully',
+				userId: user[0].Id,
+			});
+		} else {
+			res.statusMessage = 'Forbidden. Invalid credentials';
+			res.status(401).send();
+		}
+	} catch (error) {
+		res.statusMessage = 'Internal Server Error';
+		res.status(500).send();
+	}
+}
+
+export { signUpUser, signInUser };

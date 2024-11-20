@@ -1,6 +1,6 @@
 import { getPool } from '../../config/db';
 import logger from '../../config/logger';
-import { QueryResult } from 'mysql2';
+import { FieldPacket, QueryResult } from 'mysql2';
 
 type User = {
 	id: string;
@@ -12,7 +12,7 @@ type User = {
 	phoneNumber: string;
 };
 
-async function signUpUser(params: User): Promise<QueryResult> {
+async function signUpUser(params: User): Promise<any> {
 	const { id, firstName, lastName, username, email, password, phoneNumber } =
 		params;
 	logger.info(`Signing up new user with email '${email}' to the database`);
@@ -46,7 +46,7 @@ async function signUpUser(params: User): Promise<QueryResult> {
 	}
 }
 
-async function checkIfEmailExists(email: string): Promise<QueryResult> {
+async function checkIfEmailExists(email: string): Promise<any> {
 	logger.info(`Checking if email '${email}' is already in the database`);
 	const connection = await getPool().getConnection();
 
@@ -64,7 +64,28 @@ async function checkIfEmailExists(email: string): Promise<QueryResult> {
 	}
 }
 
-async function getUserById(id: string): Promise<QueryResult> {
+async function getUserByEmail(email: string): Promise<any> {
+	logger.info(`Getting user with email '${email}' from the database`);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query = `SELECT * FROM User WHERE Email = ?`;
+		const [result]: [QueryResult, FieldPacket[]] = await connection.query(
+			query,
+			[email]
+		);
+		return result;
+	} catch (error) {
+		logger.error(
+			`Error getting user with email '${email}': ${error.message}`
+		);
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
+async function getUserById(id: string): Promise<any> {
 	logger.info(`Getting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
@@ -80,7 +101,7 @@ async function getUserById(id: string): Promise<QueryResult> {
 	}
 }
 
-async function updateUser(params: Partial<User>): Promise<QueryResult> {
+async function updateUser(params: Partial<User>): Promise<any> {
 	const { id, ...updateFields } = params;
 	if (!id) {
 		throw new Error('User ID is required to update user');
@@ -111,7 +132,7 @@ async function updateUser(params: Partial<User>): Promise<QueryResult> {
 	}
 }
 
-async function deleteUserWithId(id: string): Promise<QueryResult> {
+async function deleteUserWithId(id: string): Promise<any> {
 	logger.info(`Deleting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
@@ -131,6 +152,7 @@ async function deleteUserWithId(id: string): Promise<QueryResult> {
 export {
 	signUpUser,
 	checkIfEmailExists,
+	getUserByEmail,
 	getUserById,
 	updateUser,
 	deleteUserWithId,
