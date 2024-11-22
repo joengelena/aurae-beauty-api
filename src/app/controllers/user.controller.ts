@@ -5,6 +5,8 @@ import * as userModel from '../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword, hashPassword } from '../middlewares/passwordHash';
 import { generateJwtToken } from '../middlewares/jwtUtil';
+import logger from '../../config/logger';
+import { userDBSchema } from '../resources/databaseTypes';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
 	if (!requestIsValid(ajvSchema.userSignUp, req.body, res)) {
@@ -66,11 +68,15 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 				username: user[0].username,
 			});
 
-			res.cookie('jwt', jwtToken, { httpOnly: true, secure: true });
+			res.cookie('jwt', jwtToken, {
+				httpOnly: true,
+				secure: true,
+				sameSite: 'strict',
+			});
 			res.statusMessage = 'User logged in successfully';
 			res.status(200).send({
 				message: 'User logged in successfully',
-				userId: user[0].Id,
+				userId: user[0].id,
 			});
 		} else {
 			res.statusMessage = 'Forbidden. Invalid credentials';
