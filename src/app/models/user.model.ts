@@ -1,6 +1,13 @@
 import { getPool } from '../../config/db';
 import logger from '../../config/logger';
-import { FieldPacket, QueryResult } from 'mysql2';
+import {
+	FieldPacket,
+	ProcedureCallPacket,
+	QueryResult,
+	ResultSetHeader,
+	RowDataPacket,
+} from 'mysql2';
+import { userDBSchema } from '../resources/databaseTypes';
 
 type User = {
 	id: string;
@@ -12,7 +19,7 @@ type User = {
 	phoneNumber: string;
 };
 
-async function signUpUser(params: User): Promise<any> {
+async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const { id, firstName, lastName, username, email, password, phoneNumber } =
 		params;
 	logger.info(`Signing up new user with email '${email}' to the database`);
@@ -22,9 +29,9 @@ async function signUpUser(params: User): Promise<any> {
 
 	try {
 		const query = `INSERT into User
-        (Id, Firstname, Lastname, Username, PhoneNumber, Email, Password, EmailValidated, PhoneNumberValidated) values
+        (id, first_name, last_name, username, phone_number, email, password, email_validated, phone_number_validated) values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-		const [result] = await connection.query(query, [
+		const [result] = await connection.query<ResultSetHeader>(query, [
 			id,
 			firstName,
 			lastName,
@@ -46,14 +53,16 @@ async function signUpUser(params: User): Promise<any> {
 	}
 }
 
-async function checkIfEmailExists(email: string): Promise<any> {
+async function checkIfEmailExists(email: string): Promise<userDBSchema[]> {
 	logger.info(`Checking if email '${email}' is already in the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE Email = ?`;
-		const [result] = await connection.query(query, [email]);
-		return result;
+		const query = `SELECT * FROM User WHERE email = ?`;
+		const [result] = await connection.query<RowDataPacket[]>(query, [
+			email,
+		]);
+		return result as userDBSchema[];
 	} catch (error) {
 		logger.error(
 			`Error checking to see if there exists a user with email '${email}': ${error.message}`
@@ -64,17 +73,16 @@ async function checkIfEmailExists(email: string): Promise<any> {
 	}
 }
 
-async function getUserByEmail(email: string): Promise<any> {
+async function getUserByEmail(email: string): Promise<userDBSchema[]> {
 	logger.info(`Getting user with email '${email}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE Email = ?`;
-		const [result]: [QueryResult, FieldPacket[]] = await connection.query(
-			query,
-			[email]
-		);
-		return result;
+		const query = `SELECT * FROM User WHERE email = ?`;
+		const [result] = await connection.query<RowDataPacket[]>(query, [
+			email,
+		]);
+		return result as userDBSchema[];
 	} catch (error) {
 		logger.error(
 			`Error getting user with email '${email}': ${error.message}`
@@ -85,14 +93,14 @@ async function getUserByEmail(email: string): Promise<any> {
 	}
 }
 
-async function getUserById(id: string): Promise<any> {
+async function getUserById(id: string): Promise<userDBSchema[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE Id = ?`;
-		const [result] = await connection.query(query, [id]);
-		return result;
+		const query = `SELECT * FROM User WHERE id = ?`;
+		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
+		return result as userDBSchema[];
 	} catch (error) {
 		logger.error(`Error getting user with id '${id}': ${error.message}`);
 		throw error;
@@ -101,7 +109,9 @@ async function getUserById(id: string): Promise<any> {
 	}
 }
 
-async function updateUser(params: Partial<User>): Promise<any> {
+async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
+	// This wont work because the schema has different column names
+	// the const fields uses example "firstName" but the schema uses "first_name"
 	const { id, ...updateFields } = params;
 	if (!id) {
 		throw new Error('User ID is required to update user');
@@ -119,8 +129,8 @@ async function updateUser(params: Partial<User>): Promise<any> {
 		const values = Object.values(updateFields);
 		values.push(id);
 
-		const query = `UPDATE User SET ${fields} WHERE Id = ?`;
-		const [result] = await connection.query(query, values);
+		const query = `UPDATE User SET ${fields} WHERE id = ?`;
+		const [result] = await connection.query<ResultSetHeader>(query, values);
 
 		logger.info(`User with id '${id}' successfully updated`);
 		return result;
@@ -132,13 +142,13 @@ async function updateUser(params: Partial<User>): Promise<any> {
 	}
 }
 
-async function deleteUserWithId(id: string): Promise<any> {
+async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 	logger.info(`Deleting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `DELETE FROM User WHERE Id = ?`;
-		const [result] = await connection.query(query, [id]);
+		const query = `DELETE FROM User WHERE id = ?`;
+		const [result] = await connection.query<ResultSetHeader>(query, [id]);
 		logger.info(`User with id '${id}' successfully deleted`);
 		return result;
 	} catch (error) {
