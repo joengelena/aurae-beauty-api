@@ -5,14 +5,14 @@ import {
 	signInUser,
 	signOutUser,
 } from '../controllers/userController';
-import verifyJwt from '../middlewares/verifyJwt';
+import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 
 const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/users/signup').post(signUpUser);
 
 	app.route(rootUrl + '/users/signin').post(signInUser);
 
-	app.route(rootUrl + '/users/signout').post(verifyJwt, signOutUser);
+	app.route(rootUrl + '/users/signout').post(validateRequest, signOutUser);
 };
 
 export default usersRoutes;
