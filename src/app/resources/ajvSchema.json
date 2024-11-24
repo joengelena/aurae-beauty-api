@@ -33,5 +33,13 @@
 		},
 		"required": ["email", "password"],
 		"additionalProperties": false
+	},
+	"userSignOut": {
+		"type": "object",
+		"properties": {
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
+		},
+		"required": ["email"],
+		"additionalProperties": false
 	}
 }

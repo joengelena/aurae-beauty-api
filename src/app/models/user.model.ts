@@ -1,12 +1,6 @@
 import { getPool } from '../../config/db';
 import logger from '../../config/logger';
-import {
-	FieldPacket,
-	ProcedureCallPacket,
-	QueryResult,
-	ResultSetHeader,
-	RowDataPacket,
-} from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { userDBSchema } from '../resources/databaseTypes';
 
 type User = {
@@ -53,12 +47,81 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 	}
 }
 
+async function registerAuthTokenWithEmail(
+	token: string,
+	email: string
+): Promise<ResultSetHeader> {
+	logger.info(`Registering a new token to ${email}`);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query = 'UPDATE user SET auth_token = ? WHERE email = ?';
+		const [result] = await connection.query<ResultSetHeader>(query, [
+			token,
+			email,
+		]);
+		return result;
+	} catch (error) {
+		logger.error(
+			`Error registering a new token to ${email}: ${error.message}`
+		);
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
+async function deleteAuthTokenWithEmail(
+	token: string,
+	email: string
+): Promise<ResultSetHeader> {
+	logger.info(`Checking if the token ${token} is in the database`);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query =
+			'UPDATE user SET auth_token = NULL WHERE auth_token = ? AND email = ?';
+		const [result] = await connection.query<ResultSetHeader>(query, [
+			token,
+			email,
+		]);
+		return result;
+	} catch (error) {
+		logger.error(
+			`Error checking if the token ${token} is in the database: ${error.message}`
+		);
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
+async function getUserWithAuthToken(token: string): Promise<userDBSchema[]> {
+	logger.info(`Getting user with token '${token}' from the database`);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query = 'SELECT * FROM User WHERE auth_token = ?';
+		const [result] = await connection.query<RowDataPacket[]>(query, [
+			token,
+		]);
+		return result as userDBSchema[];
+	} catch (error) {
+		logger.error(
+			`Error getting user with token '${token}': ${error.message}`
+		);
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
 async function checkIfEmailExists(email: string): Promise<userDBSchema[]> {
 	logger.info(`Checking if email '${email}' is already in the database`);
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE email = ?`;
+		const query = 'SELECT * FROM User WHERE email = ?';
 		const [result] = await connection.query<RowDataPacket[]>(query, [
 			email,
 		]);
@@ -78,7 +141,7 @@ async function getUserByEmail(email: string): Promise<userDBSchema[]> {
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE email = ?`;
+		const query = 'SELECT * FROM User WHERE email = ?';
 		const [result] = await connection.query<RowDataPacket[]>(query, [
 			email,
 		]);
@@ -98,7 +161,7 @@ async function getUserById(id: string): Promise<userDBSchema[]> {
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `SELECT * FROM User WHERE id = ?`;
+		const query = 'SELECT * FROM User WHERE id = ?';
 		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
 		return result as userDBSchema[];
 	} catch (error) {
@@ -147,7 +210,7 @@ async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 	const connection = await getPool().getConnection();
 
 	try {
-		const query = `DELETE FROM User WHERE id = ?`;
+		const query = 'DELETE FROM User WHERE id = ?';
 		const [result] = await connection.query<ResultSetHeader>(query, [id]);
 		logger.info(`User with id '${id}' successfully deleted`);
 		return result;
@@ -166,4 +229,7 @@ export {
 	getUserById,
 	updateUser,
 	deleteUserWithId,
+	registerAuthTokenWithEmail,
+	deleteAuthTokenWithEmail,
+	getUserWithAuthToken,
 };

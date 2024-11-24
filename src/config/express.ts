@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import allowCrossOriginRequestsMiddleware from '../app/middlewares/cors';
 import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
+import cookieParser from 'cookie-parser';
 
 export default () => {
 	const app = express();
@@ -12,6 +13,7 @@ export default () => {
 	app.use(bodyParser.json());
 	app.use(bodyParser.raw({ type: 'text/plain' }));
 	app.use(bodyParser.raw({ type: ['image/*'], limit: '5mb' }));
+	app.use(cookieParser());
 
 	// Debug
 	app.use((req, res, next) => {
