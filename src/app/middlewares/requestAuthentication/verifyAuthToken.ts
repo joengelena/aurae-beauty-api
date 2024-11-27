@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userModel from '../../models/user.model';
 import logger from '../../../config/logger';
+import clearCookiesInResponse from './clearCookiesInResponse';
 
 async function verifyAuthToken(req: Request, res: Response) {
 	try {
@@ -9,9 +10,9 @@ async function verifyAuthToken(req: Request, res: Response) {
 		const email = req.body.email;
 
 		if (!authToken) {
+			clearCookiesInResponse(res);
 			res.statusMessage = 'Unauthorized: No auth token provided';
 			res.status(401).send();
-			return false;
 		}
 
 		const userWithAuthToken = await userModel.getUserWithAuthToken(
@@ -22,18 +23,17 @@ async function verifyAuthToken(req: Request, res: Response) {
 			userWithAuthToken.length === 0 ||
 			userWithAuthToken[0].email !== email
 		) {
+			clearCookiesInResponse(res);
 			res.statusMessage = 'Unauthorized: Invalid auth token';
 			res.status(401).send();
-			return false;
 		}
 
 		logger.info('Verified auth token');
-		return true;
 	} catch (error) {
+		clearCookiesInResponse(res);
 		logger.error(`Error verifying auth token: ${error.message}`);
 		res.statusMessage = 'Unauthorized: Invalid auth token';
 		res.status(401).send();
-		return false;
 	}
 }
 

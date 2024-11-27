@@ -3,37 +3,21 @@ import * as userModel from '../../models/user.model';
 import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwt from './verifyJwt';
-
-// function clearCookies(res: Response) {
-// 	res.clearCookie('authToken');
-// 	res.clearCookie('jwt');
-// }
-
-// function redirectUserToSignIn(res: Response) {
-// 	res.redirect('/signin');
-// }
-
+import clearCookiesInResponse from './clearCookiesInResponse';
 async function validateRequest(
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) {
 	try {
-		if (!verifyJwt(req, res)) {
-			return;
-		}
-
-		const verifyAuthTokenResult = await verifyAuthToken(req, res);
-		if (!verifyAuthTokenResult) {
-			return;
-		}
-
+		verifyJwt(req, res);
+		await verifyAuthToken(req, res);
 		next();
 	} catch (error) {
+		clearCookiesInResponse(res);
 		logger.error(`Error validating request: ${error.message}`);
 		res.statusMessage = 'Unauthorized: Invalid request';
 		res.status(401).send();
-		return;
 	}
 }
 
