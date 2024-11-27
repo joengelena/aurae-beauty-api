@@ -1,6 +1,6 @@
 import ajvSchema from '../../resources/ajvSchema.json';
 import * as userModel from '../../models/user.model';
-import validateRequestBody from '../../middlewares/validator';
+import validateRequestBody from '../../middlewares/validateRequestBody';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {

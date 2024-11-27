@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import validateRequestBody from '../../middlewares/validator';
+import validateRequestBody from '../../middlewares/validateRequestBody';
 import ajvSchema from '../../resources/ajvSchema.json';
 import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
