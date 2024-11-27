@@ -1,12 +1,10 @@
 import ajvSchema from '../../resources/ajvSchema.json';
 import * as userModel from '../../models/user.model';
-import requestIsValid from '../../middlewares/validator';
+import validateRequestBody from '../../middlewares/validator';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {
-	if (!requestIsValid(ajvSchema.userSignOut, req.body, res)) {
-		return;
-	}
+	validateRequestBody(ajvSchema.userSignOut, req.body, res);
 
 	try {
 		const authToken: string = req.cookies.authToken;

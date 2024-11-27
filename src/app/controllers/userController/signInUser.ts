@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import requestIsValid from '../../middlewares/validator';
+import validateRequestBody from '../../middlewares/validator';
 import ajvSchema from '../../resources/ajvSchema.json';
 import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
@@ -7,9 +7,7 @@ import { comparePassword } from '../../middlewares/passwordHash';
 import { generateJwtToken } from '../../middlewares/generateJwt';
 
 async function signInUser(req: Request, res: Response): Promise<void> {
-	if (!requestIsValid(ajvSchema.userSignIn, req.body, res)) {
-		return;
-	}
+	validateRequestBody(ajvSchema.userSignIn, req.body, res);
 
 	try {
 		const { email, password } = req.body;

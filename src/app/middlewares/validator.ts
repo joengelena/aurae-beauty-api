@@ -21,16 +21,16 @@ function validate(schema: object, data: any) {
 	}
 }
 
-function requestIsValid(schema: object, data: any, res: Response) {
+function validateRequestBody(schema: object, data: any, res: Response) {
 	const validation = validate(schema, data);
 
 	if (!validation) {
 		res.status(400).send({
 			message: `Invalid request: ${validation.toString()}`,
 		});
-		return false;
 	}
+
 	return true;
 }
 
-export default requestIsValid;
+export default validateRequestBody;
