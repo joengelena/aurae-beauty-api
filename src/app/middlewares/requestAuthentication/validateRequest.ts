@@ -4,14 +4,18 @@ import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwt from './verifyJwt';
 import clearCookiesInResponse from './clearCookiesInResponse';
+import verifyCsrfToken from './csrfToken';
+
 async function validateRequest(
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) {
 	try {
+		verifyCsrfToken(req, res);
 		verifyJwt(req, res);
 		await verifyAuthToken(req, res);
+
 		next();
 	} catch (error) {
 		clearCookiesInResponse(res);
