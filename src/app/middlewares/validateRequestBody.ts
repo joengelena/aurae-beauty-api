@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import logger from '../../config/logger';
-import { Response } from 'express';
+import { NextFunction, Response, Request } from 'express';
 
 const ajv = new Ajv({ removeAdditional: 'all', strict: false });
 addFormats(ajv);
@@ -21,16 +21,21 @@ function validate(schema: object, data: any) {
 	}
 }
 
-function validateRequestBody(schema: object, data: any, res: Response) {
-	const validation = validate(schema, data);
+function validateRequestBody(
+	req: Request,
+	res: Response,
+	next: NextFunction,
+	schema: object
+) {
+	const validation = validate(schema, req.body);
 
 	if (!validation) {
 		res.status(400).send({
-			message: `Invalid request: ${validation.toString()}`,
+			message: `Invalid request body: ${validation.toString()}`,
 		});
 	}
 
-	return true;
+	next();
 }
 
 export default validateRequestBody;

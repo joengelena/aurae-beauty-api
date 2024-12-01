@@ -4,8 +4,6 @@ import validateRequestBody from '../../middlewares/validateRequestBody';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {
-	validateRequestBody(ajvSchema.userSignOut, req.body, res);
-
 	try {
 		const authToken: string = req.cookies.authToken;
 		const { email } = req.body;

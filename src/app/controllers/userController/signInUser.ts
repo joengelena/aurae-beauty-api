@@ -7,8 +7,6 @@ import { comparePassword } from '../../middlewares/passwordHash';
 import { generateJwtToken } from '../../middlewares/generateJwt';
 
 async function signInUser(req: Request, res: Response): Promise<void> {
-	validateRequestBody(ajvSchema.userSignIn, req.body, res);
-
 	try {
 		const { email, password } = req.body;
 		const user = await userModel.getUserByEmail(email);

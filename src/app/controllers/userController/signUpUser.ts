@@ -6,8 +6,6 @@ import validateRequestBody from '../../middlewares/validateRequestBody';
 import { Request, Response } from 'express';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
-	validateRequestBody(ajvSchema.userSignUp, req.body, res);
-
 	try {
 		const { firstName, lastName, username, email, password, phoneNumber } =
 			req.body;
