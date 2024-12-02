@@ -5,6 +5,7 @@ import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from '../../middlewares/passwordHash';
 import { generateJwtToken } from '../../middlewares/generateJwt';
+import { CSRF_TOKEN, JWT_TOKEN } from '../../resources/constants';
 
 async function signInUser(req: Request, res: Response): Promise<void> {
 	try {
@@ -36,19 +37,14 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 				username: user[0].username,
 			});
 
-			res.cookie('csrfToken', csrfToken, {
+			res.cookie(CSRF_TOKEN, csrfToken, {
 				httpOnly: true,
 				secure: true,
 				sameSite: 'strict',
 			});
 
-			res.cookie('jwt', jwtToken, {
+			res.cookie(JWT_TOKEN, jwtToken, {
 				httpOnly: true,
-				secure: true,
-				sameSite: 'strict',
-			});
-
-			res.cookie('authToken', authToken, {
 				secure: true,
 				sameSite: 'strict',
 			});
@@ -57,12 +53,19 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 			res.status(200).send({
 				message: 'User logged in successfully',
 				userId: user[0].id,
+				authToken,
 				csrfToken,
 			});
+			return;
 		}
+
+		res.statusMessage = 'Forbidden. User does not exist';
+		res.status(403).send();
+		return;
 	} catch (error) {
 		res.statusMessage = 'Internal Server Error';
 		res.status(500).send();
+		return;
 	}
 }
 

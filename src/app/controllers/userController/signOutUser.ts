@@ -39,10 +39,12 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 		if (error.code === 'ER_DUP_ENTRY') {
 			res.statusMessage = 'Forbidden. Email already in use';
 			res.status(403).send();
-		} else {
-			res.statusMessage = 'Internal Server Error';
-			res.status(500).send();
+			return;
 		}
+
+		res.statusMessage = 'Internal Server Error';
+		res.status(500).send();
+		return;
 	}
 }
 

@@ -29,14 +29,16 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 			message: 'User created successfully',
 			userId: id,
 		});
+		return;
 	} catch (error) {
 		if (error.code === 'ER_DUP_ENTRY') {
 			res.statusMessage = 'Forbidden. Email already in use';
 			res.status(403).send();
-		} else {
-			res.statusMessage = 'Internal Server Error';
-			res.status(500).send();
 		}
+
+		res.statusMessage = 'Internal Server Error';
+		res.status(500).send();
+		return;
 	}
 }
 
