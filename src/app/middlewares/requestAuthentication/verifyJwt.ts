@@ -1,39 +1,45 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import logger from '../../../config/logger';
-import clearCookiesInResponse from './clearCookiesInResponse';
+import { VERIFIED } from '../../resources/constants';
 
-function verifyJwt(req: Request, res: Response) {
+function verifyJwt(req: Request) {
 	try {
 		logger.info('Verifying jwt token');
 		const jwtCookie = req.cookies.jwt;
 
 		if (!jwtCookie) {
-			clearCookiesInResponse(res);
-			res.statusMessage = 'Unauthorized: No jwt token provided';
-			res.status(401).send();
+			return {
+				status: 401,
+				statusMessage: 'Unauthorized: No jwt token provided',
+			};
 		}
 
 		const validJwt = jwt.verify(jwtCookie, process.env.JWT_SECRET);
 		if (!validJwt) {
-			clearCookiesInResponse(res);
-			res.statusMessage = 'Unauthorized: Invalid jwt token';
-			res.status(401).send();
+			return {
+				status: 401,
+				statusMessage: 'Unauthorized: Invalid jwt token',
+			};
 		}
 
 		logger.info('Verified jwt token');
+		return VERIFIED;
 	} catch (error) {
 		logger.error(`Error verifying jwt token: ${error.message}`);
-		clearCookiesInResponse(res);
 
 		if (error.name === 'TokenExpiredError') {
-			res.statusMessage =
-				'Unauthorized: jwt token expired. User is signed out and needs to sign in again';
-			res.status(401).send();
-		} else {
-			res.statusMessage = 'Unauthorized: Invalid jwt token';
-			res.status(401).send();
+			return {
+				status: 401,
+				statusMessage:
+					'Unauthorized: jwt token expired. User is signed out and needs to sign in again',
+			};
 		}
+
+		return {
+			status: 401,
+			statusMessage: 'Unauthorized: Invalid jwt token',
+		};
 	}
 }
 

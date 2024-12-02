@@ -1,39 +1,44 @@
 import { Request, Response, NextFunction } from 'express';
 import * as userModel from '../../models/user.model';
 import logger from '../../../config/logger';
-import clearCookiesInResponse from './clearCookiesInResponse';
+import { VERIFIED } from '../../resources/constants';
 
 async function verifyAuthToken(req: Request, res: Response) {
 	try {
 		logger.info('Verifying auth token');
-		const authToken = req.cookies.authToken;
-		const email = req.body.email;
+		const authToken = req.headers['x-auth-token'];
+		const userId = req.body.userId;
 
 		if (!authToken) {
-			clearCookiesInResponse(res);
-			res.statusMessage = 'Unauthorized: No auth token provided';
-			res.status(401).send();
+			return {
+				status: 401,
+				statusMessage: 'Unauthorized: No auth token provided',
+			};
 		}
 
 		const userWithAuthToken = await userModel.getUserWithAuthToken(
-			authToken
+			authToken[0]
 		);
 
 		if (
 			userWithAuthToken.length === 0 ||
-			userWithAuthToken[0].email !== email
+			userWithAuthToken[0].id !== userId
 		) {
-			clearCookiesInResponse(res);
-			res.statusMessage = 'Unauthorized: Invalid auth token';
-			res.status(401).send();
+			return {
+				status: 401,
+				statusMessage: 'Unauthorized: Invalid auth token',
+			};
 		}
 
 		logger.info('Verified auth token');
+		return VERIFIED;
 	} catch (error) {
-		clearCookiesInResponse(res);
 		logger.error(`Error verifying auth token: ${error.message}`);
-		res.statusMessage = 'Unauthorized: Invalid auth token';
-		res.status(401).send();
+
+		return {
+			status: 401,
+			statusMessage: 'Unauthorized: Invalid auth token',
+		};
 	}
 }
 

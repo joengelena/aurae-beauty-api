@@ -4,7 +4,8 @@ import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwt from './verifyJwt';
 import clearCookiesInResponse from './clearCookiesInResponse';
-import verifyCsrfToken from './csrfToken';
+import verifyCsrfToken from './verifyCsrfToken';
+import { VERIFIED } from '../../resources/constants';
 
 async function validateRequest(
 	req: Request,
@@ -12,9 +13,28 @@ async function validateRequest(
 	next: NextFunction
 ) {
 	try {
-		verifyCsrfToken(req, res);
-		verifyJwt(req, res);
-		await verifyAuthToken(req, res);
+		const csrfTokenVerified = verifyCsrfToken(req);
+		if (csrfTokenVerified !== VERIFIED) {
+			clearCookiesInResponse(res);
+			res.statusMessage = csrfTokenVerified.statusMessage;
+			res.status(csrfTokenVerified.status).send();
+			return;
+		}
+
+		const jwtVerified = verifyJwt(req);
+		if (jwtVerified !== null) {
+			clearCookiesInResponse(res);
+			res.statusMessage = jwtVerified.statusMessage;
+			res.status(jwtVerified.status).send();
+			return;
+		}
+		const authTokenVerified = await verifyAuthToken(req, res);
+		if (authTokenVerified !== VERIFIED) {
+			clearCookiesInResponse(res);
+			res.statusMessage = authTokenVerified.statusMessage;
+			res.status(authTokenVerified.status).send();
+			return;
+		}
 
 		next();
 	} catch (error) {

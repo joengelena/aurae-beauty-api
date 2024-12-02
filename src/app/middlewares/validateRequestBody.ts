@@ -33,8 +33,10 @@ function validateRequestBody(
 		res.status(400).send({
 			message: `Invalid request body: ${validation.toString()}`,
 		});
+		return;
 	}
 
+	logger.info('Validated request body, schema: ', schema);
 	next();
 }
 
