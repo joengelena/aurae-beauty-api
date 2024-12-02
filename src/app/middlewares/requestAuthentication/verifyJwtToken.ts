@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import logger from '../../../config/logger';
 import { VERIFIED } from '../../resources/constants';
 
-function verifyJwt(req: Request) {
+function verifyJwtToken(req: Request) {
 	try {
 		logger.info('Verifying jwt token');
 		const jwtCookie = req.cookies.jwt;
@@ -43,4 +43,4 @@ function verifyJwt(req: Request) {
 	}
 }
 
-export default verifyJwt;
+export default verifyJwtToken;

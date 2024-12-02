@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as userModel from '../../models/user.model';
 import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
-import verifyJwt from './verifyJwt';
+import verifyJwtToken from './verifyJwtToken';
 import clearCookiesInResponse from './clearCookiesInResponse';
 import verifyCsrfToken from './verifyCsrfToken';
 import { VERIFIED } from '../../resources/constants';
@@ -21,11 +21,11 @@ async function validateRequest(
 			return;
 		}
 
-		const jwtVerified = verifyJwt(req);
-		if (jwtVerified !== null) {
+		const jwtTokenVerified = verifyJwtToken(req);
+		if (jwtTokenVerified !== VERIFIED) {
 			clearCookiesInResponse(res);
-			res.statusMessage = jwtVerified.statusMessage;
-			res.status(jwtVerified.status).send();
+			res.statusMessage = jwtTokenVerified.statusMessage;
+			res.status(jwtTokenVerified.status).send();
 			return;
 		}
 		const authTokenVerified = await verifyAuthToken(req, res);
