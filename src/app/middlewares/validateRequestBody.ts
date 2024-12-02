@@ -31,7 +31,7 @@ function validateRequestBody(
 
 	if (!validation) {
 		res.status(400).send({
-			message: `Invalid request body: ${validation.toString()}`,
+			message: 'Invalid request body',
 		});
 		return;
 	}
