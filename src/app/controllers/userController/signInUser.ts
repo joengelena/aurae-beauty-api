@@ -30,12 +30,14 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 		);
 
 		if (tokenSetResult.affectedRows === 1) {
+			const csrfToken = uuidv4();
 			const jwtToken = generateJwtToken({
 				email: user[0].email,
 				username: user[0].username,
 			});
 
-			res.cookie('authToken', authToken, {
+			res.cookie('csrfToken', csrfToken, {
+				httpOnly: true,
 				secure: true,
 				sameSite: 'strict',
 			});
@@ -46,10 +48,16 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 				sameSite: 'strict',
 			});
 
+			res.cookie('authToken', authToken, {
+				secure: true,
+				sameSite: 'strict',
+			});
+
 			res.statusMessage = 'User logged in successfully';
 			res.status(200).send({
 				message: 'User logged in successfully',
 				userId: user[0].id,
+				csrfToken,
 			});
 		}
 	} catch (error) {
