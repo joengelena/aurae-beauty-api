@@ -1,5 +1,5 @@
 {
-	"userSignUp": {
+	"signUpUser": {
 		"type": "object",
 		"properties": {
 			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
@@ -25,7 +25,7 @@
 		],
 		"additionalProperties": false
 	},
-	"userSignIn": {
+	"signInUser": {
 		"type": "object",
 		"properties": {
 			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -34,12 +34,20 @@
 		"required": ["email", "password"],
 		"additionalProperties": false
 	},
-	"userSignOut": {
+	"signOutUser": {
 		"type": "object",
 		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
+			"userId": { "type": "string", "minLength": 36, "maxLength": 36 }
 		},
-		"required": ["email"],
+		"required": ["userId"],
+		"additionalProperties": false
+	},
+	"viewUser": {
+		"type": "object",
+		"properties": {
+			"userId": { "type": "string", "minLength": 36, "maxLength": 36 }
+		},
+		"required": ["userId"],
 		"additionalProperties": false
 	}
 }

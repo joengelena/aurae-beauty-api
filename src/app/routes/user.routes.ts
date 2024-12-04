@@ -13,18 +13,18 @@ import ajvSchema from '../resources/ajvSchema.json';
 const usersRoutes = (app: Express) => {
 	// Publics routes
 	app.route(rootUrl + '/users/signup').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.userSignUp);
+		validateRequestBody(req, res, next, ajvSchema.signUpUser);
 	}, signUpUser);
 
 	app.route(rootUrl + '/users/signin').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.userSignIn);
+		validateRequestBody(req, res, next, ajvSchema.signInUser);
 	}, signInUser);
 
 	// Privates routes
 	app.route(rootUrl + '/users/signout').post(
 		validateRequest,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userSignOut);
+			validateRequestBody(req, res, next, ajvSchema.signOutUser);
 		},
 		signOutUser
 	);
@@ -32,7 +32,7 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/users/:id').get(
 		validateRequest,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userSignOut);
+			validateRequestBody(req, res, next, ajvSchema.viewUser);
 		},
 		viewUser
 	);
