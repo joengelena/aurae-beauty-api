@@ -28,7 +28,7 @@ async function validateRequest(
 			res.status(jwtTokenVerified.status).send();
 			return;
 		}
-		const authTokenVerified = await verifyAuthToken(req, res);
+		const authTokenVerified = await verifyAuthToken(req);
 		if (authTokenVerified !== VERIFIED) {
 			clearCookiesInResponse(res);
 			res.statusMessage = authTokenVerified.statusMessage;

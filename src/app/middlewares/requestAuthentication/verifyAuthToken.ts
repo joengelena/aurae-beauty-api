@@ -3,7 +3,7 @@ import * as userModel from '../../models/user.model';
 import logger from '../../../config/logger';
 import { VERIFIED } from '../../resources/constants';
 
-async function verifyAuthToken(req: Request, res: Response) {
+async function verifyAuthToken(req: Request) {
 	try {
 		logger.info('Verifying auth token');
 		const authToken = req.headers['x-auth-token'];
