@@ -1,8 +1,6 @@
-import ajvSchema from '../../resources/ajvSchema.json';
 import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword } from '../../middlewares/passwordHash';
-import validateRequestBody from '../../middlewares/validateRequestBody';
 import { Request, Response } from 'express';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
