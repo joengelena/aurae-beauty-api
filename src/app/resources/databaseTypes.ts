@@ -8,6 +8,7 @@ type userDBSchema = {
 	password: string;
 	email_validated: number;
 	phone_number_validated: number;
+	auth_token: string | null;
 };
 
 export { userDBSchema };
