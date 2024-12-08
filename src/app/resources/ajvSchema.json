@@ -42,12 +42,19 @@
 		"required": ["userId"],
 		"additionalProperties": false
 	},
-	"viewUser": {
+	"updateUser": {
 		"type": "object",
 		"properties": {
-			"userId": { "type": "string", "minLength": 36, "maxLength": 36 }
+			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"username": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"phoneNumber": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 12
+			},
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
-		"required": ["userId"],
 		"additionalProperties": false
 	}
 }

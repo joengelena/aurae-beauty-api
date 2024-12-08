@@ -3,7 +3,7 @@ import * as userModel from '../../models/user.model';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
 	try {
-		const userId = req.body.userId;
+		const userId = req.params.id;
 		const users = await userModel.getUserById(userId);
 
 		if (users.length === 0) {
