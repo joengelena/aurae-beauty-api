@@ -6,7 +6,7 @@ function verifyCsrfToken(req: Request) {
 	try {
 		logger.info('Verifying csrf token');
 		const validCsrfToken = req.cookies.csrfToken;
-		const reqHeaderCsrfToken = req.headers['x-csrf-token'];
+		const reqHeaderCsrfToken = req.headers['mtx-csrf-token'];
 
 		if (!validCsrfToken || !reqHeaderCsrfToken) {
 			return {

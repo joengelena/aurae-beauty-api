@@ -173,23 +173,32 @@ async function getUserById(id: string): Promise<userDBSchema[]> {
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
-	// This wont work because the schema has different column names
-	// the const fields uses example "firstName" but the schema uses "first_name"
 	const { id, ...updateFields } = params;
-	if (!id) {
-		throw new Error('User ID is required to update user');
-	}
-	if (Object.keys(updateFields).length === 0) {
-		throw new Error('No fields provided to update');
-	}
-	logger.info(`Updating user with id: '${id}' in the database`);
 	const connection = await getPool().getConnection();
+	const databaseFields: { [key: string]: string } = {
+		firstName: 'first_name',
+		lastName: 'last_name',
+		username: 'username',
+		email: 'email',
+		phoneNumber: 'phone_number',
+	};
 
 	try {
+		logger.info(`Updating user with id: '${id}' in the database`);
+
+		if (!id) {
+			throw new Error('User ID is required to update user');
+		}
+
+		if (Object.keys(updateFields).length === 0) {
+			throw new Error('No fields provided to update');
+		}
+
 		const fields = Object.keys(updateFields)
-			.map((key) => `${key} = ?`)
+			.map((key) => `${databaseFields[key]} = ?`)
 			.join(', ');
 		const values = Object.values(updateFields);
+
 		values.push(id);
 
 		const query = `UPDATE User SET ${fields} WHERE id = ?`;

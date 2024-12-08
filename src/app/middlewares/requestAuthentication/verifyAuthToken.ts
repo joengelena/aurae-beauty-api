@@ -6,7 +6,7 @@ import { VERIFIED } from '../../resources/constants';
 async function verifyAuthToken(req: Request) {
 	try {
 		logger.info('Verifying auth token');
-		const authToken = req.headers['x-auth-token'];
+		const authToken = req.headers['mtx-auth-token'] as string;
 		const userId = req.body.userId;
 
 		if (!authToken) {
@@ -17,7 +17,7 @@ async function verifyAuthToken(req: Request) {
 		}
 
 		const userWithAuthToken = await userModel.getUserWithAuthToken(
-			authToken[0]
+			authToken
 		);
 
 		if (

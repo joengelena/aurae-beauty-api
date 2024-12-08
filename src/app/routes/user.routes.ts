@@ -5,6 +5,7 @@ import {
 	signInUser,
 	signOutUser,
 	viewUser,
+	updateUser,
 } from '../controllers/userController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -29,13 +30,15 @@ const usersRoutes = (app: Express) => {
 		signOutUser
 	);
 
-	app.route(rootUrl + '/users/:id').get(
-		validateRequest,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.viewUser);
-		},
-		viewUser
-	);
+	app.route(rootUrl + '/users/:id')
+		.get(validateRequest, viewUser)
+		.patch(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.updateUser);
+			},
+			updateUser
+		);
 };
 
 export default usersRoutes;

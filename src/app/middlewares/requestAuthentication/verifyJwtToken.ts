@@ -6,9 +6,10 @@ import { VERIFIED } from '../../resources/constants';
 function verifyJwtToken(req: Request) {
 	try {
 		logger.info('Verifying jwt token');
-		const jwtCookie = req.cookies.jwt;
+		const jwtCookie = req.cookies.jwtToken;
 
 		if (!jwtCookie) {
+			logger.error('No jwt token provided');
 			return {
 				status: 401,
 				statusMessage: 'Unauthorized: No jwt token provided',
@@ -17,6 +18,7 @@ function verifyJwtToken(req: Request) {
 
 		const validJwt = jwt.verify(jwtCookie, process.env.JWT_SECRET);
 		if (!validJwt) {
+			logger.error('Invalid jwt token');
 			return {
 				status: 401,
 				statusMessage: 'Unauthorized: Invalid jwt token',
