@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request } from 'express';
 import jwt from 'jsonwebtoken';
 import logger from '../../../config/logger';
 import { VERIFIED } from '../../resources/constants';
@@ -16,7 +16,13 @@ function verifyJwtToken(req: Request) {
 			};
 		}
 
-		const validJwt = jwt.verify(jwtCookie, process.env.JWT_SECRET);
+		const validJwt = jwt.verify(
+			jwtCookie,
+			process.env.JWT_SECRET
+		) as jwt.JwtPayload;
+
+		req.body.userId = validJwt.userId;
+
 		if (!validJwt) {
 			logger.error('Invalid jwt token');
 			return {

@@ -31,8 +31,7 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 		if (tokenSetResult.affectedRows === 1) {
 			const csrfToken = uuidv4();
 			const jwtToken = generateJwtToken({
-				email: user[0].email,
-				username: user[0].username,
+				userId: user[0].id,
 			});
 
 			res.cookie(CSRF_TOKEN, csrfToken, {
