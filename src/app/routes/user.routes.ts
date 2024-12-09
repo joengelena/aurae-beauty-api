@@ -6,6 +6,7 @@ import {
 	signOutUser,
 	viewUser,
 	updateUser,
+	updatePasswordUser,
 } from '../controllers/userController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -39,6 +40,14 @@ const usersRoutes = (app: Express) => {
 			},
 			updateUser
 		);
+
+	app.route(rootUrl + '/users/:id/update-password').patch(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);
+		},
+		updatePasswordUser
+	);
 };
 
 export default usersRoutes;

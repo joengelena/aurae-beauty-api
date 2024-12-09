@@ -3,5 +3,13 @@ import signUpUser from './signUpUser';
 import signOutUser from './signOutUser';
 import viewUser from './viewUser';
 import updateUser from './updateUser';
+import updatePasswordUser from './updatePasswordUser';
 
-export { signInUser, signUpUser, signOutUser, viewUser, updateUser };
+export {
+	signInUser,
+	signUpUser,
+	signOutUser,
+	viewUser,
+	updateUser,
+	updatePasswordUser,
+};

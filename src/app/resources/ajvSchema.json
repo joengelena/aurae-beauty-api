@@ -57,5 +57,23 @@
 			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
 		"additionalProperties": false
+	},
+	"updateUserPassword": {
+		"type": "object",
+		"properties": {
+			"userId": { "type": "string", "minLength": 36, "maxLength": 36 },
+			"currentPassword": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"newPassword": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			}
+		},
+		"required": ["userId", "currentPassword", "newPassword"],
+		"additionalProperties": false
 	}
 }
