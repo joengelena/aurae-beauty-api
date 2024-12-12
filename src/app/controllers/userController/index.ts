@@ -4,6 +4,7 @@ import signOutUser from './signOutUser';
 import viewUser from './viewUser';
 import updateUser from './updateUser';
 import updatePasswordUser from './updatePasswordUser';
+import forgotPasswordUser from './forgotPasswordUser';
 
 export {
 	signInUser,
@@ -12,4 +13,5 @@ export {
 	viewUser,
 	updateUser,
 	updatePasswordUser,
+	forgotPasswordUser,
 };

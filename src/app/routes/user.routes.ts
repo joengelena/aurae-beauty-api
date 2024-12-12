@@ -11,6 +11,7 @@ import {
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
+import validateEmail from '../controllers/userController/validateEmail';
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
@@ -21,6 +22,8 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/users/signin').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signInUser);
 	}, signInUser);
+
+	app.route(rootUrl + '/validate-email').post(validateEmail);
 
 	// Privates routes
 	app.route(rootUrl + '/users/signout').post(
