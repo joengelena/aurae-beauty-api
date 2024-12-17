@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import logger from '../../../config/logger';
+import getValidateEmailFormat from './validateEmailFormat';
 
 const transporter = nodemailer.createTransport({
 	host: 'smtp.gmail.com',
@@ -11,13 +12,17 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-async function sendEmail(emailTo: string) {
+async function sendEmailValidationEmail(
+	emailTo: string,
+	firstName: string,
+	lastName: string,
+	verificationLink: string
+) {
 	const mailOptions = {
 		from: process.env.EMAIL,
 		to: emailTo,
-		subject: 'Nodemailer - Test Email',
-		text: 'This is a test email sent using Nodemailer.',
-		html: '<b>This is a test email sent using Nodemailer.</b>',
+		subject: `${process.env.COMPANY_NAME} - Email Validation`,
+		html: getValidateEmailFormat(firstName, lastName, verificationLink),
 	};
 
 	try {
@@ -29,4 +34,4 @@ async function sendEmail(emailTo: string) {
 	}
 }
 
-export default sendEmail;
+export default sendEmailValidationEmail;
