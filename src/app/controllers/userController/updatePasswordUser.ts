@@ -1,6 +1,6 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
-import { comparePassword, hashPassword } from '../../util/passwordHash';
+import { comparePassword, hashPassword } from '../../utils/passwordHash';
 import * as userModel from '../../models/user.model';
 
 async function updatePasswordUser(req: Request, res: Response): Promise<void> {
