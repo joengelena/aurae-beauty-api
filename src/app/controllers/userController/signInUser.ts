@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { comparePassword } from '../../middlewares/passwordHash';
-import { generateJwtToken } from '../../middlewares/generateJwt';
+import { comparePassword } from '../../util/passwordHash';
+import { generateJwtToken } from '../../util/jwt/generateJwt';
 import { CSRF_TOKEN, JWT_TOKEN } from '../../resources/constants';
 
 async function signInUser(req: Request, res: Response): Promise<void> {

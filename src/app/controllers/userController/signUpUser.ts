@@ -1,6 +1,6 @@
 import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
-import { hashPassword } from '../../middlewares/passwordHash';
+import { hashPassword } from '../../util/passwordHash';
 import { Request, Response } from 'express';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
