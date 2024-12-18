@@ -2,6 +2,7 @@ import * as userModel from '../../models/user.model';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword } from '../../utils/passwordHash';
 import { Request, Response } from 'express';
+import logger from '../../../config/logger';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
 	try {
@@ -30,8 +31,31 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 		return;
 	} catch (error) {
 		if (error.code === 'ER_DUP_ENTRY') {
-			res.statusMessage = 'Forbidden. Email already in use';
+			const splitErrorMessage = error.sqlMessage.split(' ');
+			const lastWordInErrorMessage =
+				splitErrorMessage[splitErrorMessage.length - 1];
+
+			if (lastWordInErrorMessage.includes('email')) {
+				res.statusMessage = 'Forbidden. Email already in use';
+				res.status(403).send();
+				return;
+			}
+
+			if (lastWordInErrorMessage.includes('username')) {
+				res.statusMessage = 'Forbidden. Username already in use';
+				res.status(403).send();
+				return;
+			}
+
+			if (lastWordInErrorMessage.includes('phone_number')) {
+				res.statusMessage = 'Forbidden. Phone number already in use';
+				res.status(403).send();
+				return;
+			}
+
+			req.statusMessage = lastWordInErrorMessage;
 			res.status(403).send();
+			return;
 		}
 
 		res.statusMessage = 'Internal Server Error';
