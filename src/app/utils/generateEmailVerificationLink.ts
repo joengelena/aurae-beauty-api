@@ -1,5 +1,8 @@
-function generateEmailVerificationLink(url: string, jwtToken: string): string {
-	return `${url}?token=${jwtToken}`;
+function generateEmailVerificationLink(
+	emailVerifciationUrl: string,
+	jwtToken: string
+): string {
+	return `${emailVerifciationUrl}/${jwtToken}`;
 }
 
 export default generateEmailVerificationLink;
