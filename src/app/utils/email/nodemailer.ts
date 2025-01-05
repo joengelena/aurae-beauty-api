@@ -30,6 +30,7 @@ async function sendEmailValidationEmail(
 		await transporter.sendMail(mailOptions);
 		logger.info('Email sent successfully');
 	} catch (error) {
+		logger.debug(error);
 		throw Error(`Error sending email: ${error.message}`);
 	}
 }

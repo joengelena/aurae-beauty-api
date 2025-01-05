@@ -23,7 +23,9 @@ const usersRoutes = (app: Express) => {
 		validateRequestBody(req, res, next, ajvSchema.signInUser);
 	}, signInUser);
 
-	app.route(rootUrl + '/validate-email').post(validateEmail);
+	app.route(rootUrl + '/validate-email').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.validateEmailUser);
+	}, validateEmail);
 
 	// Privates routes
 	app.route(rootUrl + '/users/signout').post(
