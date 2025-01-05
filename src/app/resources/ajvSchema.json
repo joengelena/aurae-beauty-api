@@ -76,7 +76,7 @@
 		"required": ["userId", "currentPassword", "newPassword"],
 		"additionalProperties": false
 	},
-	"validateEmailUser": {
+	"sendEmailValidation": {
 		"type": "object",
 		"properties": {
 			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -88,6 +88,11 @@
 			}
 		},
 		"required": ["email", "emailValidationUrl"],
+		"additionalProperties": false
+	},
+	"validateEmail": {
+		"type": "object",
+		"properties": {},
 		"additionalProperties": false
 	}
 }
