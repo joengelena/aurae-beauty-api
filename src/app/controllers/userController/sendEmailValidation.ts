@@ -49,7 +49,9 @@ async function sendEmailValidation(req: Request, res: Response) {
 		res.statusMessage = 'Email sent successfully';
 		res.status(200).send();
 	} catch (error) {
-		logger.error(`Error validating email: ${error}`);
+		logger.error(
+			`Error sending email about email validation link: ${error}`
+		);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 	}
