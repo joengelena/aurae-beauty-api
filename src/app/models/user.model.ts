@@ -299,5 +299,6 @@ export {
 	registerAuthTokenWithEmail,
 	deleteAuthTokenWithEmail,
 	getUserWithAuthToken,
+	getUserEmailValidationStatus,
 	updateUserEmailValidatedStatus,
 };
