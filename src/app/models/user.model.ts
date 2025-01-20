@@ -1,7 +1,10 @@
 import { getPool } from '../../config/db';
 import logger from '../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { userDBSchema } from '../resources/databaseTypes';
+import {
+	UserDBSchema,
+	UserEmailValidationStatus,
+} from '../resources/databaseTypes';
 
 type User = {
 	id: string;
@@ -96,7 +99,7 @@ async function deleteAuthTokenWithEmail(
 	}
 }
 
-async function getUserWithAuthToken(token: string): Promise<userDBSchema[]> {
+async function getUserWithAuthToken(token: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with token '${token}' from the database`);
 	const connection = await getPool().getConnection();
 
@@ -105,7 +108,7 @@ async function getUserWithAuthToken(token: string): Promise<userDBSchema[]> {
 		const [result] = await connection.query<RowDataPacket[]>(query, [
 			token,
 		]);
-		return result as userDBSchema[];
+		return result as UserDBSchema[];
 	} catch (error) {
 		logger.error(
 			`Error getting user with token '${token}': ${error.message}`
@@ -116,7 +119,7 @@ async function getUserWithAuthToken(token: string): Promise<userDBSchema[]> {
 	}
 }
 
-async function checkIfEmailExists(email: string): Promise<userDBSchema[]> {
+async function checkIfEmailExists(email: string): Promise<UserDBSchema[]> {
 	logger.info(`Checking if email '${email}' is already in the database`);
 	const connection = await getPool().getConnection();
 
@@ -125,7 +128,7 @@ async function checkIfEmailExists(email: string): Promise<userDBSchema[]> {
 		const [result] = await connection.query<RowDataPacket[]>(query, [
 			email,
 		]);
-		return result as userDBSchema[];
+		return result as UserDBSchema[];
 	} catch (error) {
 		logger.error(
 			`Error checking to see if there exists a user with email '${email}': ${error.message}`
@@ -136,7 +139,7 @@ async function checkIfEmailExists(email: string): Promise<userDBSchema[]> {
 	}
 }
 
-async function getUserByEmail(email: string): Promise<userDBSchema[]> {
+async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with email '${email}' from the database`);
 	const connection = await getPool().getConnection();
 
@@ -145,7 +148,7 @@ async function getUserByEmail(email: string): Promise<userDBSchema[]> {
 		const [result] = await connection.query<RowDataPacket[]>(query, [
 			email,
 		]);
-		return result as userDBSchema[];
+		return result as UserDBSchema[];
 	} catch (error) {
 		logger.error(
 			`Error getting user with email '${email}': ${error.message}`
@@ -156,14 +159,14 @@ async function getUserByEmail(email: string): Promise<userDBSchema[]> {
 	}
 }
 
-async function getUserById(id: string): Promise<userDBSchema[]> {
+async function getUserById(id: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
 	const connection = await getPool().getConnection();
 
 	try {
 		const query = 'SELECT * FROM User WHERE id = ?';
 		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
-		return result as userDBSchema[];
+		return result as UserDBSchema[];
 	} catch (error) {
 		logger.error(`Error getting user with id '${id}': ${error.message}`);
 		throw error;
@@ -229,6 +232,28 @@ async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 		throw error;
 	} finally {
 		connection.release();
+	}
+}
+
+async function getUserEmailValidationStatus(
+	id: User['id']
+): Promise<UserEmailValidationStatus[]> {
+	logger.info(
+		`Getting user with id '${id}' email validation status from the database`
+	);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query = 'SELECT email_validated FROM User WHERE id = ?';
+		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
+		logger.info(
+			`Successfully got the email validation status for teh user with id: '${id}'`
+		);
+		return result as UserEmailValidationStatus[];
+	} catch (error) {
+		logger.error(
+			`Error getting email validation status for user with id '${id}': ${error.message}`
+		);
 	}
 }
 

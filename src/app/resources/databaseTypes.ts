@@ -1,4 +1,4 @@
-type userDBSchema = {
+type UserDBSchema = {
 	id: string;
 	first_name: string;
 	last_name: string;
@@ -11,4 +11,8 @@ type userDBSchema = {
 	auth_token: string | null;
 };
 
-export { userDBSchema };
+type UserEmailValidationStatus = {
+	email_validated: UserDBSchema['email_validated'];
+};
+
+export { UserDBSchema, UserEmailValidationStatus };
