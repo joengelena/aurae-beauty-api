@@ -46,7 +46,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 			emailValidationLink
 		);
 
-		res.statusMessage = 'Email sent successfully';
+		res.statusMessage = 'Email validation link sent successfully';
 		res.status(200).send();
 	} catch (error) {
 		logger.error(
