@@ -232,6 +232,38 @@ async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 	}
 }
 
+async function updateUserEmailValidatedStatus(
+	email: User['email'],
+	id: User['id'],
+	status: number
+) {
+	logger.info(
+		`Updating user with id '${id}' to have an email validated status of: ${status}`
+	);
+	const connection = await getPool().getConnection();
+
+	try {
+		const query =
+			'UPDATE User SET email_validated = ? WHERE email = ? AND id = ?';
+		const [result] = await connection.query<ResultSetHeader>(query, [
+			status,
+			email,
+			id,
+		]);
+		logger.info(
+			`User with id '${id}' successfully updated email validation status`
+		);
+		return result;
+	} catch (error) {
+		logger.error(
+			`Error updating user with id '${id}' email validation status: ${error.message}`
+		);
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
 export {
 	signUpUser,
 	checkIfEmailExists,
@@ -242,4 +274,5 @@ export {
 	registerAuthTokenWithEmail,
 	deleteAuthTokenWithEmail,
 	getUserWithAuthToken,
+	updateUserEmailValidatedStatus,
 };
