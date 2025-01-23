@@ -5,12 +5,13 @@ import * as userRepository from '../../repositories/userRepository';
 import sendEmailValidationEmail from '../../utils/email/nodemailer';
 import { generateJwtToken } from '../../utils/jwt/generateJwt';
 import generateEmailVerificationLink from '../../utils/generateEmailVerificationLink';
+import { sendEmailVerificationLink } from '../../utils/email/emailService';
 
 async function sendEmailValidation(req: Request, res: Response) {
 	logger.info('Validating email');
 
 	try {
-		const { email, emailValidationBaseUrl } = req.body;
+		const { email, emailVerificationBaseUrl } = req.body;
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -29,21 +30,12 @@ async function sendEmailValidation(req: Request, res: Response) {
 			return;
 		}
 
-		const emailValidationJwt = generateJwtToken(
-			{ userId: user[0].id, email: user[0].email },
-			'1h'
-		);
-
-		const emailValidationLink = generateEmailVerificationLink(
-			emailValidationBaseUrl,
-			emailValidationJwt
-		);
-
-		await sendEmailValidationEmail(
+		await sendEmailVerificationLink(
+			user[0].id,
 			email,
 			user[0].first_name,
 			user[0].last_name,
-			emailValidationLink
+			emailVerificationBaseUrl
 		);
 
 		res.statusMessage = 'Email validation link sent successfully';

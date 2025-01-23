@@ -12,17 +12,16 @@ const transporter = nodemailer.createTransport({
 	},
 });
 
-async function sendEmailValidationEmail(
-	emailTo: string,
-	firstName: string,
-	lastName: string,
-	verificationLink: string
+async function nodemailerSendEmail(
+	to: string,
+	subject: string,
+	htmlBody: string
 ) {
 	const mailOptions = {
 		from: process.env.EMAIL,
-		to: emailTo,
-		subject: `${process.env.COMPANY_NAME} - Email Validation`,
-		html: getValidateEmailFormat(firstName, lastName, verificationLink),
+		to: to,
+		subject: subject,
+		html: htmlBody,
 	};
 
 	try {
@@ -35,4 +34,4 @@ async function sendEmailValidationEmail(
 	}
 }
 
-export default sendEmailValidationEmail;
+export default nodemailerSendEmail;

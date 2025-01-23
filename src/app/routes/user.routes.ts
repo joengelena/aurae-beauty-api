@@ -11,6 +11,7 @@ import {
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
+import sendEmailValidation from '../controllers/userController/sendEmailValidation';
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
@@ -47,6 +48,14 @@ const usersRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);
 		},
 		updatePasswordUser
+	);
+
+	app.route(rootUrl + '/users/:id/send-email-verification-link').post(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.sendEmailValidation);
+		},
+		sendEmailValidation
 	);
 };
 

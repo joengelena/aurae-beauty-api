@@ -80,7 +80,7 @@
 		"type": "object",
 		"properties": {
 			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"emailValidationBaseUrl": {
+			"emailVerificationBaseUrl": {
 				"type": "string",
 				"format": "uri",
 				"minLength": 1,
@@ -88,11 +88,6 @@
 			}
 		},
 		"required": ["email", "emailValidationUrl"],
-		"additionalProperties": false
-	},
-	"validateEmail": {
-		"type": "object",
-		"properties": {},
 		"additionalProperties": false
 	}
 }
