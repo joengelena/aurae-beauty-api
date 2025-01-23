@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import * as userModel from '../../models/user.model';
+import * as userModel from '../../repositories/userRepository';
 import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwtToken from './verifyJwtToken';

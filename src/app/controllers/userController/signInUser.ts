@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as userModel from '../../models/user.model';
+import * as userRepository from '../../repositories/userRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from '../../utils/passwordHash';
 import { generateJwtToken } from '../../utils/jwt/generateJwt';
@@ -8,7 +8,7 @@ import { CSRF_TOKEN, JWT_TOKEN } from '../../resources/constants';
 async function signInUser(req: Request, res: Response): Promise<void> {
 	try {
 		const { email, password } = req.body;
-		const user = await userModel.getUserByEmail(email);
+		const user = await userRepository.getUserByEmail(email);
 
 		if (user.length === 0) {
 			res.statusMessage = 'Forbidden. Email does not exist';
@@ -23,7 +23,7 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 		}
 
 		const authToken = uuidv4();
-		const tokenSetResult = await userModel.registerAuthTokenWithEmail(
+		const tokenSetResult = await userRepository.registerAuthTokenWithEmail(
 			authToken,
 			email
 		);

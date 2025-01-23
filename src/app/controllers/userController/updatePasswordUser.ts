@@ -1,7 +1,7 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
 import { comparePassword, hashPassword } from '../../utils/passwordHash';
-import * as userModel from '../../models/user.model';
+import * as userRepository from '../../repositories/userRepository';
 
 async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 	try {
@@ -11,7 +11,7 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 		const userId = req.params.id;
 		const { currentPassword, newPassword } = req.body;
 
-		const user = await userModel.getUserById(userId);
+		const user = await userRepository.getUserById(userId);
 
 		if (user.length === 0) {
 			res.statusMessage = 'Not found. No user with specified id';
@@ -27,7 +27,7 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 
 		const hashedNewPassword = await hashPassword(newPassword);
 
-		await userModel.updateUser({
+		await userRepository.updateUser({
 			id: userId,
 			password: hashedNewPassword,
 		});

@@ -1,4 +1,4 @@
-import * as userModel from '../../models/user.model';
+import * as userRepository from '../../repositories/userRepository';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {
@@ -6,7 +6,7 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 		const authToken: string = req.cookies.authToken;
 		const { email } = req.body;
 
-		const userWithAuthToken = await userModel.getUserWithAuthToken(
+		const userWithAuthToken = await userRepository.getUserWithAuthToken(
 			authToken
 		);
 
@@ -19,10 +19,8 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 			return;
 		}
 
-		const authTokenDeleteResult = await userModel.deleteAuthTokenWithEmail(
-			authToken,
-			email
-		);
+		const authTokenDeleteResult =
+			await userRepository.deleteAuthTokenWithEmail(authToken, email);
 
 		if (authTokenDeleteResult.affectedRows === 1) {
 			res.clearCookie('authToken');

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as userModel from '../../models/user.model';
+import * as userRepository from '../../repositories/userRepository';
 import logger from '../../../config/logger';
 
 type updateDataType = {
@@ -34,7 +34,7 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 			updateData.email = req.body.email;
 		}
 
-		await userModel.updateUser({
+		await userRepository.updateUser({
 			id: userId,
 			...updateData,
 		});

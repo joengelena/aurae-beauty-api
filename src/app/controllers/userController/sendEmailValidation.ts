@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import sendEmail from '../../utils/email/nodemailer';
-import * as userModel from '../../models/user.model';
+import * as userRepository from '../../repositories/userRepository';
 import sendEmailValidationEmail from '../../utils/email/nodemailer';
 import { generateJwtToken } from '../../utils/jwt/generateJwt';
 import generateEmailVerificationLink from '../../utils/generateEmailVerificationLink';
@@ -20,7 +20,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 			return;
 		}
 
-		const user = await userModel.getUserByEmail(email);
+		const user = await userRepository.getUserByEmail(email);
 
 		if (user.length === 0) {
 			logger.info('User not found');
