@@ -19,35 +19,29 @@ type User = {
 async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const { id, firstName, lastName, username, email, password, phoneNumber } =
 		params;
-	logger.info(`Signing up new user with email '${email}' to the database`);
-	const connection = await getPool().getConnection();
 	const emailNotValidated = 0;
 	const phoneNumberNotValidated = 0;
 
-	try {
-		const query = `INSERT into User
+	logger.info(`Signing up new user with email '${email}' to the database`);
+
+	const connection = await getPool().getConnection();
+	const query = `INSERT into User
         (id, first_name, last_name, username, phone_number, email, password, email_validated, phone_number_validated) values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-		const [result] = await connection.query<ResultSetHeader>(query, [
-			id,
-			firstName,
-			lastName,
-			username,
-			phoneNumber,
-			email,
-			password,
-			emailNotValidated,
-			phoneNumberNotValidated,
-		]);
-		return result;
-	} catch (error) {
-		logger.error(
-			`Error signing up new user with email '${email}': ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const [result] = await connection.query<ResultSetHeader>(query, [
+		id,
+		firstName,
+		lastName,
+		username,
+		phoneNumber,
+		email,
+		password,
+		emailNotValidated,
+		phoneNumberNotValidated,
+	]);
+	connection.release();
+
+	return result;
 }
 
 async function registerAuthTokenWithEmail(
@@ -55,23 +49,16 @@ async function registerAuthTokenWithEmail(
 	email: string
 ): Promise<ResultSetHeader> {
 	logger.info(`Registering a new token to ${email}`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'UPDATE user SET auth_token = ? WHERE email = ?';
-		const [result] = await connection.query<ResultSetHeader>(query, [
-			token,
-			email,
-		]);
-		return result;
-	} catch (error) {
-		logger.error(
-			`Error registering a new token to ${email}: ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'UPDATE user SET auth_token = ? WHERE email = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [
+		token,
+		email,
+	]);
+	connection.release();
+
+	return result;
 }
 
 async function deleteAuthTokenWithEmail(
@@ -79,100 +66,61 @@ async function deleteAuthTokenWithEmail(
 	email: string
 ): Promise<ResultSetHeader> {
 	logger.info(`Checking if the token ${token} is in the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query =
-			'UPDATE user SET auth_token = NULL WHERE auth_token = ? AND email = ?';
-		const [result] = await connection.query<ResultSetHeader>(query, [
-			token,
-			email,
-		]);
-		return result;
-	} catch (error) {
-		logger.error(
-			`Error checking if the token ${token} is in the database: ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query =
+		'UPDATE user SET auth_token = NULL WHERE auth_token = ? AND email = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [
+		token,
+		email,
+	]);
+	connection.release();
+
+	return result;
 }
 
 async function getUserWithAuthToken(token: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with token '${token}' from the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'SELECT * FROM User WHERE auth_token = ?';
-		const [result] = await connection.query<RowDataPacket[]>(query, [
-			token,
-		]);
-		return result as UserDBSchema[];
-	} catch (error) {
-		logger.error(
-			`Error getting user with token '${token}': ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM User WHERE auth_token = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [token]);
+	connection.release();
+
+	return result as UserDBSchema[];
 }
 
 async function checkIfEmailExists(email: string): Promise<UserDBSchema[]> {
 	logger.info(`Checking if email '${email}' is already in the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'SELECT * FROM User WHERE email = ?';
-		const [result] = await connection.query<RowDataPacket[]>(query, [
-			email,
-		]);
-		return result as UserDBSchema[];
-	} catch (error) {
-		logger.error(
-			`Error checking to see if there exists a user with email '${email}': ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM User WHERE email = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
+	connection.release();
+
+	return result as UserDBSchema[];
 }
 
 async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with email '${email}' from the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'SELECT * FROM User WHERE email = ?';
-		const [result] = await connection.query<RowDataPacket[]>(query, [
-			email,
-		]);
-		return result as UserDBSchema[];
-	} catch (error) {
-		logger.error(
-			`Error getting user with email '${email}': ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM User WHERE email = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
+	connection.release();
+
+	return result as UserDBSchema[];
 }
 
 async function getUserById(id: string): Promise<UserDBSchema[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'SELECT * FROM User WHERE id = ?';
-		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
-		return result as UserDBSchema[];
-	} catch (error) {
-		logger.error(`Error getting user with id '${id}': ${error.message}`);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM User WHERE id = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
+	connection.release();
+
+	return result as UserDBSchema[];
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
@@ -187,52 +135,40 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 		password: 'password',
 	};
 
-	try {
-		logger.info(`Updating user with id: '${id}' in the database`);
+	logger.info(`Updating user with id: '${id}' in the database`);
 
-		if (!id) {
-			throw new Error('User ID is required to update user');
-		}
-
-		if (Object.keys(updateFields).length === 0) {
-			throw new Error('No fields provided to update');
-		}
-
-		const fields = Object.keys(updateFields)
-			.map((key) => `${databaseFields[key]} = ?`)
-			.join(', ');
-		const values = Object.values(updateFields);
-
-		values.push(id);
-
-		const query = `UPDATE User SET ${fields} WHERE id = ?`;
-		const [result] = await connection.query<ResultSetHeader>(query, values);
-
-		logger.info(`User with id '${id}' successfully updated`);
-		return result;
-	} catch (error) {
-		logger.error(`Error updating user with id '${id}': ${error.message}`);
-		throw error;
-	} finally {
-		connection.release();
+	if (!id) {
+		throw new Error('User ID is required to update user');
 	}
+
+	if (Object.keys(updateFields).length === 0) {
+		throw new Error('No fields provided to update');
+	}
+
+	const fields = Object.keys(updateFields)
+		.map((key) => `${databaseFields[key]} = ?`)
+		.join(', ');
+	const values = Object.values(updateFields);
+
+	values.push(id);
+
+	const query = `UPDATE User SET ${fields} WHERE id = ?`;
+	const [result] = await connection.query<ResultSetHeader>(query, values);
+	connection.release();
+
+	return result;
 }
 
 async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 	logger.info(`Deleting user with id '${id}' from the database`);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'DELETE FROM User WHERE id = ?';
-		const [result] = await connection.query<ResultSetHeader>(query, [id]);
-		logger.info(`User with id '${id}' successfully deleted`);
-		return result;
-	} catch (error) {
-		logger.error(`Error deleting user with id '${id}': ${error.message}`);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query = 'DELETE FROM User WHERE id = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [id]);
+	logger.info(`User with id '${id}' successfully deleted`);
+	connection.release();
+
+	return result;
 }
 
 async function getUserEmailValidationStatus(
@@ -241,52 +177,38 @@ async function getUserEmailValidationStatus(
 	logger.info(
 		`Getting user with id '${id}' email validation status from the database`
 	);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query = 'SELECT email_validated FROM User WHERE id = ?';
-		const [result] = await connection.query<RowDataPacket[]>(query, [id]);
-		logger.info(
-			`Successfully got the email validation status for teh user with id: '${id}'`
-		);
-		return result as UserEmailValidationStatus[];
-	} catch (error) {
-		logger.error(
-			`Error getting email validation status for user with id '${id}': ${error.message}`
-		);
-	}
+	const connection = await getPool().getConnection();
+	const query = 'SELECT email_validated FROM User WHERE id = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
+	logger.info(
+		`Successfully got the email validation status for teh user with id: '${id}'`
+	);
+	connection.release();
+
+	return result as UserEmailValidationStatus[];
 }
 
 async function updateUserEmailValidatedStatus(
 	email: User['email'],
 	id: User['id'],
-	status: number
+	status: 0 | 1
 ) {
 	logger.info(
 		`Updating user with id '${id}' to have an email validated status of: ${status}`
 	);
-	const connection = await getPool().getConnection();
 
-	try {
-		const query =
-			'UPDATE User SET email_validated = ? WHERE email = ? AND id = ?';
-		const [result] = await connection.query<ResultSetHeader>(query, [
-			status,
-			email,
-			id,
-		]);
-		logger.info(
-			`User with id '${id}' successfully updated email validation status`
-		);
-		return result;
-	} catch (error) {
-		logger.error(
-			`Error updating user with id '${id}' email validation status: ${error.message}`
-		);
-		throw error;
-	} finally {
-		connection.release();
-	}
+	const connection = await getPool().getConnection();
+	const query =
+		'UPDATE User SET email_validated = ? WHERE email = ? AND id = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [
+		status,
+		email,
+		id,
+	]);
+	connection.release();
+
+	return result;
 }
 
 export {
