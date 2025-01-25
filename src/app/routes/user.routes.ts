@@ -50,7 +50,7 @@ const usersRoutes = (app: Express) => {
 		updatePasswordUser
 	);
 
-	app.route(rootUrl + '/users/:id/send-email-verification-link').post(
+	app.route(rootUrl + '/users/send-email-verification-link').post(
 		validateRequest,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.sendEmailValidation);

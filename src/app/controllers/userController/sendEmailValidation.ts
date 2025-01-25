@@ -1,17 +1,14 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import sendEmail from '../../utils/email/nodemailer';
 import * as userRepository from '../../repositories/userRepository';
-import sendEmailValidationEmail from '../../utils/email/nodemailer';
-import { generateJwtToken } from '../../utils/jwt/generateJwt';
-import generateEmailVerificationLink from '../../utils/generateEmailVerificationLink';
+import * as appConfigRepository from '../../repositories/appConfigurationRepository';
 import { sendEmailVerificationLink } from '../../utils/email/emailService';
 
 async function sendEmailValidation(req: Request, res: Response) {
-	logger.info('Validating email');
+	logger.info('Sending email verification link');
 
 	try {
-		const { email, emailVerificationBaseUrl } = req.body;
+		const { email } = req.body;
 
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -30,12 +27,15 @@ async function sendEmailValidation(req: Request, res: Response) {
 			return;
 		}
 
+		const emailVerificationBaseUrl =
+			await appConfigRepository.getWebAppBaseUrl();
+
 		await sendEmailVerificationLink(
 			user[0].id,
 			email,
 			user[0].first_name,
 			user[0].last_name,
-			emailVerificationBaseUrl
+			emailVerificationBaseUrl[0].value
 		);
 
 		res.statusMessage = 'Email validation link sent successfully';

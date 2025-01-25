@@ -79,15 +79,9 @@
 	"sendEmailValidation": {
 		"type": "object",
 		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"emailVerificationBaseUrl": {
-				"type": "string",
-				"format": "uri",
-				"minLength": 1,
-				"maxLength": 255
-			}
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
-		"required": ["email", "emailValidationUrl"],
+		"required": ["email"],
 		"additionalProperties": false
 	}
 }
