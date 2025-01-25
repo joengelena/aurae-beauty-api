@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import logger from '../../../config/logger';
-import getValidateEmailFormat from './validateEmailFormat';
+import getValidateEmailFormat from './getValidateEmailFormat';
 
 const transporter = nodemailer.createTransport({
 	host: 'smtp.gmail.com',

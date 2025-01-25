@@ -1,7 +1,7 @@
 import generateEmailVerificationLink from '../generateEmailVerificationLink';
 import { generateJwtToken } from '../jwt/generateJwt';
 import nodemailerSendEmail from './nodemailer';
-import getValidateEmailFormat from './validateEmailFormat';
+import getValidateEmailFormat from './getValidateEmailFormat';
 
 async function sendEmailVerificationLink(
 	userId: string,
