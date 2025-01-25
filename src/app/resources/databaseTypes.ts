@@ -15,4 +15,10 @@ type UserEmailValidationStatus = {
 	email_validated: UserDBSchema['email_validated'];
 };
 
-export { UserDBSchema, UserEmailValidationStatus };
+type AppConfigurationDBSchema = {
+	id: number;
+	name: string;
+	value: string;
+};
+
+export { UserDBSchema, UserEmailValidationStatus, AppConfigurationDBSchema };
