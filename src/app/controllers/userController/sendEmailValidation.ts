@@ -33,8 +33,6 @@ async function sendEmailValidation(req: Request, res: Response) {
 		await sendEmailVerificationLink(
 			user[0].id,
 			email,
-			user[0].first_name,
-			user[0].last_name,
 			emailVerificationBaseUrl[0].value
 		);
 

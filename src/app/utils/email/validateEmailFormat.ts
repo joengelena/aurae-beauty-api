@@ -1,8 +1,4 @@
-function getValidateEmailFormat(
-	firstName: string,
-	lastName: string,
-	verificationLink: string
-) {
+function getValidateEmailFormat(verificationLink: string) {
 	return `
         <!DOCTYPE html>
         <html>
@@ -42,7 +38,7 @@ function getValidateEmailFormat(
             <h2>Verify Your Email Address</h2>
             </div>
             <div class="content">
-            <p>Hi ${firstName} ${lastName},</p>
+            <p>Hello,</p>
             <p>Thanks for signing up! To complete your registration, please verify your email address by clicking the button below:</p>
             <a href="${verificationLink}">Verify Email</a>
             <p>If you didn't request this verification, please ignore this email.</p>
