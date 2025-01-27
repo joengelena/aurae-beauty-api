@@ -6,14 +6,14 @@ import getForgotPasswordEmailFormat from './getForgotPasswordEmailFormat';
 async function sendEmailVerificationLink(
 	userId: string,
 	email: string,
-	verificationLinkBaseUrl: string
+	webAppBaseUrl: string
 ) {
 	const emailVerificationJwt = generateJwtToken({ userId: userId }, '15m');
 
 	const emailSubject = `${process.env.COMPANY_NAME} - Email Verification`;
 
 	const htmlBody = getValidateEmailFormat(
-		`${verificationLinkBaseUrl}?token=${emailVerificationJwt}`
+		`${webAppBaseUrl}?token=${emailVerificationJwt}`
 	);
 
 	await nodemailerSendEmail(email, emailSubject, htmlBody);
@@ -23,7 +23,7 @@ async function sendResetPasswordLink(
 	userId: string,
 	email: string,
 	oldHashedPassword: string,
-	resetPasswordLink: string
+	webAppBaseUrl: string
 ) {
 	const emailSubject = `${process.env.COMPANY_NAME} - Reset Password`;
 
@@ -33,7 +33,7 @@ async function sendResetPasswordLink(
 	);
 
 	const htmlBody = getForgotPasswordEmailFormat(
-		`${resetPasswordLink}?token=${resetPasswordJwt}`
+		`${webAppBaseUrl}?token=${resetPasswordJwt}`
 	);
 
 	await nodemailerSendEmail(email, emailSubject, htmlBody);
