@@ -27,13 +27,14 @@ async function sendEmailValidation(req: Request, res: Response) {
 			return;
 		}
 
-		const emailVerificationBaseUrl =
-			await appConfigRepository.getWebAppBaseUrl();
+		const appConfig = await appConfigRepository.getAppConfig();
 
 		await sendEmailVerificationLink(
 			user[0].id,
 			email,
-			emailVerificationBaseUrl[0].value
+			appConfig.find((config) => config.name === 'webAppBaseUrl').value,
+			appConfig.find((config) => config.name === 'verifyEmailUrlPath')
+				.value
 		);
 
 		res.statusMessage = 'Email validation link sent successfully';

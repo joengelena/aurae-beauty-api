@@ -6,6 +6,7 @@ import {
 	sendEmailVerificationLink,
 	sendResetPasswordLink,
 } from '../../utils/email/emailService';
+import { config } from 'dotenv';
 
 async function forgotPasswordUser(req: Request, res: Response) {
 	try {
@@ -24,13 +25,18 @@ async function forgotPasswordUser(req: Request, res: Response) {
 			return;
 		}
 
-		const webAppBaseUrl = await appConfigRepository.getWebAppBaseUrl();
+		const appConfig = await appConfigRepository.getAppConfig();
+		const webAppBaseUrl = appConfig.find(
+			(config) => config.name === 'webAppBaseUrl'
+		).value;
 
 		if (user[0].email_validated === 0) {
 			await sendEmailVerificationLink(
 				user[0].id,
 				email,
-				webAppBaseUrl[0].value
+				webAppBaseUrl,
+				appConfig.find((config) => config.name === 'verifyEmailUrlPath')
+					.value
 			);
 
 			res.statusMessage = 'Email verification link sent successfully';
@@ -42,7 +48,9 @@ async function forgotPasswordUser(req: Request, res: Response) {
 			user[0].id,
 			email,
 			user[0].password,
-			webAppBaseUrl[0].value
+			webAppBaseUrl,
+			appConfig.find((config) => config.name === 'resetPasswordUrlPath')
+				.value
 		);
 
 		res.statusMessage = 'Reset password link sent successfully';
