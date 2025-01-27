@@ -2,7 +2,10 @@ import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository';
 import * as appConfigRepository from '../../repositories/appConfigurationRepository';
-import { sendEmailVerificationLink } from '../../utils/email/emailService';
+import {
+	sendEmailVerificationLink,
+	sendResetPasswordLink,
+} from '../../utils/email/emailService';
 
 async function forgotPasswordUser(req: Request, res: Response) {
 	try {
@@ -21,14 +24,13 @@ async function forgotPasswordUser(req: Request, res: Response) {
 			return;
 		}
 
-		if (user[0].email_validated === 0) {
-			const emailVerificationBaseUrl =
-				await appConfigRepository.getWebAppBaseUrl();
+		const webAppBaseUrl = await appConfigRepository.getWebAppBaseUrl();
 
+		if (user[0].email_validated === 0) {
 			await sendEmailVerificationLink(
 				user[0].id,
 				email,
-				emailVerificationBaseUrl[0].value
+				webAppBaseUrl[0].value
 			);
 
 			res.statusMessage = 'Email verification link sent successfully';
@@ -36,7 +38,16 @@ async function forgotPasswordUser(req: Request, res: Response) {
 			return;
 		}
 
-		// Send an email to reset their password
+		await sendResetPasswordLink(
+			user[0].id,
+			email,
+			user[0].password,
+			webAppBaseUrl[0].value
+		);
+
+		res.statusMessage = 'Reset password link sent successfully';
+		res.status(200).send();
+		return;
 	} catch (error) {
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
