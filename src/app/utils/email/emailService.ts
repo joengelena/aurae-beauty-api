@@ -8,7 +8,7 @@ async function sendEmailVerificationLink(
 	email: string,
 	verificationLinkBaseUrl: string
 ) {
-	const emailVerificationJwt = generateJwtToken({ userId: userId }, '1h');
+	const emailVerificationJwt = generateJwtToken({ userId: userId }, '15m');
 
 	const emailSubject = `${process.env.COMPANY_NAME} - Email Verification`;
 
@@ -29,7 +29,7 @@ async function sendResetPasswordLink(
 
 	const resetPasswordJwt = generateJwtToken(
 		{ userId: userId, something: oldHashedPassword },
-		'1h'
+		'15m'
 	);
 
 	const htmlBody = getForgotPasswordEmailFormat(
