@@ -8,17 +8,9 @@ async function sendEmailValidation(req: Request, res: Response) {
 	logger.info('Sending email verification link');
 
 	try {
-		const { email } = req.body;
+		const userId = req.params.id;
 
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-		if (!emailRegex.test(email)) {
-			res.statusMessage = 'Invalid email format';
-			res.status(400).send();
-			return;
-		}
-
-		const user = await userRepository.getUserByEmail(email);
+		const user = await userRepository.getUserById(userId);
 
 		if (user.length === 0) {
 			logger.info('User not found');
@@ -31,7 +23,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 
 		await sendEmailVerificationLink(
 			user[0].id,
-			email,
+			user[0].email,
 			appConfig.find((config) => config.name === 'webAppBaseUrl').value,
 			appConfig.find((config) => config.name === 'verifyEmailUrlPath')
 				.value

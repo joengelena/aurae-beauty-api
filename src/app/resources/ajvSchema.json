@@ -1,4 +1,10 @@
 {
+	"emptyBody": {
+		"type": "object",
+		"properties": {},
+		"required": [],
+		"additionalProperties": false
+	},
 	"signUpUser": {
 		"type": "object",
 		"properties": {
@@ -74,14 +80,6 @@
 			}
 		},
 		"required": ["userId", "currentPassword", "newPassword"],
-		"additionalProperties": false
-	},
-	"sendEmailValidation": {
-		"type": "object",
-		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
-		},
-		"required": ["email"],
 		"additionalProperties": false
 	}
 }
