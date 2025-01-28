@@ -6,9 +6,8 @@ import {
 	sendEmailVerificationLink,
 	sendResetPasswordLink,
 } from '../../utils/email/emailService';
-import { config } from 'dotenv';
 
-async function forgotPasswordUser(req: Request, res: Response) {
+async function forgotPassword(req: Request, res: Response) {
 	try {
 		logger.info(
 			'Processing forgot password request for user: ',
@@ -63,4 +62,4 @@ async function forgotPasswordUser(req: Request, res: Response) {
 	}
 }
 
-export default forgotPasswordUser;
+export default forgotPassword;
