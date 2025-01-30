@@ -16,20 +16,20 @@ import sendEmailValidation from '../controllers/userController/sendEmailValidati
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
-	app.route(rootUrl + '/users/signup').post((req, res, next) => {
+	app.route(rootUrl + '/user/signup').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signUpUser);
 	}, signUpUser);
 
-	app.route(rootUrl + '/users/signin').post((req, res, next) => {
+	app.route(rootUrl + '/user/signin').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signInUser);
 	}, signInUser);
 
-	app.route(rootUrl + '/users/forgot-password').post((req, res, next) => {
+	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, forgotPassword);
 
 	// Privates routes
-	app.route(rootUrl + '/users/signout').post(
+	app.route(rootUrl + '/user/signout').post(
 		validateRequest,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.signOutUser);
