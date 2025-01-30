@@ -1,30 +1,24 @@
+import clearCookiesInResponse from '../../middlewares/requestAuthentication/clearCookiesInResponse';
 import * as userRepository from '../../repositories/userRepository';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {
 	try {
-		const authToken: string = req.cookies.authToken;
-		const { email } = req.body;
+		const { userId } = req.body;
 
-		const userWithAuthToken = await userRepository.getUserWithAuthToken(
-			authToken
-		);
+		const user = await userRepository.getUserById(userId);
 
-		if (
-			userWithAuthToken.length === 0 ||
-			userWithAuthToken[0].email !== email
-		) {
+		if (user.length === 0) {
 			res.statusMessage = 'Forbidden. Invalid credentials';
 			res.status(403).send();
 			return;
 		}
 
 		const authTokenDeleteResult =
-			await userRepository.deleteAuthTokenWithEmail(authToken, email);
+			await userRepository.deleteAuthTokenForUserId(userId);
 
 		if (authTokenDeleteResult.affectedRows === 1) {
-			res.clearCookie('authToken');
-			res.clearCookie('jwt');
+			clearCookiesInResponse(res);
 			res.statusMessage = 'User signed out successfully';
 			res.status(200).send({
 				message: 'User signed out successfully',

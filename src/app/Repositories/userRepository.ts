@@ -61,19 +61,14 @@ async function registerAuthTokenWithEmail(
 	return result;
 }
 
-async function deleteAuthTokenWithEmail(
-	token: string,
-	email: string
+async function deleteAuthTokenForUserId(
+	userId: string
 ): Promise<ResultSetHeader> {
-	logger.info(`Checking if the token ${token} is in the database`);
+	logger.info(`Deleting auth token for user with id '${userId}'`);
 
 	const connection = await getPool().getConnection();
-	const query =
-		'UPDATE user SET auth_token = NULL WHERE auth_token = ? AND email = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [
-		token,
-		email,
-	]);
+	const query = 'UPDATE user SET auth_token = NULL WHERE id = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [userId]);
 	connection.release();
 
 	return result;
@@ -219,7 +214,7 @@ export {
 	updateUser,
 	deleteUserWithId,
 	registerAuthTokenWithEmail,
-	deleteAuthTokenWithEmail,
+	deleteAuthTokenForUserId,
 	getUserWithAuthToken,
 	getUserEmailValidationStatus,
 	updateUserEmailValidatedStatus,
