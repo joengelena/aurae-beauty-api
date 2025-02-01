@@ -8,9 +8,9 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 	logger.info('Validating email verification token');
 
 	try {
-		const jwtToken = req.params.token;
+		const { token } = req.query;
 
-		const validateJwt = verifyJwt(jwtToken);
+		const validateJwt = verifyJwt(token as string);
 
 		if (validateJwt.status === 'expired') {
 			res.statusMessage = 'Forbidden. Email verification link is expired';
