@@ -8,11 +8,12 @@ import {
 	updateUser,
 	updatePasswordUser,
 	forgotPassword,
+	sendEmailValidation,
+	validateEmailVerificationToken,
 } from '../controllers/userController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
-import sendEmailValidation from '../controllers/userController/sendEmailValidation';
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
@@ -27,6 +28,10 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, forgotPassword);
+
+	app.route(rootUrl + '/user/validate-email-link').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.emptyBody);
+	}, validateEmailVerificationToken);
 
 	// Privates routes
 	app.route(rootUrl + '/user/signout').post(

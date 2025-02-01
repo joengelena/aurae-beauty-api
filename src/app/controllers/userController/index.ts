@@ -5,6 +5,8 @@ import viewUser from './viewUser';
 import updateUser from './updateUser';
 import updatePasswordUser from './updatePasswordUser';
 import forgotPassword from './forgotPassword';
+import sendEmailValidation from './sendEmailValidation';
+import validateEmailVerificationToken from './validateEmailVerificationToken';
 
 export {
 	signInUser,
@@ -14,4 +16,6 @@ export {
 	updateUser,
 	updatePasswordUser,
 	forgotPassword,
+	sendEmailValidation,
+	validateEmailVerificationToken,
 };

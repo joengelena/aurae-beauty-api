@@ -184,21 +184,15 @@ async function getUserEmailValidationStatus(
 	return result as UserEmailValidationStatus[];
 }
 
-async function updateUserEmailValidatedStatus(
-	email: User['email'],
-	id: User['id'],
-	status: 0 | 1
-) {
+async function updateUserEmailValidatedStatus(id: User['id'], status: 0 | 1) {
 	logger.info(
 		`Updating user with id '${id}' to have an email validated status of: ${status}`
 	);
 
 	const connection = await getPool().getConnection();
-	const query =
-		'UPDATE User SET email_validated = ? WHERE email = ? AND id = ?';
+	const query = 'UPDATE User SET email_validated = ? WHERE id = ?';
 	const [result] = await connection.query<ResultSetHeader>(query, [
 		status,
-		email,
 		id,
 	]);
 	connection.release();
