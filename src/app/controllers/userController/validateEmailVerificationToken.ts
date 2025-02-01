@@ -45,8 +45,6 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 		res.status(500).send();
 		return;
 	} catch (error) {
-		if (error.code === 'TokenExpiredError') {
-		}
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;
