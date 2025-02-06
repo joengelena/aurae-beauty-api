@@ -38,20 +38,26 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/signout').post(
 		validateRequest,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.signOutUser);
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
 		signOutUser
 	);
 
-	app.route(rootUrl + '/users/:id')
-		.get(validateRequest, viewUser)
-		.patch(
-			validateRequest,
-			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.updateUser);
-			},
-			updateUser
-		);
+	app.route(rootUrl + '/user').get(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		viewUser
+	);
+
+	app.route(rootUrl + '/user/update-user').patch(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.updateUser);
+		},
+		updateUser
+	);
 
 	app.route(rootUrl + '/users/:id/update-password').patch(
 		validateRequest,
