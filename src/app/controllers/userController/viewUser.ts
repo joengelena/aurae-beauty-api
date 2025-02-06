@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import * as userRepository from '../../repositories/userRepository';
+import logger from '../../../config/logger';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
+	logger.info(`Viewing user with id '${req.params.id}'`);
+
 	try {
 		const userId = req.params.id;
 		const users = await userRepository.getUserById(userId);
