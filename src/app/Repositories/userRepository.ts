@@ -128,6 +128,8 @@ async function getUserById(id: string): Promise<UserDBSchema[]> {
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
+	logger.info(`Updating user with id '${params.id}' in the database`);
+
 	const { id, ...updateFields } = params;
 	const connection = await getPool().getConnection();
 	const databaseFields: { [key: string]: string } = {
@@ -138,8 +140,6 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 		phoneNumber: 'phone_number',
 		password: 'password',
 	};
-
-	logger.info(`Updating user with id: '${id}' in the database`);
 
 	if (!id) {
 		throw new Error('User ID is required to update user');
