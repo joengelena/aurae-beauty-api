@@ -26,7 +26,7 @@ async function forgotPassword(req: Request, res: Response) {
 			(config) => config.name === 'webAppBaseUrl'
 		).value;
 
-		if (user[0].email_validated === 0) {
+		if (user[0].is_email_verified === 0) {
 			await sendEmailVerificationLink(
 				user[0].id,
 				email,
