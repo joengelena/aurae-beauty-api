@@ -17,9 +17,7 @@
 				"maxLength": 12
 			},
 			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"password": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"emailValidated": { "type": "integer", "enum": [0, 1] },
-			"PhoneNumberValidated": { "type": "integer", "enum": [0, 1] }
+			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
 		"required": [
 			"firstName",
