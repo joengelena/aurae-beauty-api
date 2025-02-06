@@ -59,7 +59,7 @@ const usersRoutes = (app: Express) => {
 		updateUser
 	);
 
-	app.route(rootUrl + '/users/:id/update-password').patch(
+	app.route(rootUrl + '/user/update-password').patch(
 		validateRequest,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);

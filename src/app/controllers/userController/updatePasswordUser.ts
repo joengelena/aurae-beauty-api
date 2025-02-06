@@ -8,8 +8,8 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 		logger.info(
 			`Updating user password for user id '${req.params.userId}'`
 		);
-		const userId = req.params.id;
-		const { currentPassword, newPassword } = req.body;
+
+		const { userId, currentPassword, newPassword } = req.body;
 
 		const user = await userRepository.getUserById(userId);
 
