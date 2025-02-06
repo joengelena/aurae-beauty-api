@@ -2,6 +2,7 @@ import * as userRepository from '../../repositories/userRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword } from '../../utils/passwordHash';
 import { Request, Response } from 'express';
+import { FALSE } from '../../resources/constants';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
 	try {
@@ -20,6 +21,8 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 			email,
 			password: hashedPassword,
 			phoneNumber,
+			isEmailVerified: FALSE,
+			isPhoneNumberVerified: FALSE,
 		});
 
 		res.statusMessage = 'User created successfully';

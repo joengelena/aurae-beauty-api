@@ -14,13 +14,22 @@ type User = {
 	email: string;
 	password: string;
 	phoneNumber: string;
+	isEmailVerified: 0 | 1;
+	isPhoneNumberVerified: 0 | 1;
 };
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
-	const { id, firstName, lastName, username, email, password, phoneNumber } =
-		params;
-	const emailNotValidated = 0;
-	const phoneNumberNotValidated = 0;
+	const {
+		id,
+		firstName,
+		lastName,
+		username,
+		email,
+		password,
+		phoneNumber,
+		isEmailVerified,
+		isPhoneNumberVerified,
+	} = params;
 
 	logger.info(`Signing up new user with email '${email}' to the database`);
 
@@ -36,8 +45,8 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 		phoneNumber,
 		email,
 		password,
-		emailNotValidated,
-		phoneNumberNotValidated,
+		isEmailVerified,
+		isPhoneNumberVerified,
 	]);
 	connection.release();
 
