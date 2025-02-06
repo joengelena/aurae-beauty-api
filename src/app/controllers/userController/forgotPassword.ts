@@ -9,7 +9,10 @@ import {
 
 async function forgotPassword(req: Request, res: Response) {
 	try {
-		logger.info('Processing forgot password request for user: ');
+		logger.info(
+			'Processing forgot password request for user with email: ' +
+				req.body.email
+		);
 
 		const { email } = req.body;
 
