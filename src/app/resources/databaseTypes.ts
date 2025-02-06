@@ -6,13 +6,13 @@ type UserDBSchema = {
 	phone_number: string;
 	email: string;
 	password: string;
-	email_validated: number;
-	phone_number_validated: number;
+	is_email_verified: 0 | 1;
+	is_phone_number_verified: 0 | 1;
 	auth_token: string | null;
 };
 
 type UserEmailValidationStatus = {
-	email_validated: UserDBSchema['email_validated'];
+	is_email_verified: UserDBSchema['is_email_verified'];
 };
 
 type AppConfigurationDBSchema = {
