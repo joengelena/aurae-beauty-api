@@ -4,8 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from '../../utils/passwordHash';
 import { generateJwtToken } from '../../utils/jwt/generateJwt';
 import { CSRF_TOKEN, JWT_TOKEN } from '../../resources/constants';
+import logger from '../../../config/logger';
 
 async function signInUser(req: Request, res: Response): Promise<void> {
+	logger.info(`Signing in user with email: '${req.body.email}'`);
+
 	try {
 		const { email, password } = req.body;
 		const user = await userRepository.getUserByEmail(email);
@@ -46,7 +49,6 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 
 			res.statusMessage = 'User logged in successfully';
 			res.status(200).send({
-				message: 'User logged in successfully',
 				userId: user[0].id,
 				authToken,
 				csrfToken,
