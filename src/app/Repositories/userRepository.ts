@@ -35,7 +35,7 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 
 	const connection = await getPool().getConnection();
 	const query = `INSERT into User
-        (id, first_name, last_name, username, phone_number, email, password, email_validated, phone_number_validated) values
+        (id, first_name, last_name, username, phone_number, email, password, is_email_verified, is_phone_number_verified) values
         (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 	const [result] = await connection.query<ResultSetHeader>(query, [
 		id,
@@ -183,7 +183,7 @@ async function getUserEmailValidationStatus(
 	);
 
 	const connection = await getPool().getConnection();
-	const query = 'SELECT email_validated FROM User WHERE id = ?';
+	const query = 'SELECT is_email_verified FROM User WHERE id = ?';
 	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
 	logger.info(
 		`Successfully got the email validation status for teh user with id: '${id}'`
@@ -199,7 +199,7 @@ async function updateUserEmailValidatedStatus(id: User['id'], status: 0 | 1) {
 	);
 
 	const connection = await getPool().getConnection();
-	const query = 'UPDATE User SET email_validated = ? WHERE id = ?';
+	const query = 'UPDATE User SET is_email_verified = ? WHERE id = ?';
 	const [result] = await connection.query<ResultSetHeader>(query, [
 		status,
 		id,
