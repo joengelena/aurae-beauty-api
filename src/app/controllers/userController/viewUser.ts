@@ -3,10 +3,10 @@ import * as userRepository from '../../repositories/userRepository';
 import logger from '../../../config/logger';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
-	logger.info(`Viewing user with id '${req.params.id}'`);
+	logger.info(`Viewing user with id '${req.body.userId}'`);
 
 	try {
-		const userId = req.params.id;
+		const userId = req.body.userId;
 		const users = await userRepository.getUserById(userId);
 
 		if (users.length === 0) {
