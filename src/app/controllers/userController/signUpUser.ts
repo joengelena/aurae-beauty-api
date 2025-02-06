@@ -3,8 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword } from '../../utils/passwordHash';
 import { Request, Response } from 'express';
 import { FALSE } from '../../resources/constants';
+import logger from '../../../config/logger';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
+	logger.info('Signing up new user with username: ' + req.body.username);
+
 	try {
 		const { firstName, lastName, username, email, password, phoneNumber } =
 			req.body;
