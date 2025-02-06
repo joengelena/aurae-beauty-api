@@ -10,6 +10,7 @@ import {
 	forgotPassword,
 	sendEmailValidation,
 	validateEmailVerificationToken,
+	deleteUser,
 } from '../controllers/userController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -66,6 +67,14 @@ const usersRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		},
 		sendEmailValidation
+	);
+
+	app.route(rootUrl + '/users/:id/delete-user').delete(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.deleteUser);
+		},
+		deleteUser
 	);
 };
 

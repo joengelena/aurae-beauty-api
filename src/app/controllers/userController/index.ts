@@ -7,6 +7,7 @@ import updatePasswordUser from './updatePasswordUser';
 import forgotPassword from './forgotPassword';
 import sendEmailValidation from './sendEmailValidation';
 import validateEmailVerificationToken from './validateEmailVerificationToken';
+import deleteUser from './deleteUser';
 
 export {
 	signInUser,
@@ -18,4 +19,5 @@ export {
 	forgotPassword,
 	sendEmailValidation,
 	validateEmailVerificationToken,
+	deleteUser,
 };
