@@ -1,8 +1,11 @@
+import logger from '../../../config/logger';
 import clearCookiesInResponse from '../../middlewares/requestAuthentication/clearCookiesInResponse';
 import * as userRepository from '../../repositories/userRepository';
 import { Request, Response } from 'express';
 
 async function signOutUser(req: Request, res: Response): Promise<void> {
+	logger.info(`Signing out user with id '${req.params.userId}'`);
+
 	try {
 		const { userId } = req.body;
 
