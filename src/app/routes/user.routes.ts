@@ -75,7 +75,7 @@ const usersRoutes = (app: Express) => {
 		sendEmailValidation
 	);
 
-	app.route(rootUrl + '/users/:id/delete-user').delete(
+	app.route(rootUrl + '/user/delete-user').delete(
 		validateRequest,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.deleteUser);
