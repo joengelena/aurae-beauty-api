@@ -36,6 +36,7 @@ async function deleteUser(req: Request, res: Response) {
 		res.statusMessage = 'Not found. No user with specified id';
 		res.status(404).send();
 	} catch (error) {
+		logger.error(`Error deleting user: ${error}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

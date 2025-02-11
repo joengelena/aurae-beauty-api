@@ -60,6 +60,7 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 		res.status(403).send();
 		return;
 	} catch (error) {
+		logger.error(`Error signing in user with email: ${error}`);
 		res.statusMessage = 'Internal Server Error';
 		res.status(500).send();
 		return;

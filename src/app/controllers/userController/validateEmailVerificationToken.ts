@@ -40,11 +40,12 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 			});
 			return;
 		}
-
+		logger.error(`Error validating email verification token`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;
 	} catch (error) {
+		logger.error(`Error validating email verification token: ${error}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

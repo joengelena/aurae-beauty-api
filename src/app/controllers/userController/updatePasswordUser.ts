@@ -38,9 +38,7 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 		});
 		return;
 	} catch (error) {
-		logger.error(
-			`Error updating user password for user id '${req.params.userId}': ${error.message}`
-		);
+		logger.error(`Error updating user password: ${error.message}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

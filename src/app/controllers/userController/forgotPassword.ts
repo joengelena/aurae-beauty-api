@@ -56,6 +56,7 @@ async function forgotPassword(req: Request, res: Response) {
 		res.status(200).send();
 		return;
 	} catch (error) {
+		logger.error(`Error processing forgot password request: ${error}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

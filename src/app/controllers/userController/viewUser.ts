@@ -27,6 +27,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		res.status(200).send(user);
 		return;
 	} catch (error) {
+		logger.error(`Error viewing user: ${error}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

@@ -63,6 +63,8 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 			return;
 		}
 
+		logger.error(`Error signing up user: ${error}`);
+
 		res.statusMessage = 'Internal Server Error';
 		res.status(500).send();
 		return;
