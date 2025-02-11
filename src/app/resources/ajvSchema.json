@@ -8,9 +8,13 @@
 	"userIdOnly": {
 		"type": "object",
 		"properties": {
-			"userId": { "type": "string", "minLength": 36, "maxLength": 36 }
+			"currentUserId": {
+				"type": "string",
+				"minLength": 36,
+				"maxLength": 36
+			}
 		},
-		"required": ["userId"],
+		"required": ["currentUserId"],
 		"additionalProperties": false
 	},
 	"signUpUser": {
@@ -49,7 +53,11 @@
 	"updateUser": {
 		"type": "object",
 		"properties": {
-			"userId": { "type": "string", "minLength": 36, "maxLength": 36 },
+			"currentUserId": {
+				"type": "string",
+				"minLength": 36,
+				"maxLength": 36
+			},
 			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"username": { "type": "string", "minLength": 1, "maxLength": 50 },
@@ -65,7 +73,11 @@
 	"updateUserPassword": {
 		"type": "object",
 		"properties": {
-			"userId": { "type": "string", "minLength": 36, "maxLength": 36 },
+			"currentUserId": {
+				"type": "string",
+				"minLength": 36,
+				"maxLength": 36
+			},
 			"currentPassword": {
 				"type": "string",
 				"minLength": 1,
@@ -77,7 +89,7 @@
 				"maxLength": 255
 			}
 		},
-		"required": ["userId", "currentPassword", "newPassword"],
+		"required": ["currentUserId", "currentPassword", "newPassword"],
 		"additionalProperties": false
 	},
 	"forgotPassword": {
@@ -91,14 +103,18 @@
 	"deleteUser": {
 		"type": "object",
 		"properties": {
-			"userId": { "type": "string", "minLength": 36, "maxLength": 36 },
+			"currentUserId": {
+				"type": "string",
+				"minLength": 36,
+				"maxLength": 36
+			},
 			"currentPassword": {
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 255
 			}
 		},
-		"required": ["userId", "currentPassword"],
+		"required": ["currentUserId", "currentPassword"],
 		"additionalProperties": false
 	}
 }
