@@ -57,6 +57,13 @@ async function forgotPassword(req: Request, res: Response) {
 		return;
 	} catch (error) {
 		logger.error(`Error processing forgot password request: ${error}`);
+
+		if (error.name == 'NodeMailerError') {
+			res.statusMessage = 'Internal error sending email';
+			res.status(500).send();
+			return;
+		}
+
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;

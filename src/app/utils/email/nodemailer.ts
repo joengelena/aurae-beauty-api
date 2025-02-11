@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import logger from '../../../config/logger';
 import getValidateEmailFormat from './getValidateEmailFormat';
+import NodeMailerError from '../errors/NodeMailerError';
 
 const transporter = nodemailer.createTransport({
 	host: 'smtp.gmail.com',
@@ -30,7 +31,7 @@ async function nodemailerSendEmail(
 		logger.info('Email sent successfully');
 	} catch (error) {
 		logger.debug(error);
-		throw Error(`Error sending email: ${error.message}`);
+		throw new NodeMailerError(`Error sending email: ${error.message}`);
 	}
 }
 

@@ -31,10 +31,19 @@ async function sendEmailValidation(req: Request, res: Response) {
 
 		res.statusMessage = 'Email validation link sent successfully';
 		res.status(200).send();
+		return;
 	} catch (error) {
 		logger.error(`Error sending email validation link: ${error}`);
+
+		if (error.name == 'NodeMailerError') {
+			res.statusMessage = 'Internal error sending email';
+			res.status(500).send();
+			return;
+		}
+
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
+		return;
 	}
 }
 
