@@ -21,7 +21,7 @@ function verifyJwtToken(req: Request) {
 			process.env.JWT_SECRET
 		) as jwt.JwtPayload;
 
-		req.body.userId = validJwt.userId;
+		req.body.currentUserId = validJwt.userId;
 
 		if (!validJwt) {
 			logger.error('Invalid jwt token');

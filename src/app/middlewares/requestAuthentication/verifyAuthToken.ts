@@ -7,7 +7,7 @@ async function verifyAuthToken(req: Request) {
 	try {
 		logger.info('Verifying auth token');
 		const authToken = req.headers['mtx-auth-token'] as string;
-		const userId = req.body.userId;
+		const userId = req.body.currentUserId;
 
 		if (!authToken) {
 			return {

@@ -4,7 +4,7 @@ import logger from '../../../config/logger';
 
 async function updateUser(req: Request, res: Response): Promise<void> {
 	try {
-		logger.info(`Updating user with id '${req.body.userId}'`);
+		logger.info(`Updating user with id '${req.body.currentUserId}'`);
 		const { userId, ...newUserData } = req.body;
 
 		await userRepository.updateUser({

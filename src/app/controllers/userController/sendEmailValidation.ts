@@ -8,7 +8,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 	logger.info('Sending email verification link');
 
 	try {
-		const userId = req.body.userId;
+		const userId = req.body.currentUserId;
 
 		const user = await userRepository.getUserById(userId);
 
