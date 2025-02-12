@@ -3,20 +3,9 @@ import logger from '../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import {
 	UserDBSchema,
+	User,
 	UserEmailValidationStatus,
-} from '../resources/databaseTypes';
-
-type User = {
-	id: string;
-	firstName: string;
-	lastName: string;
-	username: string;
-	email: string;
-	password: string;
-	phoneNumber: string;
-	isEmailVerified: 0 | 1;
-	isPhoneNumberVerified: 0 | 1;
-};
+} from '../resources/types';
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const {

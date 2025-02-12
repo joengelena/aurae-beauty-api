@@ -1,7 +1,7 @@
 import { RowDataPacket } from 'mysql2';
 import { getPool } from '../../config/db';
 import logger from '../../config/logger';
-import { AppConfigurationDBSchema } from '../resources/databaseTypes';
+import { AppConfigurationDBSchema } from '../resources/types';
 
 async function getAppConfig(): Promise<AppConfigurationDBSchema[]> {
 	logger.info('Getting web app base url');
