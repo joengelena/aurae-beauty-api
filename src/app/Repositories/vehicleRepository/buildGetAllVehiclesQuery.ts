@@ -1,15 +1,20 @@
-import { Pagination, Vehicle, VehicleSortBy } from '../../resources/types';
+import {
+	Pagination,
+	Vehicle,
+	VehicleBetweenFilters,
+	VehicleEqualFilters,
+	VehicleFilters,
+	VehicleSortBy,
+} from '../../resources/types';
 
 function buildGetAllVehiclesQuery(
-	filters: Vehicle,
+	filters: VehicleFilters,
 	sortBy: VehicleSortBy,
-	pagination: Pagination = { limit: 20, offset: 0 }
+	pagination: Pagination = { limit: 20, pageNumber: 1 }
 ) {
-	let query = 'SELECT * FROM vehicle_listing';
+	let query = 'SELECT * FROM vehicle_listing WHERE';
 
-	if (Object.keys(filters).length > 0) {
-		query += buildFilterQuery(filters);
-	}
+	buildFilterQuery(filters);
 
 	if (Object.keys(sortBy).length > 0) {
 		query += buildSortByQuery(sortBy);
@@ -20,16 +25,49 @@ function buildGetAllVehiclesQuery(
 	return query;
 }
 
-function buildFilterQuery(filters: Vehicle): string {
-	return '';
+function buildFilterQuery(filters: VehicleFilters) {
+	let conditions: string[] = [];
+
+	if (Object.keys(filters.betweenFilters).length > 0) {
+		conditions.push(buildBetweenFilterQuery(filters.betweenFilters));
+	}
+
+	if (Object.keys(filters.equalFilters).length > 0) {
+		conditions.push(buildEqualFilterQuery(filters.equalFilters));
+	}
+
+	return conditions.join(' AND ');
+}
+
+function buildBetweenFilterQuery(filters: VehicleBetweenFilters): string {
+	return Object.keys(filters)
+		.map(
+			(key) =>
+				`${key} BETWEEN ${
+					filters[key as keyof VehicleBetweenFilters].from
+				} 
+                AND ${filters[key as keyof VehicleBetweenFilters].to}`
+		)
+		.join(' AND ');
+}
+
+function buildEqualFilterQuery(filters: VehicleEqualFilters): string {
+	return Object.keys(filters)
+		.map((key) => `${key} = ${filters[key as keyof VehicleEqualFilters]}`)
+		.join(' AND ');
 }
 
 function buildSortByQuery(sortBy: VehicleSortBy): string {
-	return '';
+	const sortByKey = Object.keys(sortBy)[0] as keyof VehicleSortBy;
+	const sortByValue = sortBy[sortByKey];
+
+	return `ORDER BY ${sortByKey} ${sortByValue}`;
 }
 
 function buildPaginationQuery(pagination: Pagination): string {
-	return '';
+	return `LIMIT ${pagination.limit} OFFSET ${
+		(pagination.pageNumber - 1) * pagination.limit
+	}`;
 }
 
 export default buildGetAllVehiclesQuery;
