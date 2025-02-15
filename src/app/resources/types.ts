@@ -1,3 +1,5 @@
+import { off } from 'process';
+
 type UserDBSchema = {
 	id: string;
 	first_name: string;
@@ -30,6 +32,8 @@ type UserEmailValidationStatus = {
 type VehicleListingDBSchema = {
 	id: number;
 	user_id_fk: string;
+	location: string;
+	condition: string;
 	price: number;
 	photo_paths: string;
 	upload_date: Date;
@@ -59,6 +63,8 @@ type VehicleListingDBSchema = {
 type Vehicle = {
 	id: VehicleListingDBSchema['id'];
 	userIdFk: VehicleListingDBSchema['user_id_fk'];
+	location: VehicleListingDBSchema['location'];
+	condition: VehicleListingDBSchema['condition'];
 	price: VehicleListingDBSchema['price'];
 	photoPaths: VehicleListingDBSchema['photo_paths'];
 	uploadDate: VehicleListingDBSchema['upload_date'];
@@ -91,6 +97,49 @@ type AppConfigurationDBSchema = {
 	value: string;
 };
 
+type FromAndTo = {
+	from: number | string;
+	to: number | string;
+};
+
+type VehicleBetweenFilters = {
+	price: FromAndTo;
+	year: FromAndTo;
+	kilometers: FromAndTo;
+	seats: FromAndTo;
+	doors: FromAndTo;
+	engineSize: FromAndTo;
+};
+
+type VehicleEqualFilters = {
+	userIdFk: VehicleListingDBSchema['user_id_fk'];
+	location: VehicleListingDBSchema['location'];
+	condition: VehicleListingDBSchema['condition'];
+	uploadDate: VehicleListingDBSchema['upload_date'];
+	make: VehicleListingDBSchema['make'];
+	model: VehicleListingDBSchema['model'];
+	fuelType: VehicleListingDBSchema['fuel_type'];
+	bodyType: VehicleListingDBSchema['body_type'];
+	driveType: VehicleListingDBSchema['drive_type'];
+	color: VehicleListingDBSchema['color'];
+	transmission: VehicleListingDBSchema['transmission'];
+};
+
+type SortDirection = 'asc' | 'desc';
+
+type VehicleSortBy = {
+	price: SortDirection;
+	uploadDate: SortDirection;
+	kilometers: SortDirection;
+	year: SortDirection;
+	endDate: SortDirection;
+};
+
+type Pagination = {
+	limit: number; // The number of items shown per page
+	offset: number; // The number of items to skip before starting to count the remaining items
+};
+
 export {
 	UserDBSchema,
 	User,
@@ -98,4 +147,8 @@ export {
 	AppConfigurationDBSchema,
 	VehicleListingDBSchema,
 	Vehicle,
+	VehicleEqualFilters,
+	VehicleBetweenFilters,
+	VehicleSortBy,
+	Pagination,
 };
