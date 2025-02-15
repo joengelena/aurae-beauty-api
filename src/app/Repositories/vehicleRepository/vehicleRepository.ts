@@ -1,9 +1,13 @@
-import { getPool } from '../../config/db';
-import logger from '../../config/logger';
+import { getPool } from '../../../config/db';
+import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { VehicleListingDBSchema, Vehicle } from '../resources/types';
+import { VehicleListingDBSchema, Vehicle } from '../../resources/types';
 
-const vehicleDatabaseFields: { [key: string]: string } = {
+const vehicleDatabaseFields: Record<keyof Vehicle, string> = {
+	id: 'id',
+	userIdFk: 'user_id_fk',
+	location: 'location',
+	condition: 'condition',
 	price: 'price',
 	photoPaths: 'photo_paths',
 	uploadDate: 'upload_date',
@@ -50,7 +54,7 @@ async function postVehicle(vehicleData: Omit<Vehicle, 'id'>) {
 
 	const entries = Object.entries(vehicleData);
 	const fields = entries
-		.map(([key]) => vehicleDatabaseFields[key])
+		.map(([key]) => vehicleDatabaseFields[key as keyof Vehicle])
 		.join(', ');
 	const values = entries.map(([, value]) => value);
 
@@ -87,7 +91,7 @@ async function updateVehicleWithId(
 	}
 
 	const fields = Object.keys(updateValues)
-		.map((key) => `${vehicleDatabaseFields[key]} = ?`)
+		.map(([key]) => `${vehicleDatabaseFields[key as keyof Vehicle]} = ?`)
 		.join(', ');
 
 	const values = Object.values(updateValues);
