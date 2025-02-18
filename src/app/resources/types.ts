@@ -125,19 +125,23 @@ type VehicleEqualFilters = {
 	transmission: VehicleListingDBSchema['transmission'];
 };
 
+type VehicleFilters = {
+	betweenFilters: VehicleBetweenFilters;
+	equalFilters: VehicleEqualFilters;
+};
+
 type SortDirection = 'asc' | 'desc';
 
-type VehicleSortBy = {
-	price: SortDirection;
-	uploadDate: SortDirection;
-	kilometers: SortDirection;
-	year: SortDirection;
-	endDate: SortDirection;
-};
+type VehicleSortBy =
+	| { price: SortDirection }
+	| { uploadDate: SortDirection }
+	| { kilometers: SortDirection }
+	| { year: SortDirection }
+	| { endDate: SortDirection };
 
 type Pagination = {
 	limit: number; // The number of items shown per page
-	offset: number; // The number of items to skip before starting to count the remaining items
+	pageNumber: number;
 };
 
 export {
@@ -149,6 +153,7 @@ export {
 	Vehicle,
 	VehicleEqualFilters,
 	VehicleBetweenFilters,
+	VehicleFilters,
 	VehicleSortBy,
 	Pagination,
 };
