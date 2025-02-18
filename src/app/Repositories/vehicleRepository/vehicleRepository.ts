@@ -124,3 +124,11 @@ async function updateVehicleWithId(
 
 	return result;
 }
+
+export {
+	getAllVehicles,
+	getVehicleById,
+	postVehicle,
+	deleteVehicleWithId,
+	updateVehicleWithId,
+};
