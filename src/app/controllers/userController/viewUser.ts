@@ -6,8 +6,8 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 	logger.info(`Viewing user with id '${req.body.currentUserId}'`);
 
 	try {
-		const userId = req.body.currentUserId;
-		const users = await userRepository.getUserById(userId);
+		const currentUserId = req.body.currentUserId;
+		const users = await userRepository.getUserById(currentUserId);
 
 		if (users.length === 0) {
 			res.statusMessage = 'Not found. No user with specified id';

@@ -9,9 +9,9 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 			`Updating user password for user id '${req.params.userId}'`
 		);
 
-		const { userId, currentPassword, newPassword } = req.body;
+		const { currentUserId, currentPassword, newPassword } = req.body;
 
-		const user = await userRepository.getUserById(userId);
+		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
 			res.statusMessage = 'Not found. No user with specified id';
@@ -28,7 +28,7 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 		const hashedNewPassword = await hashPassword(newPassword);
 
 		await userRepository.updateUser({
-			id: userId,
+			id: currentUserId,
 			password: hashedNewPassword,
 		});
 

@@ -7,9 +7,9 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 	logger.info(`Signing out user with id '${req.params.userId}'`);
 
 	try {
-		const { userId } = req.body;
+		const { currentUserId } = req.body;
 
-		const user = await userRepository.getUserById(userId);
+		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
 			res.statusMessage = 'Forbidden. Invalid credentials';
@@ -18,7 +18,7 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 		}
 
 		const authTokenDeleteResult =
-			await userRepository.deleteAuthTokenForUserId(userId);
+			await userRepository.deleteAuthTokenForUserId(currentUserId);
 
 		if (authTokenDeleteResult.affectedRows === 1) {
 			clearCookiesInResponse(res);

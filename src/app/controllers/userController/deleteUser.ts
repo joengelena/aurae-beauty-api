@@ -8,9 +8,9 @@ async function deleteUser(req: Request, res: Response) {
 	logger.info(`Deleting user with id '${req.params.id}'`);
 
 	try {
-		const { userId, currentPassword } = req.body;
+		const { currentUserId, currentPassword } = req.body;
 
-		const user = await userRepository.getUserById(userId);
+		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
 			res.statusMessage = 'Not found. No user with specified id';
@@ -24,7 +24,9 @@ async function deleteUser(req: Request, res: Response) {
 			return;
 		}
 
-		const deleteUserResult = await userRepository.deleteUserWithId(userId);
+		const deleteUserResult = await userRepository.deleteUserWithId(
+			currentUserId
+		);
 
 		if (deleteUserResult.affectedRows === 1) {
 			clearCookiesInResponse(res);

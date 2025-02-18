@@ -8,9 +8,9 @@ async function sendEmailValidation(req: Request, res: Response) {
 	logger.info('Sending email verification link');
 
 	try {
-		const userId = req.body.currentUserId;
+		const currentUserId = req.body.currentUserId;
 
-		const user = await userRepository.getUserById(userId);
+		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
 			logger.info('User not found');
