@@ -1,7 +1,14 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { VehicleListingDBSchema, Vehicle } from '../../resources/types';
+import {
+	VehicleListingDBSchema,
+	Vehicle,
+	VehicleFilters,
+	Pagination,
+	VehicleSortBy,
+} from '../../resources/types';
+import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
 
 const vehicleDatabaseFields: Record<keyof Vehicle, string> = {
 	id: 'id',
@@ -34,8 +41,19 @@ const vehicleDatabaseFields: Record<keyof Vehicle, string> = {
 	wofExpiryDate: 'wof_expiry_date',
 };
 
-function getAllVehicles() {
+async function getAllVehicles(
+	filters: VehicleFilters,
+	sortby: VehicleSortBy,
+	pagination: Pagination
+) {
 	logger.info('Getting all vehicles from the database');
+
+	const connection = await getPool().getConnection();
+	const query = buildGetAllVehiclesQuery(filters, sortby, pagination);
+	const [result] = await connection.query<RowDataPacket[]>(query);
+	connection.release();
+
+	return result as VehicleListingDBSchema[];
 }
 
 async function getVehicleById(id: string) {
