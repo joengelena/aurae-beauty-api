@@ -116,5 +116,92 @@
 		},
 		"required": ["currentUserId", "currentPassword"],
 		"additionalProperties": false
+	},
+	"postVehicle": {
+		"type": "object",
+		"properties": {
+			"userIdFk": { "type": "string", "minLength": 36, "maxLength": 36 },
+			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"condition": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"price": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 99999999999
+			},
+			"photoPaths": { "type": "string", "minLength": 1 },
+			"uploadDate": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"description": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 10000
+			},
+			"endDate": { "type": "string", "minLength": 1, "maxLength": 20 },
+			"endTime": { "type": "string", "minLength": 1, "maxLength": 20 },
+			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
+			"kilometers": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 99999999999
+			},
+			"fuelType": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"bodyType": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"driveType": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"orcIncluded": { "type": "integer", "minimum": 0, "maximum": 1 },
+			"numberPlate": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"seats": { "type": "integer", "minimum": 0, "maximum": 255 },
+			"doors": { "type": "integer", "minimum": 0, "maximum": 255 },
+			"previousOwners": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 255
+			},
+			"color": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"engineSize": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 100000
+			},
+			"transmission": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"cylinders": { "type": "integer", "minimum": 0, "maximum": 255 },
+			"regoExpiryDate": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"wofExpiryDate": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			}
+		},
+		"required": [
+			"userIdFk",
+			"location",
+			"condition",
+			"price",
+			"photoPaths",
+			"uploadDate",
+			"description",
+			"endDate",
+			"endTime",
+			"make",
+			"model",
+			"year",
+			"kilometers",
+			"fuelType",
+			"bodyType",
+			"driveType"
+		],
+		"additionalProperties": false
 	}
 }
