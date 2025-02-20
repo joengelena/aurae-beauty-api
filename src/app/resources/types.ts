@@ -29,11 +29,23 @@ type UserEmailValidationStatus = {
 	is_email_verified: UserDBSchema['is_email_verified'];
 };
 
+type VehiclePhotosDBSchema = {
+	vehicle_listing_id_fk: number;
+	photo_order: number;
+	photo_path: string;
+};
+
+type VehiclePhotos = {
+	vehicleListingIdFk: VehiclePhotosDBSchema['vehicle_listing_id_fk'];
+	photoOrder: VehiclePhotosDBSchema['photo_order'];
+	photoPath: VehiclePhotosDBSchema['photo_path'];
+};
+
 type VehicleListingDBSchema = {
 	id: number;
 	user_id_fk: string;
 	location: string;
-	condition: string;
+	vehicle_condition: string;
 	price: number;
 	photo_paths: string;
 	upload_date: Date;
@@ -64,7 +76,7 @@ type Vehicle = {
 	id: VehicleListingDBSchema['id'];
 	userIdFk: VehicleListingDBSchema['user_id_fk'];
 	location: VehicleListingDBSchema['location'];
-	condition: VehicleListingDBSchema['condition'];
+	vehicleCondition: VehicleListingDBSchema['vehicle_condition'];
 	price: VehicleListingDBSchema['price'];
 	photoPaths: VehicleListingDBSchema['photo_paths'];
 	uploadDate: VehicleListingDBSchema['upload_date'];
@@ -114,7 +126,7 @@ type VehicleBetweenFilters = {
 type VehicleEqualFilters = {
 	userIdFk: VehicleListingDBSchema['user_id_fk'];
 	location: VehicleListingDBSchema['location'];
-	condition: VehicleListingDBSchema['condition'];
+	vehicleCondition: VehicleListingDBSchema['vehicle_condition'];
 	uploadDate: VehicleListingDBSchema['upload_date'];
 	make: VehicleListingDBSchema['make'];
 	model: VehicleListingDBSchema['model'];
@@ -148,6 +160,8 @@ export {
 	UserDBSchema,
 	User,
 	UserEmailValidationStatus,
+	VehiclePhotosDBSchema,
+	VehiclePhotos,
 	AppConfigurationDBSchema,
 	VehicleListingDBSchema,
 	Vehicle,
