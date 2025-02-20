@@ -29,16 +29,16 @@ type UserEmailValidationStatus = {
 	is_email_verified: UserDBSchema['is_email_verified'];
 };
 
-type VehiclePhotosDBSchema = {
+type VehiclePhotoDBSchema = {
 	vehicle_listing_id_fk: number;
 	photo_order: number;
 	photo_path: string;
 };
 
-type VehiclePhotos = {
-	vehicleListingIdFk: VehiclePhotosDBSchema['vehicle_listing_id_fk'];
-	photoOrder: VehiclePhotosDBSchema['photo_order'];
-	photoPath: VehiclePhotosDBSchema['photo_path'];
+type VehiclePhoto = {
+	vehicleListingIdFk: VehiclePhotoDBSchema['vehicle_listing_id_fk'];
+	photoOrder: VehiclePhotoDBSchema['photo_order'];
+	photoPath: VehiclePhotoDBSchema['photo_path'];
 };
 
 type VehicleListingDBSchema = {
@@ -160,8 +160,8 @@ export {
 	UserDBSchema,
 	User,
 	UserEmailValidationStatus,
-	VehiclePhotosDBSchema,
-	VehiclePhotos,
+	VehiclePhotoDBSchema,
+	VehiclePhoto,
 	AppConfigurationDBSchema,
 	VehicleListingDBSchema,
 	Vehicle,
