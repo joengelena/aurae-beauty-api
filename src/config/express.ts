@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import allowCrossOriginRequestsMiddleware from '../app/middlewares/cors';
 import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
+import vehicleRoutes from '../app/routes/vehicle.routes';
 import cookieParser from 'cookie-parser';
 
 export default () => {
@@ -29,6 +30,7 @@ export default () => {
 
 	// ROUTES
 	usersRoutes(app);
+	vehicleRoutes(app);
 
 	return app;
 };
