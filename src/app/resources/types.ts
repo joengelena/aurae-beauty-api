@@ -47,7 +47,6 @@ type VehicleListingDBSchema = {
 	location: string;
 	vehicle_condition: string;
 	price: number;
-	photo_paths: string;
 	upload_date: Date;
 	description: string;
 	end_date: string;
@@ -78,7 +77,6 @@ type Vehicle = {
 	location: VehicleListingDBSchema['location'];
 	vehicleCondition: VehicleListingDBSchema['vehicle_condition'];
 	price: VehicleListingDBSchema['price'];
-	photoPaths: VehicleListingDBSchema['photo_paths'];
 	uploadDate: VehicleListingDBSchema['upload_date'];
 	description: VehicleListingDBSchema['description'];
 	endDate: VehicleListingDBSchema['end_date'];
