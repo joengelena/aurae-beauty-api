@@ -16,6 +16,29 @@ async function postVehicle(req: Request, res: Response) {
 			return;
 		}
 
+		let currentPhotoOrder = 1;
+
+		for (const key in photoPaths) {
+			// The regex will test to see if the key is a number
+			if (!/^\d+$/.test(key)) {
+				logger.error('Invalid photo order format');
+				res.statusMessage =
+					'Invalid photo order. Photo order must be a number';
+				res.status(403).send();
+				return;
+			}
+
+			if (Number(key) !== currentPhotoOrder) {
+				logger.error('Invalid photo order');
+				res.statusMessage =
+					'Invalid photo order. Photo order must be sequential';
+				res.status(403).send();
+				return;
+			}
+
+			currentPhotoOrder++;
+		}
+
 		const result = await vehicleRepository.postVehicle(vehicleData);
 
 		for (const key in photoPaths) {
