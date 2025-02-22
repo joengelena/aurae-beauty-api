@@ -51,7 +51,9 @@ async function postVehicle(req: Request, res: Response) {
 
 		if (result.affectedRows === 1) {
 			res.statusMessage = 'Vehicle added successfully';
-			res.status(201).send();
+			res.status(201).send({
+				vehicleId: result.insertId,
+			});
 			return;
 		}
 
