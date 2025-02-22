@@ -36,7 +36,7 @@ function validateRequestBody(
 		return;
 	}
 
-	logger.info('Validated request body, schema: ', schema);
+	logger.info('Validated request body');
 	next();
 }
 
