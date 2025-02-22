@@ -11,7 +11,10 @@ import {
 } from '../../resources/types';
 import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
 
-const vehicleDatabaseFields: Record<keyof Vehicle, string> = {
+const vehicleDatabaseFields: Record<
+	keyof Vehicle,
+	keyof VehicleListingDBSchema
+> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
 	location: 'location',
@@ -70,14 +73,16 @@ async function getVehicleById(id: string) {
 async function postVehicle(vehicleData: Omit<Vehicle, 'id'>) {
 	logger.info('Adding new vehicle');
 
-	const entries = Object.entries(vehicleData);
-	const fields = entries
-		.map(([key]) => vehicleDatabaseFields[key as keyof Vehicle])
-		.join(', ');
-	const values = entries.map(([, value]) => value);
+	const fields = [];
+	const values = [];
+
+	for (const [key, value] of Object.entries(vehicleData)) {
+		fields.push(`${vehicleDatabaseFields[key as keyof Vehicle]}`);
+		values.push(value);
+	}
 
 	const connection = await getPool().getConnection();
-	const query = `INSERT INTO vehicle_listing (${fields}) 
+	const query = `INSERT INTO vehicle_listing (${fields.join(', ')}) 
 					values (${values.map(() => '?').join(', ')})`;
 	const [result] = await connection.query<ResultSetHeader>(query, values);
 	connection.release();
@@ -124,18 +129,22 @@ async function updateVehicleWithId(
 		throw new Error('Empty vehicle update fields');
 	}
 
-	const fields = Object.keys(updateValues)
-		.map(([key]) => `${vehicleDatabaseFields[key as keyof Vehicle]} = ?`)
-		.join(', ');
+	const fields = [];
+	const values = [];
 
-	const values = Object.values(updateValues);
+	for (const [key, value] of Object.entries(updateValues)) {
+		fields.push(`${vehicleDatabaseFields[key as keyof Vehicle]} = ?`);
+		values.push(value);
+	}
 
 	const connection = await getPool().getConnection();
-	const query = `UPDATE vehicle_listing SET ${fields} WHERE id = ?`;
-	const [result] = await connection.query<ResultSetHeader>(query, [
-		values,
-		id,
-	]);
+	const query = `UPDATE vehicle_listing SET ${fields.join(
+		', '
+	)} WHERE id = ?`;
+
+	values.push(id);
+
+	const [result] = await connection.query<ResultSetHeader>(query, values);
 	connection.release();
 
 	return result;

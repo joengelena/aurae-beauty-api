@@ -4,6 +4,7 @@ import validateRequest from '../middlewares/requestAuthentication/validateReques
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import { postVehicle } from '../controllers/vehicleController';
+import updateVehicleLising from '../controllers/vehicleController/updateVehicleListing';
 
 const vehicleRoutes = (app: Express) => {
 	app.route(rootUrl + '/vehicles')
@@ -13,7 +14,12 @@ const vehicleRoutes = (app: Express) => {
 		.post(
 			validateRequest,
 			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.postVehicle);
+				validateRequestBody(
+					req,
+					res,
+					next,
+					ajvSchema.postVehicleListing
+				);
 			},
 			postVehicle
 		);
@@ -22,9 +28,18 @@ const vehicleRoutes = (app: Express) => {
 		.get((req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		})
-		.patch(validateRequest, (req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		})
+		.patch(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(
+					req,
+					res,
+					next,
+					ajvSchema.updateVehicleListing
+				);
+			},
+			updateVehicleLising
+		)
 		.delete(validateRequest, (req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		});
