@@ -7,6 +7,7 @@ import {
 	VehicleFilters,
 	Pagination,
 	VehicleSortBy,
+	VehiclePhoto,
 } from '../../resources/types';
 import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
 
@@ -14,9 +15,8 @@ const vehicleDatabaseFields: Record<keyof Vehicle, string> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
 	location: 'location',
-	condition: 'condition',
+	vehicleCondition: 'vehicle_condition',
 	price: 'price',
-	photoPaths: 'photo_paths',
 	uploadDate: 'upload_date',
 	description: 'description',
 	endDate: 'end_date',
@@ -79,8 +79,24 @@ async function postVehicle(vehicleData: Omit<Vehicle, 'id'>) {
 	const connection = await getPool().getConnection();
 	const query = `INSERT INTO vehicle_listing (${fields}) 
 					values (${values.map(() => '?').join(', ')})`;
-
 	const [result] = await connection.query<ResultSetHeader>(query, values);
+	connection.release();
+
+	return result;
+}
+
+async function postVehiclePhotoPath(vehiclePhotoData: VehiclePhoto) {
+	logger.info(
+		`Adding new vehicle photo path for vehicle id: ${vehiclePhotoData.vehicleListingIdFk} photo order: ${vehiclePhotoData.photoOrder}`
+	);
+
+	const connection = await getPool().getConnection();
+	const query = 'INSERT INTO vehicle_photo values (?, ?, ?)';
+	const [result] = await connection.query<ResultSetHeader>(query, [
+		vehiclePhotoData.vehicleListingIdFk,
+		vehiclePhotoData.photoOrder,
+		vehiclePhotoData.photoPath,
+	]);
 	connection.release();
 
 	return result;
@@ -129,6 +145,7 @@ export {
 	getAllVehicles,
 	getVehicleById,
 	postVehicle,
+	postVehiclePhotoPath,
 	deleteVehicleWithId,
 	updateVehicleWithId,
 };
