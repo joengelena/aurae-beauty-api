@@ -7,6 +7,7 @@ import {
 	postVehicle,
 	updateVehicleLising,
 	getVehicleListing,
+	deleteVehicleListing,
 } from '../controllers/vehicleController';
 
 const vehicleRoutes = (app: Express) => {
@@ -43,9 +44,13 @@ const vehicleRoutes = (app: Express) => {
 			},
 			updateVehicleLising
 		)
-		.delete(validateRequest, (req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		});
+		.delete(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			deleteVehicleListing
+		);
 };
 
 export default vehicleRoutes;
