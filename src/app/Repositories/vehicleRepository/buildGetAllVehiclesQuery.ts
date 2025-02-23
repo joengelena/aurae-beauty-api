@@ -8,13 +8,14 @@ import {
 } from '../../resources/types';
 
 function buildGetAllVehiclesQuery(
-	filters: VehicleFilters,
+	equalFilters: VehicleEqualFilters,
+	betweenFilters: VehicleBetweenFilters,
 	sortBy: VehicleSortBy,
 	pagination: Pagination = { limit: 20, pageNumber: 1 }
 ) {
 	let query = 'SELECT * FROM vehicle_listing WHERE';
 
-	buildFilterQuery(filters);
+	buildFilterQuery(equalFilters, betweenFilters);
 
 	if (Object.keys(sortBy).length > 0) {
 		query += buildSortByQuery(sortBy);
@@ -25,15 +26,18 @@ function buildGetAllVehiclesQuery(
 	return query;
 }
 
-function buildFilterQuery(filters: VehicleFilters) {
+function buildFilterQuery(
+	equalFilters: VehicleEqualFilters,
+	betweenFilters: VehicleBetweenFilters
+) {
 	let conditions: string[] = [];
 
-	if (Object.keys(filters.betweenFilters).length > 0) {
-		conditions.push(buildBetweenFilterQuery(filters.betweenFilters));
+	if (Object.keys(equalFilters).length > 0) {
+		conditions.push(buildEqualFilterQuery(equalFilters));
 	}
 
-	if (Object.keys(filters.equalFilters).length > 0) {
-		conditions.push(buildEqualFilterQuery(filters.equalFilters));
+	if (Object.keys(betweenFilters).length > 0) {
+		conditions.push(buildBetweenFilterQuery(betweenFilters));
 	}
 
 	return conditions.join(' AND ');
