@@ -16,7 +16,7 @@ async function deleteVehicleListing(req: Request, res: Response) {
 			res.status(404).send();
 			return;
 		}
-		logger.debug(vehicle[0].user_id_fk);
+
 		if (currentUserId !== vehicle[0].user_id_fk) {
 			logger.error('Trying to delete someone else is vehicle listing');
 			res.statusMessage =

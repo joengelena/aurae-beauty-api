@@ -30,7 +30,7 @@ async function nodemailerSendEmail(
 		await transporter.sendMail(mailOptions);
 		logger.info('Email sent successfully');
 	} catch (error) {
-		logger.debug(error);
+		logger.error(error);
 		throw new NodeMailerError(`Error sending email: ${error.message}`);
 	}
 }

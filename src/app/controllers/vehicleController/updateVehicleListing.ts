@@ -24,7 +24,7 @@ async function updateVehicleLising(req: Request, res: Response) {
 			res.status(403).send();
 			return;
 		}
-		logger.debug(newVehicleData);
+
 		const editVehicleResult = await vehicleRepository.updateVehicleWithId(
 			req.params.id,
 			newVehicleData
