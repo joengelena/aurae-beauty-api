@@ -4,10 +4,8 @@ import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import {
 	VehicleListingDBSchema,
 	Vehicle,
-	VehicleFilters,
-	Pagination,
-	VehicleSortBy,
 	VehiclePhoto,
+	testQuery,
 } from '../../resources/types';
 import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
 
@@ -44,19 +42,31 @@ const vehicleDatabaseFields: Record<
 	wofExpiryDate: 'wof_expiry_date',
 };
 
-async function getAllVehicles(
-	filters: VehicleFilters,
-	sortby: VehicleSortBy,
-	pagination: Pagination
-) {
+async function getAllVehicles(allQueries: Partial<testQuery>) {
 	logger.info('Getting all vehicles from the database');
-
+	logger.debug(allQueries);
 	const connection = await getPool().getConnection();
-	const query = buildGetAllVehiclesQuery(filters, sortby, pagination);
-	const [result] = await connection.query<RowDataPacket[]>(query);
+	const { query, values, limit, currentPage } =
+		buildGetAllVehiclesQuery(allQueries);
+	logger.debug(query);
+	logger.debug(values.toString());
+	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();
 
-	return result as VehicleListingDBSchema[];
+	const totalRows = result[0].totalRows;
+
+	result.forEach((vehicle) => {
+		delete vehicle.totalRows;
+	});
+
+	const totalPages = Math.ceil(totalRows / limit);
+
+	return {
+		data: result as VehicleListingDBSchema[],
+		currentPage,
+		totalPages,
+		totalRows,
+	};
 }
 
 async function getVehicleById(id: string) {

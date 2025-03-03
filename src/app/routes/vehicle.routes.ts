@@ -8,13 +8,14 @@ import {
 	updateVehicleLising,
 	getVehicleListing,
 	deleteVehicleListing,
+	getAllVehicleListings,
 } from '../controllers/vehicleController';
 
 const vehicleRoutes = (app: Express) => {
 	app.route(rootUrl + '/vehicles')
 		.get((req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		})
+		}, getAllVehicleListings)
 		.post(
 			validateRequest,
 			(req, res, next) => {

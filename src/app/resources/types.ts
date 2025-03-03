@@ -107,51 +107,46 @@ type AppConfigurationDBSchema = {
 	value: string;
 };
 
-type FromAndTo = {
-	from: number | string;
-	to: number | string;
-};
-
-type VehicleBetweenFilters = {
-	price: FromAndTo;
-	year: FromAndTo;
-	kilometers: FromAndTo;
-	seats: FromAndTo;
-	doors: FromAndTo;
-	engineSize: FromAndTo;
-};
-
-type VehicleEqualFilters = {
-	userIdFk: VehicleListingDBSchema['user_id_fk'];
-	location: VehicleListingDBSchema['location'];
-	vehicleCondition: VehicleListingDBSchema['vehicle_condition'];
-	uploadDate: VehicleListingDBSchema['upload_date'];
-	make: VehicleListingDBSchema['make'];
-	model: VehicleListingDBSchema['model'];
-	fuelType: VehicleListingDBSchema['fuel_type'];
-	bodyType: VehicleListingDBSchema['body_type'];
-	driveType: VehicleListingDBSchema['drive_type'];
-	color: VehicleListingDBSchema['color'];
-	transmission: VehicleListingDBSchema['transmission'];
-};
-
-type VehicleFilters = {
-	betweenFilters: VehicleBetweenFilters;
-	equalFilters: VehicleEqualFilters;
-};
-
-type SortDirection = 'asc' | 'desc';
-
-type VehicleSortBy =
-	| { price: SortDirection }
-	| { uploadDate: SortDirection }
-	| { kilometers: SortDirection }
-	| { year: SortDirection }
-	| { endDate: SortDirection };
-
-type Pagination = {
-	limit: number; // The number of items shown per page
-	pageNumber: number;
+type testQuery = {
+	searchString: string;
+	sortBy:
+		| 'priceDesc'
+		| 'priceAsc'
+		| 'uploadDateDesc'
+		| 'uploadDateAsc'
+		| 'kilometersDesc'
+		| 'kilometersAsc'
+		| 'yearDesc'
+		| 'yearAsc'
+		| 'endDateDesc'
+		| 'endDateAsc';
+	limit: string;
+	pageNumber: string;
+	// Between filters
+	priceFrom: string;
+	priceTo: string;
+	yearFrom: string;
+	yearTo: string;
+	kilometersFrom: string;
+	kilometersTo: string;
+	seatsFrom: string;
+	seatsTo: string;
+	doorsFrom: string;
+	doorsTo: string;
+	engineSizeFrom: string;
+	engineSizeTo: string;
+	// Equal filters
+	userIdFk: string;
+	location: string;
+	vehicleCondition: string;
+	uploadDate: string;
+	make: string;
+	model: string;
+	fuelType: string;
+	bodyType: string;
+	driveType: string;
+	color: string;
+	transmission: string;
 };
 
 export {
@@ -163,9 +158,5 @@ export {
 	AppConfigurationDBSchema,
 	VehicleListingDBSchema,
 	Vehicle,
-	VehicleEqualFilters,
-	VehicleBetweenFilters,
-	VehicleFilters,
-	VehicleSortBy,
-	Pagination,
+	testQuery,
 };
