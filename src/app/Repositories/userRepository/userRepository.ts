@@ -1,11 +1,7 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import {
-	UserDBSchema,
-	User,
-	UserEmailValidationStatus,
-} from '../../resources/types';
+import { User, UserEmailValidationStatus } from '../../resources/types';
 import mapUserDbToUserDTO from './mapUserDbToUserDTO';
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
@@ -81,7 +77,7 @@ async function getUserWithAuthToken(token: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [token]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result as UserDBSchema[]);
+	return mapUserDbToUserDTO(result);
 }
 
 async function getUserByEmail(email: string): Promise<User[]> {
@@ -92,7 +88,7 @@ async function getUserByEmail(email: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result as UserDBSchema[]);
+	return mapUserDbToUserDTO(result);
 }
 
 async function getUserById(id: string): Promise<User[]> {
@@ -103,7 +99,7 @@ async function getUserById(id: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result as UserDBSchema[]);
+	return mapUserDbToUserDTO(result);
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {

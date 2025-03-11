@@ -1,32 +1,17 @@
-import { off } from 'process';
-
-type UserDBSchema = {
+type User = {
 	id: string;
-	first_name: string;
-	last_name: string;
+	firstName: string;
+	lastName: string;
 	username: string;
-	phone_number: string;
 	email: string;
 	password: string;
-	is_email_verified: 0 | 1;
-	is_phone_number_verified: 0 | 1;
-	auth_token: string | null;
-};
-
-type User = {
-	id: UserDBSchema['id'];
-	firstName: UserDBSchema['first_name'];
-	lastName: UserDBSchema['last_name'];
-	username: UserDBSchema['username'];
-	email: UserDBSchema['email'];
-	password: UserDBSchema['password'];
-	phoneNumber: UserDBSchema['phone_number'];
-	isEmailVerified: UserDBSchema['is_email_verified'];
-	isPhoneNumberVerified: UserDBSchema['is_phone_number_verified'];
+	phoneNumber: string;
+	isEmailVerified: 0 | 1;
+	isPhoneNumberVerified: 0 | 1;
 };
 
 type UserEmailValidationStatus = {
-	is_email_verified: UserDBSchema['is_email_verified'];
+	is_email_verified: 0 | 1;
 };
 
 type VehiclePhotoDBSchema = {
@@ -155,7 +140,6 @@ type ListingFilters = {
 };
 
 export {
-	UserDBSchema,
 	User,
 	UserEmailValidationStatus,
 	VehiclePhotoDBSchema,

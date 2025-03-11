@@ -1,10 +1,9 @@
-import { User, UserDBSchema } from '../../resources/types';
+import { User } from '../../resources/types';
+import { RowDataPacket } from 'mysql2';
 
-function mapUserDbToUserDTO(usersDb: UserDBSchema[]): User[] {
-	const users: User[] = [];
-
-	usersDb.forEach((user) => {
-		users.push({
+function mapUserDbToUserDTO(usersDb: RowDataPacket[]): User[] {
+	return usersDb.map((user) => {
+		return {
 			id: user['id'],
 			firstName: user['first_name'],
 			lastName: user['last_name'],
@@ -14,10 +13,8 @@ function mapUserDbToUserDTO(usersDb: UserDBSchema[]): User[] {
 			phoneNumber: user['phone_number'],
 			isEmailVerified: user['is_email_verified'],
 			isPhoneNumberVerified: user['is_phone_number_verified'],
-		});
+		};
 	});
-
-	return users;
 }
 
 export default mapUserDbToUserDTO;
