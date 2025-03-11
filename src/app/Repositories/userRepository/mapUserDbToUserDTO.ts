@@ -19,3 +19,5 @@ function mapUserDbToUserDTO(usersDb: UserDBSchema[]): User[] {
 
 	return users;
 }
+
+export default mapUserDbToUserDTO;

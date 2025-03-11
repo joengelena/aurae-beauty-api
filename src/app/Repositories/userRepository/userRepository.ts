@@ -6,6 +6,7 @@ import {
 	User,
 	UserEmailValidationStatus,
 } from '../../resources/types';
+import mapUserDbToUserDTO from './mapUserDbToUserDTO';
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const {
@@ -72,7 +73,7 @@ async function deleteAuthTokenForUserId(
 	return result;
 }
 
-async function getUserWithAuthToken(token: string): Promise<UserDBSchema[]> {
+async function getUserWithAuthToken(token: string): Promise<User[]> {
 	logger.info(`Getting user with token '${token}' from the database`);
 
 	const connection = await getPool().getConnection();
@@ -83,18 +84,7 @@ async function getUserWithAuthToken(token: string): Promise<UserDBSchema[]> {
 	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
-async function checkIfEmailExists(email: string): Promise<UserDBSchema[]> {
-	logger.info(`Checking if email '${email}' is already in the database`);
-
-	const connection = await getPool().getConnection();
-	const query = 'SELECT * FROM User WHERE email = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
-	connection.release();
-
-	return mapUserDbToUserDTO(result as UserDBSchema[]);
-}
-
-async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
+async function getUserByEmail(email: string): Promise<User[]> {
 	logger.info(`Getting user with email '${email}' from the database`);
 
 	const connection = await getPool().getConnection();
@@ -105,7 +95,7 @@ async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
 	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
-async function getUserById(id: string): Promise<UserDBSchema[]> {
+async function getUserById(id: string): Promise<User[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
 
 	const connection = await getPool().getConnection();
@@ -200,7 +190,6 @@ async function updateUserEmailValidatedStatus(id: User['id'], status: 0 | 1) {
 
 export {
 	signUpUser,
-	checkIfEmailExists,
 	getUserByEmail,
 	getUserById,
 	updateUser,
@@ -211,8 +200,3 @@ export {
 	getUserEmailValidationStatus,
 	updateUserEmailValidatedStatus,
 };
-function mapUserDbToUserDTO(
-	arg0: UserDBSchema[]
-): UserDBSchema[] | PromiseLike<UserDBSchema[]> {
-	throw new Error('Function not implemented.');
-}
