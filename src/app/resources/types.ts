@@ -149,6 +149,11 @@ type testQuery = {
 	transmission: string;
 };
 
+type ListingFilters = {
+	name: string;
+	filterValues: string;
+};
+
 export {
 	UserDBSchema,
 	User,
@@ -159,4 +164,5 @@ export {
 	VehicleListingDBSchema,
 	Vehicle,
 	testQuery,
+	ListingFilters,
 };
