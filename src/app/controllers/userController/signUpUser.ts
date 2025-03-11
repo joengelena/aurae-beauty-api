@@ -1,4 +1,4 @@
-import * as userRepository from '../../repositories/userRepository';
+import * as userRepository from '../../repositories/userRepository/userRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword } from '../../utils/passwordHash';
 import { Request, Response } from 'express';

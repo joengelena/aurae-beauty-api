@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as userRepository from '../../repositories/userRepository';
+import * as userRepository from '../../repositories/userRepository/userRepository';
 import { v4 as uuidv4 } from 'uuid';
 import { comparePassword } from '../../utils/passwordHash';
 import { generateJwtToken } from '../../utils/jwt/generateJwt';

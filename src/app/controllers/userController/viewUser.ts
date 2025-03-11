@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as userRepository from '../../repositories/userRepository';
+import * as userRepository from '../../repositories/userRepository/userRepository';
 import logger from '../../../config/logger';
 
 async function viewUser(req: Request, res: Response): Promise<void> {

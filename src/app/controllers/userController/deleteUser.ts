@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as userRepository from '../../repositories/userRepository';
+import * as userRepository from '../../repositories/userRepository/userRepository';
 import { comparePassword } from '../../utils/passwordHash';
 import clearCookiesInResponse from '../../middlewares/requestAuthentication/clearCookiesInResponse';
 

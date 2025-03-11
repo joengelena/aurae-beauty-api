@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import jwt from 'jsonwebtoken';
 import verifyJwt from '../../utils/jwt/verifyJwt';
-import * as userRepository from '../../repositories/userRepository';
+import * as userRepository from '../../repositories/userRepository/userRepository';
 
 async function validateEmailVerificationToken(req: Request, res: Response) {
 	logger.info('Validating email verification token');

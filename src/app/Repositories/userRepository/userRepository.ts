@@ -1,11 +1,11 @@
-import { getPool } from '../../config/db';
-import logger from '../../config/logger';
+import { getPool } from '../../../config/db';
+import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import {
 	UserDBSchema,
 	User,
 	UserEmailValidationStatus,
-} from '../resources/types';
+} from '../../resources/types';
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const {
@@ -80,7 +80,7 @@ async function getUserWithAuthToken(token: string): Promise<UserDBSchema[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [token]);
 	connection.release();
 
-	return result as UserDBSchema[];
+	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
 async function checkIfEmailExists(email: string): Promise<UserDBSchema[]> {
@@ -91,7 +91,7 @@ async function checkIfEmailExists(email: string): Promise<UserDBSchema[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
 	connection.release();
 
-	return result as UserDBSchema[];
+	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
 async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
@@ -102,7 +102,7 @@ async function getUserByEmail(email: string): Promise<UserDBSchema[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
 	connection.release();
 
-	return result as UserDBSchema[];
+	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
 async function getUserById(id: string): Promise<UserDBSchema[]> {
@@ -113,7 +113,7 @@ async function getUserById(id: string): Promise<UserDBSchema[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
 	connection.release();
 
-	return result as UserDBSchema[];
+	return mapUserDbToUserDTO(result as UserDBSchema[]);
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
@@ -211,3 +211,8 @@ export {
 	getUserEmailValidationStatus,
 	updateUserEmailValidatedStatus,
 };
+function mapUserDbToUserDTO(
+	arg0: UserDBSchema[]
+): UserDBSchema[] | PromiseLike<UserDBSchema[]> {
+	throw new Error('Function not implemented.');
+}
