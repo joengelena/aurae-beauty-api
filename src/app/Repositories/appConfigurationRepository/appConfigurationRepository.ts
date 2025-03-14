@@ -1,9 +1,10 @@
 import { RowDataPacket } from 'mysql2';
-import { getPool } from '../../config/db';
-import logger from '../../config/logger';
-import { AppConfigurationDBSchema } from '../resources/types';
+import { getPool } from '../../../config/db';
+import logger from '../../../config/logger';
+import { AppConfiguration } from '../../resources/types';
+import mapAppConfigDbToDTO from './mapAppConfigDbToDTO';
 
-async function getAppConfig(): Promise<AppConfigurationDBSchema[]> {
+async function getAppConfig(): Promise<AppConfiguration[]> {
 	logger.info('Getting web app base url');
 
 	const connection = await getPool().getConnection();
@@ -11,7 +12,7 @@ async function getAppConfig(): Promise<AppConfigurationDBSchema[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query);
 	connection.release();
 
-	return result as AppConfigurationDBSchema[];
+	return mapAppConfigDbToDTO(result);
 }
 
 export { getAppConfig };
