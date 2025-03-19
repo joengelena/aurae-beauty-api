@@ -1,6 +1,5 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
-import { Vehicle } from '../../resources/types';
 import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
 
 async function postVehicle(req: Request, res: Response) {

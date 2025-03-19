@@ -26,64 +26,34 @@ type VehiclePhoto = {
 	photoPath: VehiclePhotoDBSchema['photo_path'];
 };
 
-type VehicleListingDBSchema = {
+type VehicleListing = {
 	id: number;
-	user_id_fk: string;
+	userIdFk: string;
 	location: string;
-	vehicle_condition: string;
+	vehicleCondition: string;
 	price: number;
-	upload_date: Date;
+	uploadDate: Date;
 	description: string;
-	end_date: string;
-	end_time: string;
+	endDate: string;
+	endTime: string;
 	make: string;
 	model: string;
 	year: string;
 	kilometers: number;
-	fuel_type: string;
-	body_type: string;
-	drive_type: string;
-	orc_included: number;
-	number_plate: string | null;
+	fuelType: string;
+	bodyType: string;
+	driveType: string;
+	orcIncluded: number;
+	numberPlate: string | null;
 	seats: number | null;
 	doors: number | null;
-	previous_owners: number | null;
+	previousOwners: number | null;
 	color: string | null;
-	engine_size: number | null;
+	engineSize: number | null;
 	transmission: string | null;
 	cylinders: number | null;
-	rego_expiry_date: string | null;
-	wof_expiry_date: string | null;
-};
-
-type Vehicle = {
-	id: VehicleListingDBSchema['id'];
-	userIdFk: VehicleListingDBSchema['user_id_fk'];
-	location: VehicleListingDBSchema['location'];
-	vehicleCondition: VehicleListingDBSchema['vehicle_condition'];
-	price: VehicleListingDBSchema['price'];
-	uploadDate: VehicleListingDBSchema['upload_date'];
-	description: VehicleListingDBSchema['description'];
-	endDate: VehicleListingDBSchema['end_date'];
-	endTime: VehicleListingDBSchema['end_time'];
-	make: VehicleListingDBSchema['make'];
-	model: VehicleListingDBSchema['model'];
-	year: VehicleListingDBSchema['year'];
-	kilometers: VehicleListingDBSchema['kilometers'];
-	fuelType: VehicleListingDBSchema['fuel_type'];
-	bodyType: VehicleListingDBSchema['body_type'];
-	driveType: VehicleListingDBSchema['drive_type'];
-	orcIncluded: VehicleListingDBSchema['orc_included'];
-	numberPlate: VehicleListingDBSchema['number_plate'];
-	seats: VehicleListingDBSchema['seats'];
-	doors: VehicleListingDBSchema['doors'];
-	previousOwners: VehicleListingDBSchema['previous_owners'];
-	color: VehicleListingDBSchema['color'];
-	engineSize: VehicleListingDBSchema['engine_size'];
-	transmission: VehicleListingDBSchema['transmission'];
-	cylinders: VehicleListingDBSchema['cylinders'];
-	regoExpiryDate: VehicleListingDBSchema['rego_expiry_date'];
-	wofExpiryDate: VehicleListingDBSchema['wof_expiry_date'];
+	regoExpiryDate: string | null;
+	wofExpiryDate: string | null;
 };
 
 type AppConfiguration = {
@@ -145,8 +115,7 @@ export {
 	VehiclePhotoDBSchema,
 	VehiclePhoto,
 	AppConfiguration,
-	VehicleListingDBSchema,
-	Vehicle,
+	VehicleListing,
 	testQuery,
 	ListingFilters,
 };

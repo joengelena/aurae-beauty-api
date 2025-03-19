@@ -17,7 +17,7 @@ async function updateVehicleLising(req: Request, res: Response) {
 
 		const vehicle = await vehicleRepository.getVehicleById(vehicleId);
 
-		if (currentUserId !== vehicle[0].user_id_fk) {
+		if (currentUserId !== vehicle[0].userIdFk) {
 			logger.error('Trying to edit someone else is vehicle listing');
 			res.statusMessage =
 				'Forbidden. Invalid credentials. You are not the owner of this vehicle listing';

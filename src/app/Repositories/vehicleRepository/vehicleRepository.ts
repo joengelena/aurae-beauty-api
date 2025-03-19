@@ -1,18 +1,11 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import {
-	VehicleListingDBSchema,
-	Vehicle,
-	VehiclePhoto,
-	testQuery,
-} from '../../resources/types';
+import { VehicleListing, VehiclePhoto, testQuery } from '../../resources/types';
 import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
+import mapVehicleListingDbToObject from './mapVehicleListingDbToObject';
 
-const vehicleDatabaseFields: Record<
-	keyof Vehicle,
-	keyof VehicleListingDBSchema
-> = {
+const vehicleListingDbFields: Record<keyof VehicleListing, string> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
 	location: 'location',
@@ -42,14 +35,18 @@ const vehicleDatabaseFields: Record<
 	wofExpiryDate: 'wof_expiry_date',
 };
 
-async function getAllVehicles(allQueries: Partial<testQuery>) {
+async function getAllVehicles(allQueries: Partial<testQuery>): Promise<{
+	data: VehicleListing[];
+	currentPage: number;
+	totalPages: number;
+	totalRows: number;
+}> {
 	logger.info('Getting all vehicles from the database');
-	logger.debug(allQueries);
+
 	const connection = await getPool().getConnection();
 	const { query, values, limit, currentPage } =
 		buildGetAllVehiclesQuery(allQueries);
-	logger.debug(query);
-	logger.debug(values.toString());
+
 	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();
 
@@ -62,14 +59,14 @@ async function getAllVehicles(allQueries: Partial<testQuery>) {
 	const totalPages = Math.ceil(totalRows / limit);
 
 	return {
-		data: result as VehicleListingDBSchema[],
+		data: mapVehicleListingDbToObject(result),
 		currentPage,
 		totalPages,
 		totalRows,
 	};
 }
 
-async function getVehicleById(id: string) {
+async function getVehicleById(id: string): Promise<VehicleListing[]> {
 	logger.info(`Getting vehicle with id '${id}' from the database`);
 
 	const conneciton = await getPool().getConnection();
@@ -77,17 +74,17 @@ async function getVehicleById(id: string) {
 	const [result] = await conneciton.query<RowDataPacket[]>(query, [id]);
 	conneciton.release();
 
-	return result as VehicleListingDBSchema[];
+	return mapVehicleListingDbToObject(result);
 }
 
-async function postVehicle(vehicleData: Omit<Vehicle, 'id'>) {
+async function postVehicle(vehicleData: Omit<VehicleListing, 'id'>) {
 	logger.info('Adding new vehicle');
 
 	const fields = [];
 	const values = [];
 
 	for (const [key, value] of Object.entries(vehicleData)) {
-		fields.push(`${vehicleDatabaseFields[key as keyof Vehicle]}`);
+		fields.push(`${vehicleListingDbFields[key as keyof VehicleListing]}`);
 		values.push(value);
 	}
 
@@ -130,7 +127,7 @@ async function deleteVehicleWithId(id: string) {
 
 async function updateVehicleWithId(
 	id: string,
-	updateValues: Omit<Partial<Vehicle>, 'id' | 'userIdFk'>
+	updateValues: Omit<Partial<VehicleListing>, 'id' | 'userIdFk'>
 ) {
 	logger.info(`Updating vehicle with id '${id}' in the database`);
 
@@ -143,7 +140,9 @@ async function updateVehicleWithId(
 	const values = [];
 
 	for (const [key, value] of Object.entries(updateValues)) {
-		fields.push(`${vehicleDatabaseFields[key as keyof Vehicle]} = ?`);
+		fields.push(
+			`${vehicleListingDbFields[key as keyof VehicleListing]} = ?`
+		);
 		values.push(value);
 	}
 
