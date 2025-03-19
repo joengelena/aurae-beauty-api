@@ -1,7 +1,7 @@
 import { RowDataPacket } from 'mysql2';
 import { ListingFilters } from '../../resources/types';
 
-function mapListingFiltersDbToListingFiltersDTO(
+function mapListingFiltersDbToObject(
 	listingFilters: RowDataPacket[]
 ): ListingFilters[] {
 	return listingFilters.map((listingFilter) => {
@@ -12,4 +12,4 @@ function mapListingFiltersDbToListingFiltersDTO(
 	});
 }
 
-export default mapListingFiltersDbToListingFiltersDTO;
+export default mapListingFiltersDbToObject;

@@ -1,7 +1,7 @@
 import { User } from '../../resources/types';
 import { RowDataPacket } from 'mysql2';
 
-function mapUserDbToUserDTO(usersDb: RowDataPacket[]): User[] {
+function mapUserDbToObject(usersDb: RowDataPacket[]): User[] {
 	return usersDb.map((user) => {
 		return {
 			id: user['id'],
@@ -17,4 +17,4 @@ function mapUserDbToUserDTO(usersDb: RowDataPacket[]): User[] {
 	});
 }
 
-export default mapUserDbToUserDTO;
+export default mapUserDbToObject;

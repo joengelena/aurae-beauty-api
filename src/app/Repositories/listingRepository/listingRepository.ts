@@ -2,7 +2,7 @@ import { RowDataPacket } from 'mysql2';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ListingFilters } from '../../resources/types';
-import mapListingFiltersDbToListingFiltersDTO from './mapListingFiltersDbToListingFiltersDTO';
+import mapListingFiltersDbToObject from './mapListingFiltersDbToObject';
 
 async function getListingFilters(): Promise<ListingFilters[]> {
 	logger.info('Getting filters from the database');
@@ -12,7 +12,7 @@ async function getListingFilters(): Promise<ListingFilters[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query);
 	connection.release();
 
-	return mapListingFiltersDbToListingFiltersDTO(result);
+	return mapListingFiltersDbToObject(result);
 }
 
 export { getListingFilters };

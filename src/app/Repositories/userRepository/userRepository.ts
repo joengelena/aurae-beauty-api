@@ -2,7 +2,7 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { User, UserEmailValidationStatus } from '../../resources/types';
-import mapUserDbToUserDTO from './mapUserDbToUserDTO';
+import mapUserDbToObject from './mapUserDbToObject';
 
 async function signUpUser(params: User): Promise<ResultSetHeader> {
 	const {
@@ -77,7 +77,7 @@ async function getUserWithAuthToken(token: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [token]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result);
+	return mapUserDbToObject(result);
 }
 
 async function getUserByEmail(email: string): Promise<User[]> {
@@ -88,7 +88,7 @@ async function getUserByEmail(email: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result);
+	return mapUserDbToObject(result);
 }
 
 async function getUserById(id: string): Promise<User[]> {
@@ -99,7 +99,7 @@ async function getUserById(id: string): Promise<User[]> {
 	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
 	connection.release();
 
-	return mapUserDbToUserDTO(result);
+	return mapUserDbToObject(result);
 }
 
 async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {

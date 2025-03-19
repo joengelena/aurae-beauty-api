@@ -1,7 +1,9 @@
 import { RowDataPacket } from 'mysql2';
 import { AppConfiguration } from '../../resources/types';
 
-function mapAppConfigDbToDTO(appConfigDb: RowDataPacket[]): AppConfiguration[] {
+function mapAppConfigDbToObject(
+	appConfigDb: RowDataPacket[]
+): AppConfiguration[] {
 	return appConfigDb.map((appConfig) => {
 		return {
 			id: appConfig['id'],
@@ -11,4 +13,4 @@ function mapAppConfigDbToDTO(appConfigDb: RowDataPacket[]): AppConfiguration[] {
 	});
 }
 
-export default mapAppConfigDbToDTO;
+export default mapAppConfigDbToObject;
