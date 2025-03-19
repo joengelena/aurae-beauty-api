@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
-import * as appConfigRepository from '../../repositories/appConfigurationRepository';
+import * as appConfigRepository from '../../repositories/appConfigurationRepository/appConfigurationRepository';
 import {
 	sendEmailVerificationLink,
 	sendResetPasswordLink,

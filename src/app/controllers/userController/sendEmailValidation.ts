@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
-import * as appConfigRepository from '../../repositories/appConfigurationRepository';
+import * as appConfigRepository from '../../repositories/appConfigurationRepository/appConfigurationRepository';
 import { sendEmailVerificationLink } from '../../utils/email/emailService';
 
 async function sendEmailValidation(req: Request, res: Response) {

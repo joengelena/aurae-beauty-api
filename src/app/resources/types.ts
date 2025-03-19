@@ -86,7 +86,7 @@ type Vehicle = {
 	wofExpiryDate: VehicleListingDBSchema['wof_expiry_date'];
 };
 
-type AppConfigurationDBSchema = {
+type AppConfiguration = {
 	id: number;
 	name: string;
 	value: string;
@@ -144,7 +144,7 @@ export {
 	UserEmailValidationStatus,
 	VehiclePhotoDBSchema,
 	VehiclePhoto,
-	AppConfigurationDBSchema,
+	AppConfiguration,
 	VehicleListingDBSchema,
 	Vehicle,
 	testQuery,
