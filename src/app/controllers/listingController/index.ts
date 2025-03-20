@@ -1,5 +1,3 @@
-import getFilters from './getListingFilters';
+import getListingFilters from './getListingFilters';
 
-export default {
-	getFilters,
-};
+export { getListingFilters };
