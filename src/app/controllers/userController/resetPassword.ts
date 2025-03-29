@@ -1,9 +1,10 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
-import { comparePassword, hashPassword } from '../../utils/passwordHash';
+import { hashPassword } from '../../utils/passwordHash';
 import * as userRepository from '../../repositories/userRepository/userRepository';
 import verifyJwt, { JwtStatus } from '../../utils/jwt/verifyJwt';
 import jwt from 'jsonwebtoken';
+import { sendResetPasswordLink } from '../../utils/email/emailService';
 
 async function resetPassword(req: Request, res: Response): Promise<void> {
 	try {
@@ -13,34 +14,24 @@ async function resetPassword(req: Request, res: Response): Promise<void> {
 
 		const jwtToken = req.params.token;
 		const { email, newPassword } = req.body;
-
+		const user = await userRepository.getUserByEmail(email);
 		const verifiedJwt = verifyJwt(jwtToken);
+		const jwtPayload = verifiedJwt.data as jwt.JwtPayload;
+
+		if (
+			verifiedJwt.status === JwtStatus.INVALID ||
+			user.length === 0 ||
+			user[0].id !== jwtPayload.userId
+		) {
+			res.statusMessage = 'Forbidden. Invalid token';
+			res.status(403).send();
+			return;
+		}
 
 		if (verifiedJwt.status === JwtStatus.EXPIRED) {
-			// Send another password reset link
-		}
-
-		if (verifiedJwt.status !== JwtStatus.VALID) {
-			res.statusMessage = 'Forbidden. Invalid token';
-			res.status(403).send();
-			return;
-		}
-
-		const validJwt = verifiedJwt.data as jwt.JwtPayload;
-
-		const user = await userRepository.getUserByEmail(email);
-
-		if (user.length === 0 || user[0].id !== validJwt.userId) {
-			res.statusMessage = 'Forbidden. Invalid token';
-			res.status(403).send();
-			return;
-		}
-
-		if (user[0].isEmailVerified === 0) {
-			// Send the user an email verification link
-
-			res.statusMessage = 'Forbidden. Email not verified';
-			res.status(403).send();
+			await sendResetPasswordLink(user[0].id, email);
+			res.statusMessage = 'Email verification link sent successfully';
+			res.status(200).send();
 			return;
 		}
 
@@ -51,10 +42,8 @@ async function resetPassword(req: Request, res: Response): Promise<void> {
 			password: hashedNewPassword,
 		});
 
-		res.statusMessage = 'User password updated successfully';
-		res.status(200).send({
-			message: 'User password updated successfully',
-		});
+		res.statusMessage = 'Successfully reset password';
+		res.status(200).send();
 		return;
 	} catch (error) {
 		logger.error(`Error updating user password: ${error.message}`);
