@@ -46,7 +46,6 @@ async function forgotPassword(req: Request, res: Response) {
 		await sendResetPasswordLink(
 			user[0].id,
 			email,
-			user[0].password,
 			webAppBaseUrl,
 			appConfig.find((config) => config.name === 'resetPasswordUrlPath')
 				.value
