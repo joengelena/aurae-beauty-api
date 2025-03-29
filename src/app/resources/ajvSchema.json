@@ -100,6 +100,19 @@
 		"required": ["email"],
 		"additionalProperties": false
 	},
+	"ResetPassword": {
+		"type": "object",
+		"properties": {
+			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"newPassword": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			}
+		},
+		"required": ["email", "newPassword"],
+		"additionalProperties": false
+	},
 	"deleteUser": {
 		"type": "object",
 		"properties": {

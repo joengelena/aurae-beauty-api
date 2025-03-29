@@ -30,6 +30,12 @@ const usersRoutes = (app: Express) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, forgotPassword);
 
+	app.route(rootUrl + '/user/forgot-password/reset-password/:token').post(
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.ResetPassword);
+		}
+	);
+
 	app.route(rootUrl + '/user/validate-email-link').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.emptyBody);
 	}, validateEmailVerificationToken);
