@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
-import * as appConfigRepository from '../../repositories/appConfigurationRepository/appConfigurationRepository';
 import {
 	sendEmailVerificationLink,
 	sendResetPasswordLink,
@@ -24,32 +23,15 @@ async function forgotPassword(req: Request, res: Response) {
 			return;
 		}
 
-		const appConfig = await appConfigRepository.getAppConfig();
-		const webAppBaseUrl = appConfig.find(
-			(config) => config.name === 'webAppBaseUrl'
-		).value;
-
 		if (user[0].isEmailVerified === 0) {
-			await sendEmailVerificationLink(
-				user[0].id,
-				email,
-				webAppBaseUrl,
-				appConfig.find((config) => config.name === 'verifyEmailUrlPath')
-					.value
-			);
+			await sendEmailVerificationLink(user[0].id, email);
 
 			res.statusMessage = 'Email verification link sent successfully';
 			res.status(200).send();
 			return;
 		}
 
-		await sendResetPasswordLink(
-			user[0].id,
-			email,
-			webAppBaseUrl,
-			appConfig.find((config) => config.name === 'resetPasswordUrlPath')
-				.value
-		);
+		await sendResetPasswordLink(user[0].id, email);
 
 		res.statusMessage = 'Reset password link sent successfully';
 		res.status(200).send();
