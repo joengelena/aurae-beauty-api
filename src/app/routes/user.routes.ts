@@ -11,6 +11,7 @@ import {
 	sendEmailValidation,
 	validateEmailVerificationToken,
 	deleteUser,
+	resetPassword,
 } from '../controllers/userController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -33,7 +34,8 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/forgot-password/reset-password/:token').post(
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.ResetPassword);
-		}
+		},
+		resetPassword
 	);
 
 	app.route(rootUrl + '/user/validate-email-link').post((req, res, next) => {
