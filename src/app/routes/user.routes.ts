@@ -51,21 +51,28 @@ const usersRoutes = (app: Express) => {
 		signOutUser
 	);
 
-	app.route(rootUrl + '/user').get(
-		validateRequest,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-		},
-		viewUser
-	);
-
-	app.route(rootUrl + '/user/update-user').patch(
-		validateRequest,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.updateUser);
-		},
-		updateUser
-	);
+	app.route(rootUrl + '/user')
+		.get(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			viewUser
+		)
+		.delete(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.deleteUser);
+			},
+			deleteUser
+		)
+		.patch(
+			validateRequest,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.updateUser);
+			},
+			updateUser
+		);
 
 	app.route(rootUrl + '/user/update-password').patch(
 		validateRequest,
@@ -81,14 +88,6 @@ const usersRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
 		sendEmailValidation
-	);
-
-	app.route(rootUrl + '/user/delete-user').delete(
-		validateRequest,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.deleteUser);
-		},
-		deleteUser
 	);
 };
 
