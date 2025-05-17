@@ -23,10 +23,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 
 		await sendEmailVerificationLink(
 			user[0].id,
-			user[0].email,
-			appConfig.find((config) => config.name === 'webAppBaseUrl').value,
-			appConfig.find((config) => config.name === 'verifyEmailUrlPath')
-				.value
+			user[0].email
 		);
 
 		res.statusMessage = 'Email validation link sent successfully';
@@ -35,7 +32,7 @@ async function sendEmailValidation(req: Request, res: Response) {
 	} catch (error) {
 		logger.error(`Error sending email validation link: ${error}`);
 
-		if (error.name == 'NodeMailerError') {
+		if (error.name === 'NodeMailerError') {
 			res.statusMessage = 'Internal error sending email';
 			res.status(500).send();
 			return;
