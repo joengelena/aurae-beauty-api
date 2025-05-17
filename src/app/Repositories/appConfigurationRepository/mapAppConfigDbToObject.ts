@@ -6,9 +6,9 @@ function mapAppConfigDbToObject(
 ): AppConfiguration[] {
 	return appConfigDb.map((appConfig) => {
 		return {
-			id: appConfig['id'],
-			name: appConfig['name'],
-			value: appConfig['value'],
+			id: appConfig.id,
+			name: appConfig.name,
+			value: appConfig.value,
 		};
 	});
 }

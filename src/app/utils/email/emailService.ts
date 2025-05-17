@@ -15,7 +15,7 @@ async function sendEmailVerificationLink(userId: string, email: string) {
 		(config) => config.name === 'verifyEmailUrlPath'
 	).value;
 
-	const emailVerificationJwt = generateJwtToken({ userId: userId }, '15m');
+	const emailVerificationJwt = generateJwtToken({ userId }, '15m');
 
 	const emailSubject = `${process.env.COMPANY_NAME} - Email Verification`;
 
@@ -39,7 +39,7 @@ async function sendResetPasswordLink(userId: string, email: string) {
 
 	const emailSubject = `${process.env.COMPANY_NAME} - Reset Password`;
 
-	const resetPasswordJwt = generateJwtToken({ userId: userId }, '15m');
+	const resetPasswordJwt = generateJwtToken({ userId }, '15m');
 
 	const htmlBody = getForgotPasswordEmailFormat(
 		`${webAppBaseUrl}${resetPasswordUrlPath}?token=${resetPasswordJwt}`

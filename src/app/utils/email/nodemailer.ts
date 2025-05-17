@@ -20,8 +20,8 @@ async function nodemailerSendEmail(
 ) {
 	const mailOptions = {
 		from: process.env.EMAIL,
-		to: to,
-		subject: subject,
+		to,
+		subject,
 		html: htmlBody,
 	};
 

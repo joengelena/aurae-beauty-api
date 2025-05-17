@@ -24,7 +24,7 @@ type QueryAndValue = {
 
 function buildGetAllVehiclesQuery(allQueries: Partial<testQuery>) {
 	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM vehicle_listing';
-	let queryValues: (string | number)[] = [];
+	const queryValues: (string | number)[] = [];
 
 	const searchQuery = buildSearchQuery(allQueries);
 	const betweenFilterQuery = buildBetweenFilterQuery(allQueries);
@@ -63,7 +63,7 @@ function buildGetAllVehiclesQuery(allQueries: Partial<testQuery>) {
 	}
 
 	return {
-		query: query,
+		query,
 		values: queryValues,
 		limit: Number(paginationQuery.values[0]),
 		currentPage: Number(paginationQuery.values[1]) + 1,
@@ -71,17 +71,17 @@ function buildGetAllVehiclesQuery(allQueries: Partial<testQuery>) {
 }
 
 function buildSearchQuery(allQueries: Partial<testQuery>): QueryAndValue {
-	if (allQueries['searchString'] !== undefined) {
+	if (allQueries.searchString !== undefined) {
 		return {
 			query: 'make LIKE ? OR model LIKE ? OR location LIKE ? OR body_type LIKE ? OR color LIKE ? OR transmission LIKE ? OR drive_type LIKE ?',
 			values: [
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
-				`%${allQueries['searchString']}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
+				`%${allQueries.searchString}%`,
 			],
 		};
 	}
@@ -179,9 +179,9 @@ function buildSortByQuery(allQueries: Partial<testQuery>): QueryAndValue {
 		{ key: 'endDateAsc', column: 'end_date', order: 'ASC' },
 	];
 
-	if (allQueries['sortBy'] !== undefined) {
+	if (allQueries.sortBy !== undefined) {
 		const sortBy = sortByConditions.find(
-			(condition) => condition.key === allQueries['sortBy']
+			(condition) => condition.key === allQueries.sortBy
 		);
 
 		if (sortBy) {
@@ -196,8 +196,8 @@ function buildSortByQuery(allQueries: Partial<testQuery>): QueryAndValue {
 }
 
 function buildPaginationQuery(allQueries: Partial<testQuery>): QueryAndValue {
-	let limit = Number(allQueries['limit']);
-	let pageNumber = Number(allQueries['pageNumber']);
+	let limit = Number(allQueries.limit);
+	let pageNumber = Number(allQueries.pageNumber);
 
 	if (
 		Number.isNaN(limit) ||

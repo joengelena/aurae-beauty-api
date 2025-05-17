@@ -89,7 +89,7 @@ async function postVehicle(vehicleData: Omit<VehicleListing, 'id'>) {
 	}
 
 	const connection = await getPool().getConnection();
-	const query = `INSERT INTO vehicle_listing (${fields.join(', ')}) 
+	const query = `INSERT INTO vehicle_listing (${fields.join(', ')})
 					values (${values.map(() => '?').join(', ')})`;
 	const [result] = await connection.query<ResultSetHeader>(query, values);
 	connection.release();
