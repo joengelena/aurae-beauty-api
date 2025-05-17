@@ -1,0 +1,952 @@
+type: collection.insomnia.rest/5.0
+name: motorix-api
+meta:
+  id: wrk_850edce9f52248aea49df71e4210a9ba
+  created: 1731654707398
+  modified: 1731654707398
+collection:
+  - name: User Routes
+    meta:
+      id: fld_45a18079dff94750bc438101148c277c
+      created: 1739948097791
+      modified: 1739948151907
+      sortKey: -1739948097991
+    children:
+      - name: Sign up
+        meta:
+          id: fld_f15aa8c16e6543529537c3c1d4abd43c
+          created: 1732769413654
+          modified: 1739948119283
+          sortKey: -1739948103469
+        children:
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up as a new user
+            meta:
+              id: req_55f8f8bc33c04c4f9443b9f9f40bcba7
+              created: 1731654720743
+              modified: 1738644674219
+              isPrivate: false
+              sortKey: -1732769418812
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "apple",
+                	"username": "Insomnia",
+                	"email": "{{ _.mainUserEmail }}",
+                	"password": "{{ _.userPassword }}",
+                	"phoneNumber": "0204012234"
+                }
+            parameters:
+              - id: pair_160e13432db94e20846fe4b092a46fb3
+                disabled: false
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            scripts:
+              afterResponse: >-
+                insomnia.test('Expected outcome', () => {
+                	const jsonBody = insomnia.response.json();
+                	
+                    insomnia.expect(insomnia.response.code).to.eql(201);
+                	insomnia.expect(jsonBody.message).to.eql("User created successfully");
+                	insomnia.expect(jsonBody.userId).to.have.lengthOf(36);
+                });
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without first name
+            meta:
+              id: req_64adc95b3b084416bcdeebd964eab8a6
+              created: 1732769225540
+              modified: 1738219781138
+              isPrivate: false
+              sortKey: -1732769419112
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "",
+                	"lastName": "apple",
+                	"username": "Insomnia",
+                	"email": "insomnia@example.com",
+                	"password": "lexus",
+                	"phoneNumber": "0204012234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without last name
+            meta:
+              id: req_19bcd5b3c33e48039dc64393cd938987
+              created: 1732769436442
+              modified: 1738219785516
+              isPrivate: false
+              sortKey: -1732769419012
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "",
+                	"username": "Insomnia",
+                	"email": "insomnia@example.com",
+                	"password": "lexus",
+                	"phoneNumber": "0204012234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without email
+            meta:
+              id: req_59d3b8f1def140048cb0385b1e88c740
+              created: 1732769490144
+              modified: 1738219796634
+              isPrivate: false
+              sortKey: -1732769418962
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "apple",
+                	"username": "Insomnia",
+                	"email": "",
+                	"password": "lexus",
+                	"phoneNumber": "0204012234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without username
+            meta:
+              id: req_3ad7c0c198ae4d5599e77290631333bc
+              created: 1732769499245
+              modified: 1738219790774
+              isPrivate: false
+              sortKey: -1732769418987
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "apple",
+                	"username": "",
+                	"email": "insomnia@example.com",
+                	"password": "lexus",
+                	"phoneNumber": "0204012234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without password
+            meta:
+              id: req_6bfed4e7ce61490a9fa9f5aa4562837d
+              created: 1732769538696
+              modified: 1738219801759
+              isPrivate: false
+              sortKey: -1732769418849.5
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "apple",
+                	"username": "Insomnia",
+                	"email": "insomnia@example.com",
+                	"password": "",
+                	"phoneNumber": "0204012234"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/signup"
+            name: Sign up without phone number
+            meta:
+              id: req_297a2ff49e944d338f8d822b348c27e0
+              created: 1732769549835
+              modified: 1738219806257
+              isPrivate: false
+              sortKey: -1732769418830.75
+            method: POST
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"firstName": "insomnia",
+                	"lastName": "apple",
+                	"username": "Insomnia",
+                	"email": "insomnia@example.com",
+                	"password": "lexus",
+                	"phoneNumber": ""
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.1.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Update user
+        meta:
+          id: fld_92ce112c17a44d0f88dd26407896b550
+          created: 1733634857243
+          modified: 1739948114680
+          sortKey: -1739948103281.5
+        children:
+          - url: "{{ _.localBaseUrl }}/user/update-user"
+            name: Update user first name
+            meta:
+              id: req_986873911f8440a48af5cfdfd4fb14b9
+              created: 1733634821610
+              modified: 1738824535002
+              isPrivate: false
+              sortKey: -1733634863524
+            method: PATCH
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"userId": "{{ _.userId }}",
+                	"firstName": "newName"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+                id: pair_a713b1fa493744a3adf2330b1f76b9fa
+              - name: User-Agent
+                value: insomnia/10.2.0
+                id: pair_4e538d48931f44118da20bca34cbe82f
+              - id: pair_ee0dc27a44af41338d5ee8a185a38389
+                name: mtx-auth-token
+                value: "{{ _.authToken }}"
+                disabled: false
+              - id: pair_f66fe9174c1c433581c5313e158fe3f1
+                name: mtx-csrf-token
+                value: "{{ _.csrfToken }}"
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/user/update-password"
+            name: Change user password to "honda"
+            meta:
+              id: req_5b56db721f364decada574c1d1df8055
+              created: 1733731148940
+              modified: 1738825113035
+              isPrivate: false
+              sortKey: -1733634863424
+            method: PATCH
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"currentPassword": "lexus",
+                	"newPassword": "honda"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+                id: pair_fc35edbaebfd4783b1839d398497ab2b
+              - name: User-Agent
+                value: insomnia/10.2.0
+                id: pair_8a7be7e19a3149f5ad95f5b4fb83598f
+              - id: pair_2c87726fa6984bceb0a99648e2c3d6bc
+                name: mtx-auth-token
+                value: "{{ _.authToken }}"
+                disabled: false
+              - id: pair_ad428bf220764254b155cca9093409d0
+                name: mtx-csrf-token
+                value: "{{ _.csrfToken }}"
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/users/{{ _.userId }}/delete-user"
+            name: Delete user
+            meta:
+              id: req_1486c08abb8f46848dd4bc7a4395d4f5
+              created: 1738644473741
+              modified: 1738810150337
+              isPrivate: false
+              sortKey: -1733634863624
+            method: DELETE
+            body:
+              mimeType: application/json
+              text: |-
+                {
+                	"currentPassword": "{{ _.userPassword }}"
+                }
+            headers:
+              - name: Content-Type
+                value: application/json
+              - name: User-Agent
+                value: insomnia/10.3.0
+                id: pair_385624c837de405d8023e80421525689
+              - id: pair_5b946b3a965547c2aabd0636b7b7ddfc
+                name: mtx-auth-token
+                value: "{{ _.authToken }}"
+                disabled: false
+              - id: pair_cedac4a266524adeb6906331ddb505e5
+                name: mtx-csrf-token
+                value: "{{ _.csrfToken }}"
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - name: Email validation
+        meta:
+          id: fld_0cb3ffdedd314daf9a8d0958980a045a
+          created: 1737160795074
+          modified: 1739948113177
+          sortKey: -1739948103294
+        children:
+          - url: "{{ _.localBaseUrl }}/user/send-email-verification-link"
+            name: Send email validation link
+            meta:
+              id: req_3eee6a2b979840e8898cab3940b786b7
+              created: 1733988143795
+              modified: 1739176684956
+              isPrivate: false
+              sortKey: -1737160826078
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/10.2.0
+                id: pair_2da88e07b6b7490fad38b6834a123be9
+              - id: pair_d1bb1b62818945e8948c1eb7c21bf095
+                name: mtx-auth-token
+                value: "{{ _.authToken }}"
+                disabled: false
+              - id: pair_58b4f1116e9f49d1ad81f0497c9c1582
+                name: mtx-csrf-token
+                value: "{{ _.csrfToken }}"
+                disabled: false
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl
+              }}/user/validate-email-link?token=eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp\
+              XVCJ9.eyJ1c2VySWQiOiJmYjc4NzgwYS1lZWNiLTQ1ZDYtOWVkNC05YTcxMzBhZjV\
+              mYmIiLCJpYXQiOjE3MzgzODAxNDQsImV4cCI6MTczODM4MTA0NH0.6ZYwj-SCjO1d\
+              sT6f3UHYkjB2-L7DTWMA7BgoluResE4"
+            name: Verify email validation link
+            meta:
+              id: req_35e189bcdddd4e30afc63c2ce67f3085
+              created: 1738379833850
+              modified: 1738380242658
+              isPrivate: false
+              sortKey: -1737160825978
+            method: POST
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.0
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/user/signin"
+        name: Sign in with the user just created
+        meta:
+          id: req_df392b31631d40dbab4dfd8c5e721ccb
+          created: 1732261455840
+          modified: 1741678740542
+          isPrivate: false
+          sortKey: -1739948103369
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "{{ _.mainUserEmail }}",
+            	"password": "lexus"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_76761fad5b0e47dc921da40c55ed9d5f
+          - name: User-Agent
+            value: insomnia/10.1.1
+            id: pair_b57d61e616ad41a7b546ab3ae523457d
+        authentication:
+          type: none
+        scripts:
+          afterResponse: >+
+            const cookies = insomnia.response.cookies.toObject();
+
+            const jsonBody = insomnia.response.json();
+
+
+            insomnia.test('Expected outcome', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            	insomnia.expect(jsonBody.message).to.eql("User logged in successfully")
+            	insomnia.expect(jsonBody.userId).to.have.lengthOf(36);
+            	insomnia.expect(cookies).to.have.lengthOf(2);
+            });
+
+
+            insomnia.environment.set("userId", jsonBody.userId);
+
+            insomnia.environment.set("authToken", jsonBody.authToken);
+
+            insomnia.environment.set("csrfToken", jsonBody.csrfToken);
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/user/signout"
+        name: Sign out user
+        meta:
+          id: req_38a7c05b9bf14419baf903ace2039ec6
+          created: 1732413746471
+          modified: 1739948117206
+          isPrivate: false
+          sortKey: -1739948103272.125
+        method: POST
+        headers:
+          - name: User-Agent
+            value: insomnia/10.1.1
+            id: pair_3a125c32132a40ae958ae06976598abf
+          - id: pair_2c762b8d37eb44e5bd2fd794a601e28c
+            name: mtx-auth-token
+            value: "{{ _.authToken }}"
+            disabled: false
+          - id: pair_e19d752b50c246fda22905067fb3a1b5
+            name: mtx-csrf-token
+            value: "{{ _.csrfToken }}"
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/user"
+        name: View user
+        meta:
+          id: req_138c3b884c4947b7b2d46f977b739de5
+          created: 1733632580290
+          modified: 1739948111278
+          isPrivate: false
+          sortKey: -1739948103319
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.2.0
+            id: pair_4a895b414fda403ea6afb54ae7af8cd1
+          - id: pair_aa23e2d51b3b4085a6eefa3ea820cb81
+            name: mtx-auth-token
+            value: "{{ _.authToken }}"
+            disabled: false
+          - id: pair_0d6603da8baf44f6966e3f636b63485f
+            name: mtx-csrf-token
+            value: "{{ _.csrfToken }}"
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/user/forgot-password"
+        name: Forgot password and email not validated
+        meta:
+          id: req_7a4df075fc524aaaa0e36d50ed625e30
+          created: 1738055141152
+          modified: 1739948115868
+          isPrivate: false
+          sortKey: -1739948103275.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email": "{{ _.mainUserEmail }}"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Vehicle Routes
+    meta:
+      id: fld_4033f823c0274330992a286760009c90
+      created: 1739948133229
+      modified: 1740889790787
+      sortKey: -1739948097891
+    children:
+      - name: VehicleListingQueries
+        meta:
+          id: fld_30494ebae9624a92b349a127e9748b8b
+          created: 1740889816204
+          modified: 1740889825182
+          sortKey: -1739948155812
+        children:
+          - url: "{{ _.localBaseUrl }}/vehicles"
+            name: Base request with no queries
+            meta:
+              id: req_3c643b17457545b7a9508e4c79b6f3ef
+              created: 1740889827800
+              modified: 1740902381405
+              isPrivate: false
+              sortKey: -1740889827800
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&pageNumber=1"
+            name: Limit 10, pageNumber 1
+            meta:
+              id: req_6a2517153c5f4fb99a3a5be95f827590
+              created: 1740902394692
+              modified: 1740903791535
+              isPrivate: false
+              sortKey: -1740418991756
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&sortBy=priceAsc"
+            name: Sort by price asc
+            meta:
+              id: req_a4cdeca7979c4c8ca3d2dba6a93bac0e
+              created: 1740903811247
+              modified: 1740904717797
+              isPrivate: false
+              sortKey: -1740183573734
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&sortBy=yearDesc"
+            name: Sort by year desc
+            meta:
+              id: req_8055760840c54b89bbcaa8cbf22f0cc9
+              created: 1740904746524
+              modified: 1740904757936
+              isPrivate: false
+              sortKey: -1740065864723
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?priceFrom=1000&priceTo=3000"
+            name: Price between
+            meta:
+              id: req_d4f4d0cd03b6462dbe51eb0476bbb4c3
+              created: 1740904959834
+              modified: 1740904984786
+              isPrivate: false
+              sortKey: -1740007010217.5
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?model=corolla"
+            name: Model is Corolla
+            meta:
+              id: req_f1062c2ccb484a03a4c1738ce1d16b50
+              created: 1740905124385
+              modified: 1740905147497
+              isPrivate: false
+              sortKey: -1739977582964.75
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+          - url: "{{ _.localBaseUrl }}/vehicles?searchString=corolla"
+            name: Search corolla
+            meta:
+              id: req_076d20e5df9546909f809bb3de92bce2
+              created: 1740991818255
+              modified: 1740993545680
+              isPrivate: false
+              sortKey: -1739962869338.375
+            method: GET
+            headers:
+              - name: User-Agent
+                value: insomnia/10.3.1
+            settings:
+              renderRequestBody: true
+              encodeUrl: true
+              followRedirects: global
+              cookies:
+                send: true
+                store: true
+              rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/vehicles"
+        name: Post vehicle
+        meta:
+          id: req_6f1a308091964280a432d6d237b13ff8
+          created: 1739948155712
+          modified: 1740195921785
+          isPrivate: false
+          sortKey: -1739948155712
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"userIdFk": "{{ _.userId }}",
+            	"location": "Christchurch",
+            	"vehicleCondition": "Used",
+            	"price": 10000,
+            	"uploadDate": "2025-01-01",
+            	"description": "My very first car",
+            	"endDate": "2025-02-01",
+            	"endTime": "12:00",
+            	"make": "Honda",
+            	"model": "Civic",
+            	"year": 1975,
+            	"kilometers": 200000,
+            	"fuelType": "Petrol",
+            	"bodyType": "Hatchback",
+            	"driveType": "2WD",
+            	"photoPaths": {"1":"photo/path","2":"photo/path","3":"photo/path"}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.1
+            id: pair_540edfcab882400881071cbea6b29435
+          - id: pair_847cf9f42b8b4459804053ba51cfad33
+            name: mtx-auth-token
+            value: "{{ _.authToken }}"
+            disabled: false
+          - id: pair_25d4232491624d4788690400c4f132fe
+            name: mtx-csrf-token
+            value: "{{ _.csrfToken }}"
+            disabled: false
+        scripts:
+          afterResponse: |-
+            const jsonBody = insomnia.response.json();
+
+            insomnia.environment.set("vehicleId", jsonBody.vehicleId);
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
+        name: Update vehicle listing
+        meta:
+          id: req_b92a98860dda4428bee3192e3380ca2f
+          created: 1740195555111
+          modified: 1740200017062
+          isPrivate: false
+          sortKey: -1739948155612
+        method: PATCH
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"location": "Auckland",
+            	"price": 333
+            }  
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/10.3.1
+            id: pair_c2c6434368524f6b9bb83491e9f88242
+          - id: pair_23620a6b9eca432da44372402cbd913e
+            name: mtx-auth-token
+            value: "{{ _.authToken }}"
+            disabled: false
+          - id: pair_d1c5106102264cea94aa075118b331c6
+            name: mtx-csrf-token
+            value: "{{ _.csrfToken }}"
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
+        name: Get vehicle listing
+        meta:
+          id: req_1204b7646a7f44b5b197a064cf68ccbc
+          created: 1740265211633
+          modified: 1740277361398
+          isPrivate: false
+          sortKey: -1739948155662
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
+        name: Delete vehicle listing
+        meta:
+          id: req_c56da176ab774226a2acd809ec2dc54b
+          created: 1740277325153
+          modified: 1740277392313
+          isPrivate: false
+          sortKey: -1739948155412
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+            id: pair_39fc4f9a8d9048ad98fcc9fc652f41b9
+          - id: pair_1f066be335b14e3084e5529653601d1d
+            name: mtx-auth-token
+            value: "{{ _.authToken }}"
+            disabled: false
+          - id: pair_9b7ae63646134f54b355dd5ba7ba4d0f
+            name: mtx-csrf-token
+            value: "{{ _.csrfToken }}"
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Listing Routes
+    meta:
+      id: fld_aed43998623544e08dd4ef24a2fe661f
+      created: 1742450921727
+      modified: 1742450921727
+      sortKey: -1742450921727
+    children:
+      - url: "{{ _.localBaseUrl }}/listing/filters"
+        name: Listing filters
+        meta:
+          id: req_27941488a6a541b1aabb97221cd33620
+          created: 1742450924935
+          modified: 1742451006060
+          isPrivate: false
+          sortKey: -1742450924935
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_c1ffbd2e44b1e0bdb20f66b97c58c61919084003
+    created: 1731654707400
+    modified: 1741678751565
+  cookies:
+    - key: csrfToken
+      value: 3e7d4b68-f0a1-436a-802a-8fcda48d619c
+      domain: localhost
+      path: /
+      secure: true
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-03-11T07:39:11.553Z
+      lastAccessed: 2025-03-11T07:39:11.553Z
+      sameSite: strict
+      id: 98f3b397-fd82-48eb-8404-16ca8d92887b
+    - key: jwtToken
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0NWEwYWI4Mi1iYzg2LTRmOTctYjEyNi1hMTk5MWNmYmYwMGMiLCJpYXQiOjE3NDE2Nzg3NTEsImV4cCI6MTc0MTY4MjM1MX0.dhcuO7sBeL0rAGsIuE9F21tPgE8Nb7TMGJgjKrNkb34
+      domain: localhost
+      path: /
+      secure: true
+      httpOnly: true
+      hostOnly: true
+      creation: 2025-03-11T07:39:11.554Z
+      lastAccessed: 2025-03-11T07:39:11.554Z
+      sameSite: strict
+      id: 34717c4d-e6c7-4ef9-8e86-f9a29a8b5619
+environments:
+  name: Base Environment
+  meta:
+    id: env_c1ffbd2e44b1e0bdb20f66b97c58c61919084003
+    created: 1731654707400
+    modified: 1741678751566
+    isPrivate: false
+  data:
+    authToken: f6209c21-a880-41c8-94a8-cf7564444d45
+    csrfToken: 3e7d4b68-f0a1-436a-802a-8fcda48d619c
+    userId: 45a0ab82-bc86-4f97-b126-a1991cfbf00c
+    vehicleId: 3
