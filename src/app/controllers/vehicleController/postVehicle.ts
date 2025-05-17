@@ -17,9 +17,9 @@ async function postVehicle(req: Request, res: Response) {
 
 		let currentPhotoOrder = 1;
 
-		for (const key in photoPaths) {
+		Object.keys(photoPaths).forEach((path) => {
 			// The regex will test to see if the key is a number
-			if (!/^\d+$/.test(key)) {
+			if (!/^\d+$/.test(path)) {
 				logger.error('Invalid photo order format');
 				res.statusMessage =
 					'Invalid photo order. Photo order must be a number';
@@ -27,7 +27,7 @@ async function postVehicle(req: Request, res: Response) {
 				return;
 			}
 
-			if (Number(key) !== currentPhotoOrder) {
+			if (Number(path) !== currentPhotoOrder) {
 				logger.error('Invalid photo order');
 				res.statusMessage =
 					'Invalid photo order. Photo order must be sequential';
@@ -36,17 +36,17 @@ async function postVehicle(req: Request, res: Response) {
 			}
 
 			currentPhotoOrder++;
-		}
+		})
 
 		const result = await vehicleRepository.postVehicle(vehicleData);
 
-		for (const key in photoPaths) {
+		Object.keys(photoPaths).forEach(async (path) => {
 			await vehicleRepository.postVehiclePhotoPath({
 				vehicleListingIdFk: result.insertId,
-				photoOrder: Number(key),
-				photoPath: photoPaths[key],
+				photoOrder: Number(path),
+				photoPath: photoPaths[path],
 			});
-		}
+		})
 
 		if (result.affectedRows === 1) {
 			res.statusMessage = 'Vehicle added successfully';
