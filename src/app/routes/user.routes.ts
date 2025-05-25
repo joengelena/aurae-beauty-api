@@ -42,6 +42,10 @@ const usersRoutes = (app: Express) => {
 		validateRequestBody(req, res, next, ajvSchema.emptyBody);
 	}, validateEmailVerificationToken);
 
+	app.route(rootUrl + '/users/:userId').get((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.emptyBody);
+	}, viewUser);
+
 	// Privates routes
 	app.route(rootUrl + '/user/signout').post(
 		validateRequest,
@@ -52,13 +56,6 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user')
-		.get(
-			validateRequest,
-			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-			},
-			viewUser
-		)
 		.delete(
 			validateRequest,
 			(req, res, next) => {
