@@ -50,7 +50,7 @@ async function getAllVehicles(allQueries: Partial<testQuery>): Promise<{
 	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();
 
-	const totalRows = result[0].totalRows;
+	const totalRows = result[0]?.totalRows ?? 0;
 
 	result.forEach((vehicle) => {
 		delete vehicle.totalRows;
