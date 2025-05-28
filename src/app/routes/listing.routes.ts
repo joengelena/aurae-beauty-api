@@ -24,12 +24,7 @@ const listingRoutes = (app: Express) => {
 		.post(
 			validateRequest,
 			(req, res, next) => {
-				validateRequestBody(
-					req,
-					res,
-					next,
-					ajvSchema.postVehicleListing
-				);
+				validateRequestBody(req, res, next, ajvSchema.postListing);
 			},
 			postListing
 		);
@@ -41,12 +36,7 @@ const listingRoutes = (app: Express) => {
 		.patch(
 			validateRequest,
 			(req, res, next) => {
-				validateRequestBody(
-					req,
-					res,
-					next,
-					ajvSchema.updateVehicleListing
-				);
+				validateRequestBody(req, res, next, ajvSchema.updateListing);
 			},
 			updateLising
 		)

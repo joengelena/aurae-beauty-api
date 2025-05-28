@@ -130,7 +130,7 @@
 		"required": ["currentUserId", "currentPassword"],
 		"additionalProperties": false
 	},
-	"postVehicleListing": {
+	"postListing": {
 		"type": "object",
 		"properties": {
 			"currentUserId": {
@@ -227,7 +227,7 @@
 		],
 		"additionalProperties": false
 	},
-	"updateVehicleListing": {
+	"updateListing": {
 		"type": "object",
 		"properties": {
 			"currentUserId": {
