@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
 import { testQuery } from '../../resources/types';
+import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 
 async function getAllListings(req: Request, res: Response) {
 	logger.info('Getting all listings from the database');
@@ -9,7 +9,7 @@ async function getAllListings(req: Request, res: Response) {
 	try {
 		const query: Partial<testQuery> = req.query;
 
-		const vehicles = await vehicleRepository.getAllListings(query);
+		const vehicles = await listingRepository.getAllListings(query);
 
 		res.statusMessage = 'listings found';
 		res.status(200).send(vehicles);

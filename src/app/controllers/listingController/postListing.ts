@@ -1,6 +1,6 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 
 async function postListing(req: Request, res: Response) {
 	logger.info('Posting new listing');
@@ -38,10 +38,10 @@ async function postListing(req: Request, res: Response) {
 			currentPhotoOrder++;
 		});
 
-		const result = await vehicleRepository.postListing(listingData);
+		const result = await listingRepository.postListing(listingData);
 
 		Object.keys(photoPaths).forEach(async (path) => {
-			await vehicleRepository.postListingPhotoPath({
+			await listingRepository.postListingPhotoPath({
 				listingIdFk: result.insertId,
 				photoOrder: Number(path),
 				photoPath: photoPaths[path],

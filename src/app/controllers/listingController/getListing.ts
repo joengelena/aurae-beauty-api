@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 
 async function getListing(req: Request, res: Response) {
 	logger.info(`Getting listing with id '${req.params.id}'`);
 
 	try {
 		const listingId = req.params.id;
-		const listing = await vehicleRepository.getListingById(listingId);
+		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
 			res.statusMessage = 'Not found. No listing with specified id';

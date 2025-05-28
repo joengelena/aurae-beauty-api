@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 
 async function updateLising(req: Request, res: Response) {
 	logger.info(`Updating listing with id '${req.params.id}'`);
@@ -15,7 +15,7 @@ async function updateLising(req: Request, res: Response) {
 			return;
 		}
 
-		const listing = await vehicleRepository.getListingById(listingId);
+		const listing = await listingRepository.getListingById(listingId);
 
 		if (currentUserId !== listing[0].userIdFk) {
 			logger.error('Trying to edit someone else is listing');
@@ -25,7 +25,7 @@ async function updateLising(req: Request, res: Response) {
 			return;
 		}
 
-		const editListingResult = await vehicleRepository.updateListingWithId(
+		const editListingResult = await listingRepository.updateListingWithId(
 			req.params.id,
 			newListingData
 		);

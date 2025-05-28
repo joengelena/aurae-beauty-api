@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 
 async function deleteListing(req: Request, res: Response) {
 	logger.info(`Deleting listing with id '${req.params.id}'`);
@@ -9,7 +9,7 @@ async function deleteListing(req: Request, res: Response) {
 		const listingId = req.params.id;
 		const currentUserId = req.body.currentUserId;
 
-		const listing = await vehicleRepository.getListingById(listingId);
+		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
 			res.statusMessage = 'Not found. No listing with specified id';
@@ -25,7 +25,7 @@ async function deleteListing(req: Request, res: Response) {
 			return;
 		}
 
-		const deleteListingResult = await vehicleRepository.deleteListingWithId(
+		const deleteListingResult = await listingRepository.deleteListingWithId(
 			listingId
 		);
 
