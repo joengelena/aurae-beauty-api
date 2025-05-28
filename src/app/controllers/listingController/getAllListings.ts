@@ -9,10 +9,10 @@ async function getAllListings(req: Request, res: Response) {
 	try {
 		const query: Partial<testQuery> = req.query;
 
-		const vehicles = await listingRepository.getAllListings(query);
+		const listings = await listingRepository.getAllListings(query);
 
 		res.statusMessage = 'listings found';
-		res.status(200).send(vehicles);
+		res.status(200).send(listings);
 		return;
 	} catch (error) {
 		logger.error(`Error getting all listings: ${error}`);
