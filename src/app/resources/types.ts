@@ -14,19 +14,13 @@ type UserEmailValidationStatus = {
 	is_email_verified: 0 | 1;
 };
 
-type VehiclePhotoDBSchema = {
-	vehicle_listing_id_fk: number;
-	photo_order: number;
-	photo_path: string;
+type ListingPhoto = {
+	listingIdFk: number;
+	photoOrder: number;
+	photoPath: string;
 };
 
-type VehiclePhoto = {
-	vehicleListingIdFk: VehiclePhotoDBSchema['vehicle_listing_id_fk'];
-	photoOrder: VehiclePhotoDBSchema['photo_order'];
-	photoPath: VehiclePhotoDBSchema['photo_path'];
-};
-
-type VehicleListing = {
+type Listing = {
 	id: number;
 	userIdFk: string;
 	location: string;
@@ -112,10 +106,9 @@ type ListingFilters = {
 export {
 	User,
 	UserEmailValidationStatus,
-	VehiclePhotoDBSchema,
-	VehiclePhoto,
+	ListingPhoto,
 	AppConfiguration,
-	VehicleListing,
+	Listing,
 	testQuery,
 	ListingFilters,
 };

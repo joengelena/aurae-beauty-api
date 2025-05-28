@@ -42,7 +42,7 @@ async function postListing(req: Request, res: Response) {
 
 		Object.keys(photoPaths).forEach(async (path) => {
 			await vehicleRepository.postVehiclePhotoPath({
-				vehicleListingIdFk: result.insertId,
+				listingIdFk: result.insertId,
 				photoOrder: Number(path),
 				photoPath: photoPaths[path],
 			});

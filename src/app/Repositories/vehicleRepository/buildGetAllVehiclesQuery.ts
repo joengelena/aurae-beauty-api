@@ -23,7 +23,7 @@ type QueryAndValue = {
 };
 
 function buildGetAllVehiclesQuery(allQueries: Partial<testQuery>) {
-	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM vehicle_listing';
+	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM listing';
 	const queryValues: (string | number)[] = [];
 
 	const searchQuery = buildSearchQuery(allQueries);

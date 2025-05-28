@@ -1,11 +1,11 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { VehicleListing, VehiclePhoto, testQuery } from '../../resources/types';
+import { Listing, ListingPhoto, testQuery } from '../../resources/types';
 import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
-import mapVehicleListingDbToObject from './mapVehicleListingDbToObject';
+import mapVehicleListingDbToObject from './mapListingDbToObject';
 
-const vehicleListingDbFields: Record<keyof VehicleListing, string> = {
+const listingDbFields: Record<keyof Listing, string> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
 	location: 'location',
@@ -36,7 +36,7 @@ const vehicleListingDbFields: Record<keyof VehicleListing, string> = {
 };
 
 async function getAllVehicles(allQueries: Partial<testQuery>): Promise<{
-	data: VehicleListing[];
+	data: Listing[];
 	currentPage: number;
 	totalPages: number;
 	totalRows: number;
@@ -66,7 +66,7 @@ async function getAllVehicles(allQueries: Partial<testQuery>): Promise<{
 	};
 }
 
-async function getVehicleById(id: string): Promise<VehicleListing[]> {
+async function getVehicleById(id: string): Promise<Listing[]> {
 	logger.info(`Getting vehicle with id '${id}' from the database`);
 
 	const conneciton = await getPool().getConnection();
@@ -77,14 +77,14 @@ async function getVehicleById(id: string): Promise<VehicleListing[]> {
 	return mapVehicleListingDbToObject(result);
 }
 
-async function postVehicle(vehicleData: Omit<VehicleListing, 'id'>) {
+async function postVehicle(vehicleData: Omit<Listing, 'id'>) {
 	logger.info('Adding new vehicle');
 
 	const fields = [];
 	const values = [];
 
 	for (const [key, value] of Object.entries(vehicleData)) {
-		fields.push(`${vehicleListingDbFields[key as keyof VehicleListing]}`);
+		fields.push(`${listingDbFields[key as keyof Listing]}`);
 		values.push(value);
 	}
 
@@ -97,15 +97,15 @@ async function postVehicle(vehicleData: Omit<VehicleListing, 'id'>) {
 	return result;
 }
 
-async function postVehiclePhotoPath(vehiclePhotoData: VehiclePhoto) {
+async function postVehiclePhotoPath(vehiclePhotoData: ListingPhoto) {
 	logger.info(
-		`Adding new vehicle photo path for vehicle id: ${vehiclePhotoData.vehicleListingIdFk} photo order: ${vehiclePhotoData.photoOrder}`
+		`Adding new vehicle photo path for vehicle id: ${vehiclePhotoData.listingIdFk} photo order: ${vehiclePhotoData.photoOrder}`
 	);
 
 	const connection = await getPool().getConnection();
 	const query = 'INSERT INTO vehicle_photo values (?, ?, ?)';
 	const [result] = await connection.query<ResultSetHeader>(query, [
-		vehiclePhotoData.vehicleListingIdFk,
+		vehiclePhotoData.listingIdFk,
 		vehiclePhotoData.photoOrder,
 		vehiclePhotoData.photoPath,
 	]);
@@ -127,7 +127,7 @@ async function deleteVehicleWithId(id: string) {
 
 async function updateVehicleWithId(
 	id: string,
-	updateValues: Omit<Partial<VehicleListing>, 'id' | 'userIdFk'>
+	updateValues: Omit<Partial<Listing>, 'id' | 'userIdFk'>
 ) {
 	logger.info(`Updating vehicle with id '${id}' in the database`);
 
@@ -140,9 +140,7 @@ async function updateVehicleWithId(
 	const values = [];
 
 	for (const [key, value] of Object.entries(updateValues)) {
-		fields.push(
-			`${vehicleListingDbFields[key as keyof VehicleListing]} = ?`
-		);
+		fields.push(`${listingDbFields[key as keyof Listing]} = ?`);
 		values.push(value);
 	}
 
