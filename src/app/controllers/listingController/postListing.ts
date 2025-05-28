@@ -2,14 +2,14 @@ import logger from '../../../config/logger';
 import { Request, Response } from 'express';
 import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
 
-async function postVehicle(req: Request, res: Response) {
-	logger.info('Posting new vehicle');
+async function postListing(req: Request, res: Response) {
+	logger.info('Posting new listing');
 
 	try {
-		const { currentUserId, photoPaths, ...vehicleData } = req.body;
+		const { currentUserId, photoPaths, ...listingData } = req.body;
 
-		if (currentUserId !== vehicleData.userIdFk) {
-			logger.error('Trying to post someone else vehicle');
+		if (currentUserId !== listingData.userIdFk) {
+			logger.error('Trying to post a listing for someone else');
 			res.statusMessage = 'Forbidden. Invalid credentials';
 			res.status(403).send();
 			return;
@@ -36,9 +36,9 @@ async function postVehicle(req: Request, res: Response) {
 			}
 
 			currentPhotoOrder++;
-		})
+		});
 
-		const result = await vehicleRepository.postVehicle(vehicleData);
+		const result = await vehicleRepository.postVehicle(listingData);
 
 		Object.keys(photoPaths).forEach(async (path) => {
 			await vehicleRepository.postVehiclePhotoPath({
@@ -46,10 +46,10 @@ async function postVehicle(req: Request, res: Response) {
 				photoOrder: Number(path),
 				photoPath: photoPaths[path],
 			});
-		})
+		});
 
 		if (result.affectedRows === 1) {
-			res.statusMessage = 'Vehicle added successfully';
+			res.statusMessage = 'Listing posted successfully';
 			res.status(201).send({
 				vehicleId: result.insertId,
 			});
@@ -60,11 +60,11 @@ async function postVehicle(req: Request, res: Response) {
 		res.status(500).send();
 		return;
 	} catch (error) {
-		logger.error(`Error posting vehicle: ${error}`);
+		logger.error(`Error posting listing: ${error}`);
 		res.statusMessage = 'Internal server error';
 		res.status(500).send();
 		return;
 	}
 }
 
-export default postVehicle;
+export default postListing;

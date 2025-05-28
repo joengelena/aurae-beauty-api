@@ -1,15 +1,15 @@
 import getListingFilters from './getListingFilters';
 import getAllListings from './getAllListings';
-import postVehicle from './postVehicle';
-import getVehicleListing from './getVehicleListing';
-import updateVehicleLising from './updateVehicleListing';
+import postListing from './postListing';
+import getListing from './getListing';
+import updateLising from './updateListing';
 import deleteListing from './deleteListing';
 
 export {
 	getListingFilters,
 	getAllListings,
-	postVehicle,
-	getVehicleListing,
-	updateVehicleLising,
+	postListing,
+	getListing,
+	updateLising,
 	deleteListing,
 };
