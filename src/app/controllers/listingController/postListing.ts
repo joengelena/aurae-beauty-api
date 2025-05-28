@@ -38,10 +38,10 @@ async function postListing(req: Request, res: Response) {
 			currentPhotoOrder++;
 		});
 
-		const result = await vehicleRepository.postVehicle(listingData);
+		const result = await vehicleRepository.postListing(listingData);
 
 		Object.keys(photoPaths).forEach(async (path) => {
-			await vehicleRepository.postVehiclePhotoPath({
+			await vehicleRepository.postListingPhotoPath({
 				listingIdFk: result.insertId,
 				photoOrder: Number(path),
 				photoPath: photoPaths[path],
@@ -51,7 +51,7 @@ async function postListing(req: Request, res: Response) {
 		if (result.affectedRows === 1) {
 			res.statusMessage = 'Listing posted successfully';
 			res.status(201).send({
-				vehicleId: result.insertId,
+				listingId: result.insertId,
 			});
 			return;
 		}

@@ -9,7 +9,7 @@ async function getAllListings(req: Request, res: Response) {
 	try {
 		const query: Partial<testQuery> = req.query;
 
-		const vehicles = await vehicleRepository.getAllVehicles(query);
+		const vehicles = await vehicleRepository.getAllListings(query);
 
 		res.statusMessage = 'listings found';
 		res.status(200).send(vehicles);

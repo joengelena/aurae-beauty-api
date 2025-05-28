@@ -6,17 +6,17 @@ async function getListing(req: Request, res: Response) {
 	logger.info(`Getting listing with id '${req.params.id}'`);
 
 	try {
-		const vehicleId = req.params.id;
-		const vehicle = await vehicleRepository.getVehicleById(vehicleId);
+		const listingId = req.params.id;
+		const listing = await vehicleRepository.getListingById(listingId);
 
-		if (vehicle.length === 0) {
+		if (listing.length === 0) {
 			res.statusMessage = 'Not found. No listing with specified id';
 			res.status(404).send();
 			return;
 		}
 
 		res.statusMessage = 'listing found';
-		res.status(200).send(vehicle);
+		res.status(200).send(listing);
 		return;
 	} catch (error) {
 		logger.error(

@@ -6,18 +6,18 @@ async function deleteListing(req: Request, res: Response) {
 	logger.info(`Deleting listing with id '${req.params.id}'`);
 
 	try {
-		const vehicleId = req.params.id;
+		const listingId = req.params.id;
 		const currentUserId = req.body.currentUserId;
 
-		const vehicle = await vehicleRepository.getVehicleById(vehicleId);
+		const listing = await vehicleRepository.getListingById(listingId);
 
-		if (vehicle.length === 0) {
+		if (listing.length === 0) {
 			res.statusMessage = 'Not found. No listing with specified id';
 			res.status(404).send();
 			return;
 		}
 
-		if (currentUserId !== vehicle[0].userIdFk) {
+		if (currentUserId !== listing[0].userIdFk) {
 			logger.error('Trying to delete someone else is listing');
 			res.statusMessage =
 				'Forbidden. Invalid credentials. You are not the owner of this listing';
@@ -25,11 +25,11 @@ async function deleteListing(req: Request, res: Response) {
 			return;
 		}
 
-		const deleteVehicleResult = await vehicleRepository.deleteVehicleWithId(
-			vehicleId
+		const deleteListingResult = await vehicleRepository.deleteListingWithId(
+			listingId
 		);
 
-		if (deleteVehicleResult.affectedRows === 0) {
+		if (deleteListingResult.affectedRows === 0) {
 			res.statusMessage = 'Not found. No listing with specified id';
 			res.status(404).send();
 			return;

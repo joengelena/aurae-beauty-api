@@ -6,7 +6,7 @@ async function updateLising(req: Request, res: Response) {
 	logger.info(`Updating listing with id '${req.params.id}'`);
 
 	try {
-		const vehicleId = req.params.id;
+		const listingId = req.params.id;
 		const { currentUserId, ...newListingData } = req.body;
 
 		if (Object.keys(newListingData).length === 0) {
@@ -15,9 +15,9 @@ async function updateLising(req: Request, res: Response) {
 			return;
 		}
 
-		const vehicle = await vehicleRepository.getVehicleById(vehicleId);
+		const listing = await vehicleRepository.getListingById(listingId);
 
-		if (currentUserId !== vehicle[0].userIdFk) {
+		if (currentUserId !== listing[0].userIdFk) {
 			logger.error('Trying to edit someone else is listing');
 			res.statusMessage =
 				'Forbidden. Invalid credentials. You are not the owner of this listing';
@@ -25,12 +25,12 @@ async function updateLising(req: Request, res: Response) {
 			return;
 		}
 
-		const editVehicleResult = await vehicleRepository.updateVehicleWithId(
+		const editListingResult = await vehicleRepository.updateListingWithId(
 			req.params.id,
 			newListingData
 		);
 
-		if (editVehicleResult.affectedRows === 1) {
+		if (editListingResult.affectedRows === 1) {
 			res.statusMessage = 'Listing edited successfully';
 			res.status(200).send({
 				message: 'Listing edited successfully',
