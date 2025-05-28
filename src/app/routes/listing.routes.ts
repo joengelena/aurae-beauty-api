@@ -1,15 +1,15 @@
 import { Express } from 'express';
 import { rootUrl } from './base.routes';
-import { getListingFilters } from '../controllers/listingController';
 import ajvSchema from '../resources/ajvSchema.json';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import {
+	getListingFilters,
 	getAllVehicleListings,
 	postVehicle,
 	getVehicleListing,
 	updateVehicleLising,
 	deleteVehicleListing,
-} from '../controllers/vehicleController';
+} from '../controllers/listingController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 
 const listingRoutes = (app: Express) => {
