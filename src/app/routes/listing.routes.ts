@@ -4,11 +4,11 @@ import ajvSchema from '../resources/ajvSchema.json';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import {
 	getListingFilters,
-	getAllVehicleListings,
+	getAllListings,
 	postVehicle,
 	getVehicleListing,
 	updateVehicleLising,
-	deleteVehicleListing,
+	deleteListing,
 } from '../controllers/listingController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 
@@ -20,7 +20,7 @@ const listingRoutes = (app: Express) => {
 	app.route(rootUrl + '/listings')
 		.get((req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		}, getAllVehicleListings)
+		}, getAllListings)
 		.post(
 			validateRequest,
 			(req, res, next) => {
@@ -55,7 +55,7 @@ const listingRoutes = (app: Express) => {
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			deleteVehicleListing
+			deleteListing
 		);
 };
 
