@@ -2,7 +2,7 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { Listing, ListingPhoto, testQuery } from '../../resources/types';
-import buildGetAllVehiclesQuery from './buildGetAllVehiclesQuery';
+import buildGetAllListingsQuery from './buildGetAllListingsQuery';
 import mapVehicleListingDbToObject from './mapListingDbToObject';
 
 const listingDbFields: Record<keyof Listing, string> = {
@@ -45,7 +45,7 @@ async function getAllVehicles(allQueries: Partial<testQuery>): Promise<{
 
 	const connection = await getPool().getConnection();
 	const { query, values, limit, currentPage } =
-		buildGetAllVehiclesQuery(allQueries);
+		buildGetAllListingsQuery(allQueries);
 
 	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();

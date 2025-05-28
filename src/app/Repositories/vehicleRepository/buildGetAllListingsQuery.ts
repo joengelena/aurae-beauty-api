@@ -1,6 +1,4 @@
-import { constants } from 'buffer';
 import { testQuery } from '../../resources/types';
-import logger from '../../../config/logger';
 
 const MAX_PAGE_LIMIT = 100;
 const MIN_PAGE_LIMIT = 10;
@@ -22,7 +20,7 @@ type QueryAndValue = {
 	values: (string | number)[];
 };
 
-function buildGetAllVehiclesQuery(allQueries: Partial<testQuery>) {
+function buildGetAllListingsQuery(allQueries: Partial<testQuery>) {
 	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM listing';
 	const queryValues: (string | number)[] = [];
 
@@ -217,4 +215,4 @@ function buildPaginationQuery(allQueries: Partial<testQuery>): QueryAndValue {
 	};
 }
 
-export default buildGetAllVehiclesQuery;
+export default buildGetAllListingsQuery;
