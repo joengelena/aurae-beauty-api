@@ -9,14 +9,14 @@ collection:
     meta:
       id: fld_45a18079dff94750bc438101148c277c
       created: 1739948097791
-      modified: 1739948151907
+      modified: 1748138013741
       sortKey: -1739948097991
     children:
       - name: Sign up
         meta:
           id: fld_f15aa8c16e6543529537c3c1d4abd43c
           created: 1732769413654
-          modified: 1739948119283
+          modified: 1748137988478
           sortKey: -1739948103469
         children:
           - url: "{{ _.localBaseUrl }}/user/signup"
@@ -24,7 +24,7 @@ collection:
             meta:
               id: req_55f8f8bc33c04c4f9443b9f9f40bcba7
               created: 1731654720743
-              modified: 1738644674219
+              modified: 1748137985053
               isPrivate: false
               sortKey: -1732769418812
             method: POST
@@ -32,9 +32,9 @@ collection:
               mimeType: application/json
               text: |-
                 {
-                	"firstName": "insomnia",
-                	"lastName": "apple",
-                	"username": "Insomnia",
+                	"firstName": "jj",
+                	"lastName": "jj",
+                	"username": "Jeesungggg",
                 	"email": "{{ _.mainUserEmail }}",
                 	"password": "{{ _.userPassword }}",
                 	"phoneNumber": "0204012234"
@@ -584,168 +584,21 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: Vehicle Routes
+  - name: Listing Routes
     meta:
-      id: fld_4033f823c0274330992a286760009c90
-      created: 1739948133229
-      modified: 1740889790787
-      sortKey: -1739948097891
+      id: fld_aed43998623544e08dd4ef24a2fe661f
+      created: 1742450921727
+      modified: 1742450921727
+      sortKey: -1742450921727
     children:
-      - name: VehicleListingQueries
-        meta:
-          id: fld_30494ebae9624a92b349a127e9748b8b
-          created: 1740889816204
-          modified: 1740889825182
-          sortKey: -1739948155812
-        children:
-          - url: "{{ _.localBaseUrl }}/vehicles"
-            name: Base request with no queries
-            meta:
-              id: req_3c643b17457545b7a9508e4c79b6f3ef
-              created: 1740889827800
-              modified: 1740902381405
-              isPrivate: false
-              sortKey: -1740889827800
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&pageNumber=1"
-            name: Limit 10, pageNumber 1
-            meta:
-              id: req_6a2517153c5f4fb99a3a5be95f827590
-              created: 1740902394692
-              modified: 1740903791535
-              isPrivate: false
-              sortKey: -1740418991756
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&sortBy=priceAsc"
-            name: Sort by price asc
-            meta:
-              id: req_a4cdeca7979c4c8ca3d2dba6a93bac0e
-              created: 1740903811247
-              modified: 1740904717797
-              isPrivate: false
-              sortKey: -1740183573734
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?limit=10&sortBy=yearDesc"
-            name: Sort by year desc
-            meta:
-              id: req_8055760840c54b89bbcaa8cbf22f0cc9
-              created: 1740904746524
-              modified: 1740904757936
-              isPrivate: false
-              sortKey: -1740065864723
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?priceFrom=1000&priceTo=3000"
-            name: Price between
-            meta:
-              id: req_d4f4d0cd03b6462dbe51eb0476bbb4c3
-              created: 1740904959834
-              modified: 1740904984786
-              isPrivate: false
-              sortKey: -1740007010217.5
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?model=corolla"
-            name: Model is Corolla
-            meta:
-              id: req_f1062c2ccb484a03a4c1738ce1d16b50
-              created: 1740905124385
-              modified: 1740905147497
-              isPrivate: false
-              sortKey: -1739977582964.75
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-          - url: "{{ _.localBaseUrl }}/vehicles?searchString=corolla"
-            name: Search corolla
-            meta:
-              id: req_076d20e5df9546909f809bb3de92bce2
-              created: 1740991818255
-              modified: 1740993545680
-              isPrivate: false
-              sortKey: -1739962869338.375
-            method: GET
-            headers:
-              - name: User-Agent
-                value: insomnia/10.3.1
-            settings:
-              renderRequestBody: true
-              encodeUrl: true
-              followRedirects: global
-              cookies:
-                send: true
-                store: true
-              rebuildPath: true
-      - url: "{{ _.localBaseUrl }}/vehicles"
-        name: Post vehicle
+      - url: "{{ _.localBaseUrl }}/listings"
+        name: Post listing
         meta:
           id: req_6f1a308091964280a432d6d237b13ff8
           created: 1739948155712
-          modified: 1740195921785
+          modified: 1748423590339
           isPrivate: false
-          sortKey: -1739948155712
+          sortKey: -1742450924435
         method: POST
         body:
           mimeType: application/json
@@ -786,7 +639,7 @@ collection:
           afterResponse: |-
             const jsonBody = insomnia.response.json();
 
-            insomnia.environment.set("vehicleId", jsonBody.vehicleId);
+            insomnia.environment.set("listingId", jsonBody.listingId);
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -795,14 +648,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
-        name: Update vehicle listing
+      - url: "{{ _.localBaseUrl }}/listings/{{ _.listingId }}"
+        name: Update listing
         meta:
           id: req_b92a98860dda4428bee3192e3380ca2f
           created: 1740195555111
-          modified: 1740200017062
+          modified: 1748423511886
           isPrivate: false
-          sortKey: -1739948155612
+          sortKey: -1742450924335
         method: PATCH
         body:
           mimeType: application/json
@@ -833,14 +686,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
+      - url: "{{ _.localBaseUrl }}/listings/{{ _.listingId }}"
         name: Get vehicle listing
         meta:
           id: req_1204b7646a7f44b5b197a064cf68ccbc
           created: 1740265211633
-          modified: 1740277361398
+          modified: 1748423539153
           isPrivate: false
-          sortKey: -1739948155662
+          sortKey: -1742450924535
         method: GET
         headers:
           - name: User-Agent
@@ -853,14 +706,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.localBaseUrl }}/vehicles/{{ _.vehicleId }}"
-        name: Delete vehicle listing
+      - url: "{{ _.localBaseUrl }}/listings/{{ _.listingId }}"
+        name: Delete listing
         meta:
           id: req_c56da176ab774226a2acd809ec2dc54b
           created: 1740277325153
-          modified: 1740277392313
+          modified: 1748423526021
           isPrivate: false
-          sortKey: -1739948155412
+          sortKey: -1742450924235
         method: DELETE
         headers:
           - name: User-Agent
@@ -882,19 +735,152 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: Listing Routes
-    meta:
-      id: fld_aed43998623544e08dd4ef24a2fe661f
-      created: 1742450921727
-      modified: 1742450921727
-      sortKey: -1742450921727
-    children:
-      - url: "{{ _.localBaseUrl }}/listing/filters"
+      - url: "{{ _.localBaseUrl }}/listings"
+        name: Base request with no queries
+        meta:
+          id: req_3c643b17457545b7a9508e4c79b6f3ef
+          created: 1740889827800
+          modified: 1748340717848
+          isPrivate: false
+          sortKey: -1742450924835
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?limit=10&pageNumber=1"
+        name: Limit 10, pageNumber 1
+        meta:
+          id: req_6a2517153c5f4fb99a3a5be95f827590
+          created: 1740902394692
+          modified: 1748340735428
+          isPrivate: false
+          sortKey: -1742450924735
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?limit=10&sortBy=priceAsc"
+        name: Sort by price asc
+        meta:
+          id: req_a4cdeca7979c4c8ca3d2dba6a93bac0e
+          created: 1740903811247
+          modified: 1748340775924
+          isPrivate: false
+          sortKey: -1742450925035
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?limit=10&sortBy=yearDesc"
+        name: Sort by year desc
+        meta:
+          id: req_8055760840c54b89bbcaa8cbf22f0cc9
+          created: 1740904746524
+          modified: 1748340789000
+          isPrivate: false
+          sortKey: -1742450925135
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?priceFrom=1000&priceTo=3000"
+        name: Price between
+        meta:
+          id: req_d4f4d0cd03b6462dbe51eb0476bbb4c3
+          created: 1740904959834
+          modified: 1748340798747
+          isPrivate: false
+          sortKey: -1742450925235
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?model=corolla"
+        name: Model is Corolla
+        meta:
+          id: req_f1062c2ccb484a03a4c1738ce1d16b50
+          created: 1740905124385
+          modified: 1748340808457
+          isPrivate: false
+          sortKey: -1742450925335
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings?searchString=corolla"
+        name: Search corolla
+        meta:
+          id: req_076d20e5df9546909f809bb3de92bce2
+          created: 1740991818255
+          modified: 1748340833358
+          isPrivate: false
+          sortKey: -1742450924635
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/10.3.1
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.localBaseUrl }}/listings/filters"
         name: Listing filters
         meta:
           id: req_27941488a6a541b1aabb97221cd33620
           created: 1742450924935
-          modified: 1742451006060
+          modified: 1748339798414
           isPrivate: false
           sortKey: -1742450924935
         method: GET
@@ -914,39 +900,31 @@ cookieJar:
   meta:
     id: jar_c1ffbd2e44b1e0bdb20f66b97c58c61919084003
     created: 1731654707400
-    modified: 1741678751565
+    modified: 1748423365603
   cookies:
     - key: csrfToken
-      value: 3e7d4b68-f0a1-436a-802a-8fcda48d619c
       domain: localhost
       path: /
-      secure: true
-      httpOnly: true
       hostOnly: true
       creation: 2025-03-11T07:39:11.553Z
-      lastAccessed: 2025-03-11T07:39:11.553Z
-      sameSite: strict
-      id: 98f3b397-fd82-48eb-8404-16ca8d92887b
+      lastAccessed: 2025-05-28T09:09:25.603Z
+      id: 9066961d-81f2-462e-b880-2f8ce32e8d7e
     - key: jwtToken
-      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0NWEwYWI4Mi1iYzg2LTRmOTctYjEyNi1hMTk5MWNmYmYwMGMiLCJpYXQiOjE3NDE2Nzg3NTEsImV4cCI6MTc0MTY4MjM1MX0.dhcuO7sBeL0rAGsIuE9F21tPgE8Nb7TMGJgjKrNkb34
       domain: localhost
       path: /
-      secure: true
-      httpOnly: true
       hostOnly: true
       creation: 2025-03-11T07:39:11.554Z
-      lastAccessed: 2025-03-11T07:39:11.554Z
-      sameSite: strict
-      id: 34717c4d-e6c7-4ef9-8e86-f9a29a8b5619
+      lastAccessed: 2025-05-28T09:09:25.603Z
+      id: 3bccd141-0a16-45e8-b4d3-06ab608ef7dd
 environments:
   name: Base Environment
   meta:
     id: env_c1ffbd2e44b1e0bdb20f66b97c58c61919084003
     created: 1731654707400
-    modified: 1741678751566
+    modified: 1748138013740
     isPrivate: false
   data:
-    authToken: f6209c21-a880-41c8-94a8-cf7564444d45
-    csrfToken: 3e7d4b68-f0a1-436a-802a-8fcda48d619c
+    authToken: 13a577af-58ba-4bfe-9554-3a14c531f8bd
+    csrfToken: 1983dc4c-1031-47ab-9dc7-e6715be45786
     userId: 45a0ab82-bc86-4f97-b126-a1991cfbf00c
     vehicleId: 3
