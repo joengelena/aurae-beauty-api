@@ -5,6 +5,7 @@ import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import listingRoutes from '../app/routes/listing.routes';
+import cloundinaryRoutes from '../app/routes/cloundinary.routes';
 
 export default () => {
 	const app = express();
@@ -31,6 +32,7 @@ export default () => {
 	// ROUTES
 	usersRoutes(app);
 	listingRoutes(app);
+	cloundinaryRoutes(app);
 
 	return app;
 };
