@@ -1,12 +1,13 @@
 import logger from '../../../config/logger';
 import { Request, Response } from 'express';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
+import uploadImages from '../../utils/cloudinary/uploadImages';
 
 async function postListing(req: Request, res: Response) {
 	logger.info('Posting new listing');
 
 	try {
-		const { currentUserId, photoPaths, ...listingData } = req.body;
+		const { currentUserId, ...listingData } = req.body;
 
 		if (currentUserId !== listingData.userIdFk) {
 			logger.error('Trying to post a listing for someone else');
@@ -15,38 +16,30 @@ async function postListing(req: Request, res: Response) {
 			return;
 		}
 
-		let currentPhotoOrder = 1;
+		// Files are in the order that it was sent in the request
+		// therefore order matters
+		const files = req.files as Express.Multer.File[];
 
-		Object.keys(photoPaths).forEach((path) => {
-			// The regex will test to see if the key is a number
-			if (!/^\d+$/.test(path)) {
-				logger.error('Invalid photo order format');
-				res.statusMessage =
-					'Invalid photo order. Photo order must be a number';
-				res.status(403).send();
-				return;
-			}
+		if (files.length === 0) {
+			res.statusMessage = 'Bad request. No images for listing';
+			res.status(400).send();
+			return;
+		}
 
-			if (Number(path) !== currentPhotoOrder) {
-				logger.error('Invalid photo order');
-				res.statusMessage =
-					'Invalid photo order. Photo order must be sequential';
-				res.status(403).send();
-				return;
-			}
-
-			currentPhotoOrder++;
-		});
-
+		const uploadedImageUrls = await uploadImages(files);
 		const result = await listingRepository.postListing(listingData);
 
-		Object.keys(photoPaths).forEach(async (path) => {
+		let photoOrder = 0;
+
+		for (const photoUrl of uploadedImageUrls) {
 			await listingRepository.postListingPhotoPath({
 				listingIdFk: result.insertId,
-				photoOrder: Number(path),
-				photoPath: photoPaths[path],
+				photoOrder,
+				photoPath: photoUrl,
 			});
-		});
+
+			photoOrder++;
+		}
 
 		if (result.affectedRows === 1) {
 			res.statusMessage = 'Listing posted successfully';
