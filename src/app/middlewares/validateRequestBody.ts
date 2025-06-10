@@ -3,7 +3,11 @@ import addFormats from 'ajv-formats';
 import logger from '../../config/logger';
 import { NextFunction, Response, Request } from 'express';
 
-const ajv = new Ajv({ removeAdditional: 'all', strict: false });
+const ajv = new Ajv({
+	removeAdditional: 'all',
+	strict: false,
+	coerceTypes: true,
+});
 addFormats(ajv);
 
 function validate(schema: object, data: any) {
