@@ -11,6 +11,7 @@ import {
 	deleteListing,
 } from '../controllers/listingController';
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
+import uploadMulter from '../utils/multerStorage';
 
 const listingRoutes = (app: Express) => {
 	app.route(rootUrl + '/listings/filters').get((req, res, next) => {
@@ -22,6 +23,8 @@ const listingRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		}, getAllListings)
 		.post(
+			// Order matters when uploading images
+			uploadMulter.array('images', 10),
 			validateRequest,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postListing);
