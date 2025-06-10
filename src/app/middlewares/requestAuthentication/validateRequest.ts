@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import * as userModel from '../../repositories/userRepository/userRepository';
 import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwtToken from './verifyJwtToken';
@@ -28,6 +27,7 @@ async function validateRequest(
 			res.status(jwtTokenVerified.status).send();
 			return;
 		}
+
 		const authTokenVerified = await verifyAuthToken(req);
 		if (authTokenVerified !== VERIFIED) {
 			clearCookiesInResponse(res);
