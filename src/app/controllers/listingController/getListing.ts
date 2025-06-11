@@ -15,7 +15,7 @@ async function getListing(req: Request, res: Response) {
 			return;
 		}
 
-		res.statusMessage = 'listing found';
+		res.statusMessage = 'Listing found';
 		res.status(200).send(listing);
 		return;
 	} catch (error) {

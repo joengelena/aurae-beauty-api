@@ -30,7 +30,6 @@ async function verifyAuthToken(req: Request) {
 			};
 		}
 
-		logger.info('Verified auth token');
 		return VERIFIED;
 	} catch (error) {
 		logger.error(`Error verifying auth token: ${error.message}`);

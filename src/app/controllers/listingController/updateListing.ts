@@ -32,9 +32,7 @@ async function updateLising(req: Request, res: Response) {
 
 		if (editListingResult.affectedRows === 1) {
 			res.statusMessage = 'Listing edited successfully';
-			res.status(200).send({
-				message: 'Listing edited successfully',
-			});
+			res.status(200).send();
 			return;
 		}
 	} catch (error) {

@@ -22,7 +22,6 @@ function verifyCsrfToken(req: Request) {
 			};
 		}
 
-		logger.info('Verified csrf token');
 		return VERIFIED;
 	} catch (error) {
 		return {

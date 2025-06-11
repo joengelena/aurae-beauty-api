@@ -11,7 +11,7 @@ async function getAllListings(req: Request, res: Response) {
 
 		const listings = await listingRepository.getAllListings(query);
 
-		res.statusMessage = 'listings found';
+		res.statusMessage = 'Listings found';
 		res.status(200).send(listings);
 		return;
 	} catch (error) {

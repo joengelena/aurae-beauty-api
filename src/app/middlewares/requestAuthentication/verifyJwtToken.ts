@@ -31,7 +31,6 @@ function verifyJwtToken(req: Request) {
 			};
 		}
 
-		logger.info('Verified jwt token');
 		return VERIFIED;
 	} catch (error) {
 		logger.error(`Error verifying jwt token: ${error.message}`);

@@ -9,7 +9,6 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 
 	try {
 		const { token } = req.query;
-
 		const validateJwt = verifyJwt(token as string);
 
 		if (validateJwt.status === 'expired') {
