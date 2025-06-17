@@ -3,21 +3,21 @@ import logger from '../../../config/logger';
 import getValidateEmailFormat from './getValidateEmailFormat';
 import NodeMailerError from '../errors/NodeMailerError';
 
-const transporter = nodemailer.createTransport({
-	host: 'smtp.gmail.com',
-	port: 465,
-	secure: true,
-	auth: {
-		user: process.env.EMAIL,
-		pass: process.env.EMAIL_PASSWORD,
-	},
-});
-
 async function nodemailerSendEmail(
 	to: string,
 	subject: string,
 	htmlBody: string
 ) {
+	const transporter = nodemailer.createTransport({
+		host: 'smtp.gmail.com',
+		port: 465,
+		secure: true,
+		auth: {
+			user: process.env.EMAIL,
+			pass: process.env.EMAIL_PASSWORD,
+		},
+	});
+
 	const mailOptions = {
 		from: process.env.EMAIL,
 		to,
