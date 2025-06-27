@@ -23,13 +23,13 @@ type ListingPhoto = {
 type Listing = {
 	id: number;
 	userIdFk: string;
+	viewCount: number;
 	location: string;
 	vehicleCondition: string;
 	price: number;
 	uploadDate: Date;
 	description: string;
 	endDate: string;
-	endTime: string;
 	make: string;
 	model: string;
 	year: string;
