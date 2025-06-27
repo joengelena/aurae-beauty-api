@@ -26,12 +26,11 @@ async function postListing(req: Request, res: Response) {
 			return;
 		}
 
-		const uploadedImageUrls = await uploadImages(files);
 		const result = await listingRepository.postListing(listingData);
 
+		const uploadedImagesUrls = await uploadImages(files);
 		let photoOrder = 0;
-
-		for (const photoUrl of uploadedImageUrls) {
+		for (const photoUrl of uploadedImagesUrls) {
 			await listingRepository.postListingPhotoPath({
 				listingIdFk: result.insertId,
 				photoOrder,
