@@ -10,6 +10,7 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			}
@@ -28,7 +29,12 @@
 				"minLength": 1,
 				"maxLength": 12
 			},
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"email": {
+				"type": "string",
+				"format": "email",
+				"minLength": 1,
+				"maxLength": 255
+			},
 			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
 		"required": [
@@ -44,7 +50,12 @@
 	"signInUser": {
 		"type": "object",
 		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"email": {
+				"type": "string",
+				"format": "email",
+				"minLength": 1,
+				"maxLength": 255
+			},
 			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
 		"required": ["email", "password"],
@@ -55,6 +66,7 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			},
@@ -66,8 +78,14 @@
 				"minLength": 1,
 				"maxLength": 12
 			},
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
+			"email": {
+				"type": "string",
+				"format": "email",
+				"minLength": 1,
+				"maxLength": 255
+			}
 		},
+		"required": "currentUserId",
 		"additionalProperties": false
 	},
 	"updateUserPassword": {
@@ -75,6 +93,7 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			},
@@ -95,7 +114,12 @@
 	"forgotPassword": {
 		"type": "object",
 		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 }
+			"email": {
+				"type": "string",
+				"format": "email",
+				"minLength": 1,
+				"maxLength": 255
+			}
 		},
 		"required": ["email"],
 		"additionalProperties": false
@@ -103,7 +127,12 @@
 	"ResetPassword": {
 		"type": "object",
 		"properties": {
-			"email": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"email": {
+				"type": "string",
+				"format": "email",
+				"minLength": 1,
+				"maxLength": 255
+			},
 			"newPassword": {
 				"type": "string",
 				"minLength": 1,
@@ -118,6 +147,7 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			},
@@ -135,10 +165,10 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			},
-			"userIdFk": { "type": "string", "minLength": 36, "maxLength": 36 },
 			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"vehicleCondition": {
 				"type": "string",
@@ -150,14 +180,23 @@
 				"minimum": 0,
 				"maximum": 99999999999
 			},
-			"uploadDate": { "type": "string", "minLength": 1, "maxLength": 50 },
+			"uploadDate": {
+				"type": "string",
+				"format": "date",
+				"minLength": 1,
+				"maxLength": 50
+			},
 			"description": {
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 10000
 			},
-			"endDate": { "type": "string", "minLength": 1, "maxLength": 20 },
-			"endTime": { "type": "string", "minLength": 1, "maxLength": 20 },
+			"endDate": {
+				"type": "string",
+				"format": "date",
+				"minLength": 1,
+				"maxLength": 20
+			},
 			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
@@ -182,7 +221,7 @@
 				"minimum": 0,
 				"maximum": 255
 			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"color": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"engineSize": {
 				"type": "integer",
 				"minimum": 0,
@@ -196,25 +235,25 @@
 			"cylinders": { "type": "integer", "minimum": 0, "maximum": 255 },
 			"regoExpiryDate": {
 				"type": "string",
+				"format": "date",
 				"minLength": 1,
 				"maxLength": 255
 			},
 			"wofExpiryDate": {
 				"type": "string",
+				"format": "date",
 				"minLength": 1,
 				"maxLength": 255
 			}
 		},
 		"required": [
 			"currentUserId",
-			"userIdFk",
 			"location",
 			"vehicleCondition",
 			"price",
 			"uploadDate",
 			"description",
 			"endDate",
-			"endTime",
 			"make",
 			"model",
 			"year",
@@ -230,10 +269,10 @@
 		"properties": {
 			"currentUserId": {
 				"type": "string",
+				"format": "uuid",
 				"minLength": 36,
 				"maxLength": 36
 			},
-			"userIdFk": { "type": "string", "minLength": 36, "maxLength": 36 },
 			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"vehicleCondition": {
 				"type": "string",
@@ -246,14 +285,17 @@
 				"maximum": 99999999999
 			},
 			"photoPaths": { "type": "object" },
-			"uploadDate": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"description": {
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 10000
 			},
-			"endDate": { "type": "string", "minLength": 1, "maxLength": 20 },
-			"endTime": { "type": "string", "minLength": 1, "maxLength": 20 },
+			"endDate": {
+				"type": "string",
+				"format": "date",
+				"minLength": 1,
+				"maxLength": 20
+			},
 			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
@@ -278,7 +320,7 @@
 				"minimum": 0,
 				"maximum": 255
 			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"color": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"engineSize": {
 				"type": "integer",
 				"minimum": 0,
