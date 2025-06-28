@@ -2,6 +2,7 @@ import logger from '../../../config/logger';
 import { Request, Response } from 'express';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 import uploadImages from '../../utils/cloudinary/uploadImages';
+import { Listing } from '../../resources/types';
 
 async function postListing(req: Request, res: Response) {
 	logger.info('Posting new listing');
@@ -9,12 +10,12 @@ async function postListing(req: Request, res: Response) {
 	try {
 		const { currentUserId, ...listingData } = req.body;
 
-		if (currentUserId !== listingData.userIdFk) {
-			logger.error('Trying to post a listing for someone else');
-			res.statusMessage = 'Forbidden. Invalid credentials';
-			res.status(403).send();
-			return;
-		}
+		const postListingDetails = listingData as Omit<
+			Listing,
+			'id' | 'viewCount'
+		>;
+
+		postListingDetails.userIdFk = currentUserId;
 
 		// Files are in the order that it was sent in the request
 		// therefore order matters
@@ -25,10 +26,11 @@ async function postListing(req: Request, res: Response) {
 			res.status(400).send();
 			return;
 		}
+		const uploadedImagesUrls = await uploadImages(files);
+		listingData.previewImgUrl = uploadedImagesUrls[0];
 
 		const result = await listingRepository.postListing(listingData);
 
-		const uploadedImagesUrls = await uploadImages(files);
 		let photoOrder = 0;
 		for (const photoUrl of uploadedImagesUrls) {
 			await listingRepository.postListingPhotoPath({

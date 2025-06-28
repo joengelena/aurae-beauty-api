@@ -14,8 +14,9 @@ import mapListingDbToObject from './mapListingDbToObject';
 const listingDbFields: Record<keyof Listing, string> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
-	location: 'location',
 	viewCount: 'view_count',
+	previewImgUrl: 'preview_img_url',
+	location: 'location',
 	vehicleCondition: 'vehicle_condition',
 	price: 'price',
 	uploadDate: 'upload_date',

@@ -24,6 +24,7 @@ type Listing = {
 	id: number;
 	userIdFk: string;
 	viewCount: number;
+	previewImgUrl: string;
 	location: string;
 	vehicleCondition: string;
 	price: number;
