@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import logger from '../../../config/logger';
 import verifyAuthToken from './verifyAuthToken';
 import verifyJwtToken from './verifyJwtToken';
-import clearCookiesInResponse from './clearCookiesInResponse';
 import verifyCsrfToken from './verifyCsrfToken';
 import { VERIFIED } from '../../resources/constants';
 
@@ -14,7 +13,6 @@ async function validateRequest(
 	try {
 		const csrfTokenVerified = verifyCsrfToken(req);
 		if (csrfTokenVerified !== VERIFIED) {
-			clearCookiesInResponse(res);
 			res.statusMessage = csrfTokenVerified.statusMessage;
 			res.status(csrfTokenVerified.status).send();
 			return;
@@ -22,7 +20,6 @@ async function validateRequest(
 
 		const jwtTokenVerified = verifyJwtToken(req);
 		if (jwtTokenVerified !== VERIFIED) {
-			clearCookiesInResponse(res);
 			res.statusMessage = jwtTokenVerified.statusMessage;
 			res.status(jwtTokenVerified.status).send();
 			return;
@@ -30,7 +27,6 @@ async function validateRequest(
 
 		const authTokenVerified = await verifyAuthToken(req);
 		if (authTokenVerified !== VERIFIED) {
-			clearCookiesInResponse(res);
 			res.statusMessage = authTokenVerified.statusMessage;
 			res.status(authTokenVerified.status).send();
 			return;
@@ -38,7 +34,6 @@ async function validateRequest(
 
 		next();
 	} catch (error) {
-		clearCookiesInResponse(res);
 		logger.error(`Error validating request: ${error.message}`);
 		res.statusMessage = 'Unauthorized: Invalid request';
 		res.status(401).send();
