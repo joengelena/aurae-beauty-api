@@ -8,13 +8,11 @@ async function getListingFilters(req: Request, res: Response) {
 	try {
 		const filters = await listingRepository.getListingFilters();
 
-		res.statusMessage = 'Successfully retrieved listing filters';
 		res.status(200).send(filters);
 		return;
 	} catch (error) {
 		logger.error(`Error getting filters: ${error}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

@@ -12,16 +12,14 @@ async function deleteListing(req: Request, res: Response) {
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			res.statusMessage = 'Not found. No listing with specified id';
-			res.status(404).send();
+			res.status(404).send('Not found. No listing with specified id');
 			return;
 		}
 
 		if (currentUserId !== listing[0].userIdFk) {
-			logger.error('Trying to delete someone else is listing');
-			res.statusMessage =
-				'Forbidden. Invalid credentials. You are not the owner of this listing';
-			res.status(403).send();
+			res.status(403).send(
+				'Forbidden. Invalid credentials. You are not the owner of this listing'
+			);
 			return;
 		}
 
@@ -30,18 +28,15 @@ async function deleteListing(req: Request, res: Response) {
 		);
 
 		if (deleteListingResult.affectedRows === 0) {
-			res.statusMessage = 'Not found. No listing with specified id';
-			res.status(404).send();
+			res.status(404).send('Not found. No listing with specified id');
 			return;
 		}
 
-		res.statusMessage = 'Listing deleted successfully';
-		res.status(200).send();
+		res.status(200).send('Listing deleted successfully');
 		return;
 	} catch (error) {
 		logger.error(`Error deleting listing: ${error}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

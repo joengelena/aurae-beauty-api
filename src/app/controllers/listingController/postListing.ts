@@ -22,8 +22,7 @@ async function postListing(req: Request, res: Response) {
 		const files = req.files as Express.Multer.File[];
 
 		if (files.length === 0) {
-			res.statusMessage = 'Bad request. No images for listing';
-			res.status(400).send();
+			res.status(400).send('Bad request. No images for listing');
 			return;
 		}
 		const uploadedImagesUrls = await uploadImages(files);
@@ -43,20 +42,17 @@ async function postListing(req: Request, res: Response) {
 		}
 
 		if (result.affectedRows === 1) {
-			res.statusMessage = 'Listing posted successfully';
 			res.status(201).send({
 				listingId: result.insertId,
 			});
 			return;
 		}
 
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	} catch (error) {
 		logger.error(`Error posting listing: ${error}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

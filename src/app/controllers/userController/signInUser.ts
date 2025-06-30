@@ -14,14 +14,12 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 		const user = await userRepository.getUserByEmail(email);
 
 		if (user.length === 0) {
-			res.statusMessage = 'Forbidden. Email does not exist';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Email does not exist');
 			return;
 		}
 
 		if (!comparePassword(password, user[0].password)) {
-			res.statusMessage = 'Forbidden. Invalid credentials';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Invalid credentials');
 			return;
 		}
 
@@ -47,7 +45,6 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 				sameSite: 'strict',
 			});
 
-			res.statusMessage = 'User logged in successfully';
 			res.status(200).send({
 				userId: user[0].id,
 				authToken,
@@ -56,13 +53,11 @@ async function signInUser(req: Request, res: Response): Promise<void> {
 			return;
 		}
 
-		res.statusMessage = 'Forbidden. User does not exist';
-		res.status(403).send();
+		res.status(403).send('Forbidden. User does not exist');
 		return;
 	} catch (error) {
 		logger.error(`Error signing in user with email: ${error}`);
-		res.statusMessage = 'Internal Server Error';
-		res.status(500).send();
+		res.status(500).send('Internal Server Error');
 		return;
 	}
 }

@@ -18,35 +18,29 @@ async function forgotPassword(req: Request, res: Response) {
 		const user = await userRepository.getUserByEmail(email);
 
 		if (user.length === 0) {
-			res.statusMessage = 'Not found. No user with specified email';
-			res.status(404).send();
+			res.status(404).send('Not found. No user with specified email');
 			return;
 		}
 
 		if (user[0].isEmailVerified === 0) {
 			await sendEmailVerificationLink(user[0].id, email);
-
-			res.statusMessage = 'Email verification link sent successfully';
-			res.status(200).send();
+			res.status(200).send('Email verification link sent successfully');
 			return;
 		}
 
 		await sendResetPasswordLink(user[0].id, email);
 
-		res.statusMessage = 'Reset password link sent successfully';
-		res.status(200).send();
+		res.status(200).send('Reset password link sent successfully');
 		return;
 	} catch (error) {
 		logger.error(`Error processing forgot password request: ${error}`);
 
 		if (error.name === 'NodeMailerError') {
-			res.statusMessage = 'Internal error sending email';
-			res.status(500).send();
+			res.status(500).send('Internal error sending email');
 			return;
 		}
 
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

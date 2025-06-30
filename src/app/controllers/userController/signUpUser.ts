@@ -28,7 +28,6 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 			isPhoneNumberVerified: FALSE,
 		});
 
-		res.statusMessage = 'User created successfully';
 		res.status(201).send({
 			message: 'User created successfully',
 			userId: id,
@@ -41,32 +40,26 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 				splitErrorMessage[splitErrorMessage.length - 1];
 
 			if (lastWordInErrorMessage.includes('email')) {
-				res.statusMessage = 'Forbidden. Email already in use';
-				res.status(403).send();
+				res.status(403).send('Forbidden. Email already in use');
 				return;
 			}
 
 			if (lastWordInErrorMessage.includes('username')) {
-				res.statusMessage = 'Forbidden. Username already in use';
-				res.status(403).send();
+				res.status(403).send('Forbidden. Username already in use');
 				return;
 			}
 
 			if (lastWordInErrorMessage.includes('phone_number')) {
-				res.statusMessage = 'Forbidden. Phone number already in use';
-				res.status(403).send();
+				res.status(403).send('Forbidden. Phone number already in use');
 				return;
 			}
 
-			req.statusMessage = lastWordInErrorMessage;
-			res.status(403).send();
+			res.status(403).send(lastWordInErrorMessage);
 			return;
 		}
 
 		logger.error(`Error signing up user: ${error}`);
-
-		res.statusMessage = 'Internal Server Error';
-		res.status(500).send();
+		res.status(500).send('Internal Server Error');
 		return;
 	}
 }

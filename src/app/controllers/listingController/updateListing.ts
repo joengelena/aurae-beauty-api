@@ -10,18 +10,16 @@ async function updateLising(req: Request, res: Response) {
 		const { currentUserId, ...newListingData } = req.body;
 
 		if (Object.keys(newListingData).length === 0) {
-			res.statusMessage = 'Bad request. No fields to update';
-			res.status(400).send();
+			res.status(400).send('Bad request. No fields to update');
 			return;
 		}
 
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (currentUserId !== listing[0].userIdFk) {
-			logger.error('Trying to edit someone else is listing');
-			res.statusMessage =
-				'Forbidden. Invalid credentials. You are not the owner of this listing';
-			res.status(403).send();
+			res.status(403).send(
+				'Forbidden. Invalid credentials. You are not the owner of this listing'
+			);
 			return;
 		}
 
@@ -31,14 +29,12 @@ async function updateLising(req: Request, res: Response) {
 		);
 
 		if (editListingResult.affectedRows === 1) {
-			res.statusMessage = 'Listing edited successfully';
 			res.status(200).send();
 			return;
 		}
 	} catch (error) {
 		logger.error(`Error editing listing: ${error}`);
-		res.statusMessage = 'Internal Server Error';
-		res.status(500).send();
+		res.status(500).send('Internal Server Error');
 		return;
 	}
 }

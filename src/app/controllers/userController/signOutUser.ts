@@ -12,8 +12,7 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
-			res.statusMessage = 'Forbidden. Invalid credentials';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Invalid credentials');
 			return;
 		}
 
@@ -22,16 +21,12 @@ async function signOutUser(req: Request, res: Response): Promise<void> {
 
 		if (authTokenDeleteResult.affectedRows === 1) {
 			clearCookiesInResponse(res);
-			res.statusMessage = 'User signed out successfully';
-			res.status(200).send({
-				message: 'User signed out successfully',
-			});
+			res.status(200).send();
 			return;
 		}
 	} catch (error) {
 		logger.error(`Error signing out user: ${error}`);
-		res.statusMessage = 'Internal Server Error';
-		res.status(500).send();
+		res.status(500).send('Internal Server Error');
 		return;
 	}
 }

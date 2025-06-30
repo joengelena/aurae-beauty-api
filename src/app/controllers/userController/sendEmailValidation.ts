@@ -13,33 +13,25 @@ async function sendEmailValidation(req: Request, res: Response) {
 		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
-			logger.info('User not found');
-			res.statusMessage = 'Not found. No user with specified email';
-			res.status(404).send();
+			res.status(404).send('Not found. No user with specified email');
 			return;
 		}
 
 		const appConfig = await appConfigRepository.getAppConfig();
 
-		await sendEmailVerificationLink(
-			user[0].id,
-			user[0].email
-		);
+		await sendEmailVerificationLink(user[0].id, user[0].email);
 
-		res.statusMessage = 'Email validation link sent successfully';
 		res.status(200).send();
 		return;
 	} catch (error) {
 		logger.error(`Error sending email validation link: ${error}`);
 
 		if (error.name === 'NodeMailerError') {
-			res.statusMessage = 'Internal error sending email';
-			res.status(500).send();
+			res.status(500).send('Internal error sending email');
 			return;
 		}
 
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

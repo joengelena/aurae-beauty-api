@@ -13,30 +13,33 @@ async function validateRequest(
 	try {
 		const csrfTokenVerified = verifyCsrfToken(req);
 		if (csrfTokenVerified !== VERIFIED) {
-			res.statusMessage = csrfTokenVerified.statusMessage;
-			res.status(csrfTokenVerified.status).send();
+			res.status(csrfTokenVerified.status).send({
+				error: csrfTokenVerified.statusMessage,
+			});
 			return;
 		}
 
 		const jwtTokenVerified = verifyJwtToken(req);
 		if (jwtTokenVerified !== VERIFIED) {
-			res.statusMessage = jwtTokenVerified.statusMessage;
-			res.status(jwtTokenVerified.status).send();
+			res.status(jwtTokenVerified.status).send(
+				jwtTokenVerified.statusMessage
+			);
 			return;
 		}
 
 		const authTokenVerified = await verifyAuthToken(req);
 		if (authTokenVerified !== VERIFIED) {
-			res.statusMessage = authTokenVerified.statusMessage;
-			res.status(authTokenVerified.status).send();
+			res.status(authTokenVerified.status).send(
+				authTokenVerified.statusMessage
+			);
 			return;
 		}
 
 		next();
 	} catch (error) {
 		logger.error(`Error validating request: ${error.message}`);
-		res.statusMessage = 'Unauthorized: Invalid request';
-		res.status(401).send();
+		res.status(401).send('Unauthorized: Invalid request');
+		return;
 	}
 }
 

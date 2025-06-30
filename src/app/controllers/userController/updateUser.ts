@@ -12,15 +12,11 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 			...newUserData,
 		});
 
-		res.statusMessage = 'User updated successfully';
-		res.status(200).send({
-			message: 'User updated successfully',
-		});
+		res.status(200).send();
 		return;
 	} catch (error) {
 		logger.error('Error updating user: ', error);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

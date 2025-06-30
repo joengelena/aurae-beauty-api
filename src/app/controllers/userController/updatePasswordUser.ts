@@ -14,14 +14,12 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
-			res.statusMessage = 'Not found. No user with specified id';
-			res.status(404).send();
+			res.status(404).send('Not found. No user with specified id');
 			return;
 		}
 
 		if (!comparePassword(currentPassword, user[0].password)) {
-			res.statusMessage = 'Forbidden. Invalid credentials';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Invalid credentials');
 			return;
 		}
 
@@ -32,15 +30,11 @@ async function updatePasswordUser(req: Request, res: Response): Promise<void> {
 			password: hashedNewPassword,
 		});
 
-		res.statusMessage = 'User password updated successfully';
-		res.status(200).send({
-			message: 'User password updated successfully',
-		});
+		res.status(200).send();
 		return;
 	} catch (error) {
 		logger.error(`Error updating user password: ${error.message}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

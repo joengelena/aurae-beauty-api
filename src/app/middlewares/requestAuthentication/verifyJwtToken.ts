@@ -9,7 +9,6 @@ function verifyJwtToken(req: Request) {
 		const jwtCookie = req.cookies.jwtToken;
 
 		if (!jwtCookie) {
-			logger.error('No jwt token provided');
 			return {
 				status: 401,
 				statusMessage: 'Unauthorized: No jwt token provided',
@@ -24,7 +23,6 @@ function verifyJwtToken(req: Request) {
 		req.body.currentUserId = validJwt.userId;
 
 		if (!validJwt) {
-			logger.error('Invalid jwt token');
 			return {
 				status: 401,
 				statusMessage: 'Unauthorized: Invalid jwt token',
@@ -33,8 +31,6 @@ function verifyJwtToken(req: Request) {
 
 		return VERIFIED;
 	} catch (error) {
-		logger.error(`Error verifying jwt token: ${error.message}`);
-
 		if (error.name === 'TokenExpiredError') {
 			return {
 				status: 401,

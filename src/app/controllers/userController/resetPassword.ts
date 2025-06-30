@@ -23,15 +23,15 @@ async function resetPassword(req: Request, res: Response): Promise<void> {
 			user.length === 0 ||
 			user[0].id !== jwtPayload.userId
 		) {
-			res.statusMessage = 'Forbidden. Invalid token';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Invalid token');
 			return;
 		}
 
 		if (verifiedJwt.status === JwtStatus.EXPIRED) {
 			await sendResetPasswordLink(user[0].id, email);
-			res.statusMessage = 'Email verification link sent successfully';
-			res.status(200).send();
+			// TODO: might have to change this to a different code because
+			// technically it is not a successful request
+			res.status(200).send('Email verification link sent successfully');
 			return;
 		}
 
@@ -42,13 +42,11 @@ async function resetPassword(req: Request, res: Response): Promise<void> {
 			password: hashedNewPassword,
 		});
 
-		res.statusMessage = 'Successfully reset password';
 		res.status(200).send();
 		return;
 	} catch (error) {
 		logger.error(`Error updating user password: ${error.message}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

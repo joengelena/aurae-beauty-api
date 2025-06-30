@@ -13,14 +13,12 @@ async function deleteUser(req: Request, res: Response) {
 		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
-			res.statusMessage = 'Not found. No user with specified id';
-			res.status(404).send();
+			res.status(404).send('Not found. No user with specified id');
 			return;
 		}
 
 		if (!comparePassword(currentPassword, user[0].password)) {
-			res.statusMessage = 'Forbidden. Invalid credentials';
-			res.status(403).send();
+			res.status(403).send('Forbidden. Invalid credentials');
 			return;
 		}
 
@@ -30,17 +28,15 @@ async function deleteUser(req: Request, res: Response) {
 
 		if (deleteUserResult.affectedRows === 1) {
 			clearCookiesInResponse(res);
-			res.statusMessage = 'User deleted successfully';
 			res.status(200).send();
 			return;
 		}
 
-		res.statusMessage = 'Not found. No user with specified id';
-		res.status(404).send();
+		res.status(404).send('Not found. No user with specified id');
+		return;
 	} catch (error) {
 		logger.error(`Error deleting user: ${error}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }

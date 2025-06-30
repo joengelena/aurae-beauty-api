@@ -12,15 +12,16 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 		const validateJwt = verifyJwt(token as string);
 
 		if (validateJwt.status === 'expired') {
-			res.statusMessage = 'Forbidden. Email verification link is expired';
-			res.status(403).send();
+			res.status(403).send(
+				'Forbidden. Email verification link is expired'
+			);
 			return;
 		}
 
 		if (validateJwt.status === 'invalid') {
-			res.statusMessage =
-				'Forbidden. Invalid token, email verification link is invalid';
-			res.status(403).send();
+			res.status(403).send(
+				'Forbidden. Invalid token, email verification link is invalid'
+			);
 			return;
 		}
 
@@ -33,20 +34,16 @@ async function validateEmailVerificationToken(req: Request, res: Response) {
 			);
 
 		if (updateEmailValidatedStatusResult.affectedRows === 1) {
-			res.statusMessage = 'Email validated successfully';
-			res.status(200).send({
-				message: 'Email validated successfully',
-			});
+			res.status(200).send();
 			return;
 		}
+
 		logger.error(`Error validating email verification token`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	} catch (error) {
 		logger.error(`Error validating email verification token: ${error}`);
-		res.statusMessage = 'Internal server error';
-		res.status(500).send();
+		res.status(500).send('Internal server error');
 		return;
 	}
 }
