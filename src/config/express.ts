@@ -5,6 +5,7 @@ import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import listingRoutes from '../app/routes/listing.routes';
+import { Request, Response, NextFunction } from 'express';
 
 export default () => {
 	const app = express();
@@ -36,6 +37,21 @@ export default () => {
 	// ROUTES
 	usersRoutes(app);
 	listingRoutes(app);
+
+	app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+		logger.error({
+			message: err.message,
+			status: err.status || 500,
+			stack: err.stack,
+			method: req.method,
+			path: req.originalUrl,
+			body: req.body,
+		});
+
+		res.status(err.status || 500).send({
+			message: err.message || 'Something went very wrong!',
+		});
+	});
 
 	return app;
 };

@@ -16,12 +16,13 @@ import {
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
 	app.route(rootUrl + '/user/signup').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signUpUser);
-	}, signUpUser);
+	}, asyncHandler(signUpUser));
 
 	app.route(rootUrl + '/user/signin').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signInUser);

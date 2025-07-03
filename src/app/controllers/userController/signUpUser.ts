@@ -4,6 +4,7 @@ import { hashPassword } from '../../utils/passwordHash';
 import { Request, Response } from 'express';
 import { FALSE } from '../../resources/constants';
 import logger from '../../../config/logger';
+import AppError from '../../utils/errors/appError';
 
 async function signUpUser(req: Request, res: Response): Promise<void> {
 	logger.info('Signing up new user with username: ' + req.body.username);
@@ -40,27 +41,24 @@ async function signUpUser(req: Request, res: Response): Promise<void> {
 				splitErrorMessage[splitErrorMessage.length - 1];
 
 			if (lastWordInErrorMessage.includes('email')) {
-				res.status(403).send('Forbidden. Email already in use');
-				return;
+				throw new AppError(403, 'Forbidden. Email already in use');
 			}
 
 			if (lastWordInErrorMessage.includes('username')) {
-				res.status(403).send('Forbidden. Username already in use');
-				return;
+				throw new AppError(403, 'Forbidden. Username already in use');
 			}
 
 			if (lastWordInErrorMessage.includes('phone_number')) {
-				res.status(403).send('Forbidden. Phone number already in use');
-				return;
+				throw new AppError(
+					403,
+					'Forbidden. Phone number already in use'
+				);
 			}
 
-			res.status(403).send(lastWordInErrorMessage);
-			return;
+			throw new AppError(403, lastWordInErrorMessage);
 		}
 
-		logger.error(`Error signing up user: ${error}`);
-		res.status(500).send('Internal Server Error');
-		return;
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 
