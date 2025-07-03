@@ -1,6 +1,6 @@
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
-import allowCrossOriginRequestsMiddleware from '../app/middlewares/cors';
 import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
@@ -10,7 +10,12 @@ export default () => {
 	const app = express();
 
 	// Middleware
-	app.use(allowCrossOriginRequestsMiddleware);
+	app.use(
+		cors({
+			origin: 'http://localhost:53544',
+			credentials: true,
+		})
+	);
 	app.use(bodyParser.json());
 	app.use(bodyParser.raw({ type: 'text/plain' }));
 	app.use(bodyParser.raw({ type: ['image/*'], limit: '5mb' }));
