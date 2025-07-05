@@ -13,7 +13,8 @@ export default () => {
 	// Middleware
 	app.use(
 		cors({
-			origin: 'http://localhost:53544',
+			// Allow any origin, should set to website domain in prod
+			origin: true,
 			credentials: true,
 		})
 	);
