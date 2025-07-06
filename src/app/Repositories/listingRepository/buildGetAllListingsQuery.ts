@@ -64,7 +64,6 @@ function buildGetAllListingsQuery(allQueries: Partial<testQuery>) {
 		query,
 		values: queryValues,
 		limit: Number(paginationQuery.values[0]),
-		currentPage: Number(paginationQuery.values[1]) + 1,
 	};
 }
 
@@ -195,7 +194,7 @@ function buildSortByQuery(allQueries: Partial<testQuery>): QueryAndValue {
 
 function buildPaginationQuery(allQueries: Partial<testQuery>): QueryAndValue {
 	let limit = Number(allQueries.limit);
-	let pageNumber = Number(allQueries.pageNumber);
+	let pageNumber = Number(allQueries.pageNumber) - 1;
 
 	if (
 		Number.isNaN(limit) ||
@@ -209,9 +208,11 @@ function buildPaginationQuery(allQueries: Partial<testQuery>): QueryAndValue {
 		pageNumber = 0;
 	}
 
+	const offset = pageNumber * limit;
+
 	return {
 		query: 'LIMIT ? OFFSET ?',
-		values: [limit, pageNumber * limit],
+		values: [limit, offset],
 	};
 }
 
