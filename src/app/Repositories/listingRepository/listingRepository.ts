@@ -55,15 +55,14 @@ async function getListingFilters(): Promise<ListingFilters[]> {
 
 async function getAllListings(allQueries: Partial<testQuery>): Promise<{
 	data: Listing[];
-	currentPage: number;
+	pageNumber: number;
 	totalPages: number;
 	totalRows: number;
 }> {
 	logger.info('Getting all listings from the database');
 
 	const connection = await getPool().getConnection();
-	const { query, values, limit, currentPage } =
-		buildGetAllListingsQuery(allQueries);
+	const { query, values, limit } = buildGetAllListingsQuery(allQueries);
 
 	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();
@@ -78,7 +77,7 @@ async function getAllListings(allQueries: Partial<testQuery>): Promise<{
 
 	return {
 		data: mapListingDbToObject(result),
-		currentPage,
+		pageNumber: Number(allQueries.pageNumber),
 		totalPages,
 		totalRows,
 	};
