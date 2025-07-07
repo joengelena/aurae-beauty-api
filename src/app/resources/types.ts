@@ -57,7 +57,7 @@ type AppConfiguration = {
 	value: string;
 };
 
-type testQuery = {
+type ListingQueryParams = {
 	searchString: string;
 	sortBy:
 		| 'priceDesc'
@@ -110,6 +110,6 @@ export {
 	ListingPhoto,
 	AppConfiguration,
 	Listing,
-	testQuery,
+	ListingQueryParams,
 	ListingFilters,
 };

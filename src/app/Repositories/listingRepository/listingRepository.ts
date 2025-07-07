@@ -5,7 +5,7 @@ import {
 	Listing,
 	ListingFilters,
 	ListingPhoto,
-	testQuery,
+	ListingQueryParams,
 } from '../../resources/types';
 import mapListingFiltersDbToObject from './mapListingFiltersDbToObject';
 import buildGetAllListingsQuery from './buildGetAllListingsQuery';
@@ -53,7 +53,9 @@ async function getListingFilters(): Promise<ListingFilters[]> {
 	return mapListingFiltersDbToObject(result);
 }
 
-async function getAllListings(allQueries: Partial<testQuery>): Promise<{
+async function getAllListings(
+	allQueries: Partial<ListingQueryParams>
+): Promise<{
 	data: Listing[];
 	pageNumber: number;
 	totalPages: number;

@@ -1,17 +1,17 @@
-import { testQuery } from '../../resources/types';
+import { ListingQueryParams } from '../../resources/types';
 
 const MAX_PAGE_LIMIT = 100;
 const MIN_PAGE_LIMIT = 10;
 const DEFAULT_PAGE_LIMIT = 20;
 
 type BetweenFilterCondition = {
-	key: keyof testQuery;
+	key: keyof ListingQueryParams;
 	column: string;
 	operator: string;
 };
 
 type EqualFilterCondition = {
-	key: keyof testQuery;
+	key: keyof ListingQueryParams;
 	column: string;
 };
 
@@ -20,7 +20,7 @@ type QueryAndValue = {
 	values: (string | number)[];
 };
 
-function buildGetAllListingsQuery(allQueries: Partial<testQuery>) {
+function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM listing';
 	const queryValues: (string | number)[] = [];
 
@@ -67,7 +67,9 @@ function buildGetAllListingsQuery(allQueries: Partial<testQuery>) {
 	};
 }
 
-function buildSearchQuery(allQueries: Partial<testQuery>): QueryAndValue {
+function buildSearchQuery(
+	allQueries: Partial<ListingQueryParams>
+): QueryAndValue {
 	if (allQueries.searchString !== undefined) {
 		return {
 			query: 'make LIKE ? OR model LIKE ? OR location LIKE ? OR body_type LIKE ? OR color LIKE ? OR transmission LIKE ? OR drive_type LIKE ?',
@@ -90,7 +92,7 @@ function buildSearchQuery(allQueries: Partial<testQuery>): QueryAndValue {
 }
 
 function buildBetweenFilterQuery(
-	allQueries: Partial<testQuery>
+	allQueries: Partial<ListingQueryParams>
 ): QueryAndValue {
 	const betweenFilterConditions: BetweenFilterCondition[] = [
 		{ key: 'priceFrom', column: 'price', operator: '>=' },
@@ -127,7 +129,9 @@ function buildBetweenFilterQuery(
 	return { query: '', values: [] };
 }
 
-function buildEqualFilterQuery(allQueries: Partial<testQuery>): QueryAndValue {
+function buildEqualFilterQuery(
+	allQueries: Partial<ListingQueryParams>
+): QueryAndValue {
 	const equalFilterConditions: EqualFilterCondition[] = [
 		{ key: 'userIdFk', column: 'user_id_fk' },
 		{ key: 'location', column: 'location' },
@@ -162,7 +166,9 @@ function buildEqualFilterQuery(allQueries: Partial<testQuery>): QueryAndValue {
 	return { query: '', values: [] };
 }
 
-function buildSortByQuery(allQueries: Partial<testQuery>): QueryAndValue {
+function buildSortByQuery(
+	allQueries: Partial<ListingQueryParams>
+): QueryAndValue {
 	const sortByConditions = [
 		{ key: 'priceDesc', column: 'price', order: 'DESC' },
 		{ key: 'priceAsc', column: 'price', order: 'ASC' },
@@ -192,7 +198,9 @@ function buildSortByQuery(allQueries: Partial<testQuery>): QueryAndValue {
 	return { query: '', values: [] };
 }
 
-function buildPaginationQuery(allQueries: Partial<testQuery>): QueryAndValue {
+function buildPaginationQuery(
+	allQueries: Partial<ListingQueryParams>
+): QueryAndValue {
 	let limit = Number(allQueries.limit);
 	let pageNumber = Number(allQueries.pageNumber) - 1;
 
