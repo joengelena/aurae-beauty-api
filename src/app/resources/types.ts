@@ -67,9 +67,7 @@ type ListingQueryParams = {
 		| 'kilometersDesc'
 		| 'kilometersAsc'
 		| 'yearDesc'
-		| 'yearAsc'
-		| 'endDateDesc'
-		| 'endDateAsc';
+		| 'yearAsc';
 	limit: string;
 	pageNumber: string;
 	// Between filters
