@@ -7,7 +7,7 @@ function mapListingFiltersDbToObject(
 	return listingFilters.map((listingFilter) => {
 		return {
 			name: listingFilter.name,
-			filterValues: listingFilter.filter_values,
+			filterValues: listingFilter.filter_values as Array<string>,
 		};
 	});
 }

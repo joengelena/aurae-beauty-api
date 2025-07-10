@@ -99,7 +99,7 @@ type ListingQueryParams = {
 
 type ListingFilters = {
 	name: string;
-	filterValues: string;
+	filterValues: string[];
 };
 
 export {
