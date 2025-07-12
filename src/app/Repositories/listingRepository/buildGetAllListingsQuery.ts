@@ -70,7 +70,10 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 function buildSearchQuery(
 	allQueries: Partial<ListingQueryParams>
 ): QueryAndValue {
-	if (allQueries.searchString !== undefined) {
+	if (
+		allQueries.searchString !== undefined &&
+		allQueries.searchString !== ''
+	) {
 		return {
 			query: 'make LIKE ? OR model LIKE ? OR location LIKE ? OR body_type LIKE ? OR color LIKE ? OR transmission LIKE ? OR drive_type LIKE ?',
 			values: [
@@ -113,7 +116,7 @@ function buildBetweenFilterQuery(
 	const queryInputValues: string[] = [];
 
 	betweenFilterConditions.forEach(({ key, operator, column }) => {
-		if (allQueries[key] !== undefined) {
+		if (allQueries[key] !== undefined && allQueries[key] !== '') {
 			subQueryParts.push(`${column} ${operator} ?`);
 			queryInputValues.push(allQueries[key]);
 		}
@@ -150,7 +153,7 @@ function buildEqualFilterQuery(
 	const queryInputValues: string[] = [];
 
 	equalFilterConditions.forEach(({ key, column }) => {
-		if (allQueries[key] !== undefined) {
+		if (allQueries[key] !== undefined && allQueries[key] !== '') {
 			subQueryParts.push(`${column} = ?`);
 			queryInputValues.push(allQueries[key]);
 		}
