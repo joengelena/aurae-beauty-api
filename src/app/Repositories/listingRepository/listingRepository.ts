@@ -61,8 +61,6 @@ async function getAllListings(
 	totalPages: number;
 	totalRows: number;
 }> {
-	logger.info('Getting all listings from the database');
-
 	const connection = await getPool().getConnection();
 	const { query, values, limit } = buildGetAllListingsQuery(allQueries);
 
