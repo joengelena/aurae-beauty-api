@@ -180,12 +180,6 @@
 				"minimum": 0,
 				"maximum": 99999999999
 			},
-			"uploadDate": {
-				"type": "string",
-				"format": "date",
-				"minLength": 1,
-				"maxLength": 50
-			},
 			"description": {
 				"type": "string",
 				"minLength": 1,
@@ -251,7 +245,6 @@
 			"location",
 			"vehicleCondition",
 			"price",
-			"uploadDate",
 			"description",
 			"endDate",
 			"make",
