@@ -96,13 +96,15 @@ async function getListingById(id: string): Promise<Listing[]> {
 
 async function postListing(listingData: Omit<Listing, 'id'>) {
 	logger.info('Adding new listing');
+	const today = new Date();
+	const uploadDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
 
-	const fields = [];
-	const values = [];
+	const fields = ['upload_date'];
+	const values = [uploadDate];
 
 	for (const [key, value] of Object.entries(listingData)) {
 		fields.push(`${listingDbFields[key as keyof Listing]}`);
-		values.push(value);
+		values.push(value.toString());
 	}
 
 	const connection = await getPool().getConnection();
