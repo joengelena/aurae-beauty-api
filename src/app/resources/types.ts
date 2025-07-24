@@ -97,9 +97,9 @@ type ListingQueryParams = {
 	transmission: string;
 };
 
-type ListingFilters = {
+type ListingAttribute = {
 	name: string;
-	filterValues: string[];
+	attributeValues: string[];
 };
 
 export {
@@ -109,5 +109,5 @@ export {
 	AppConfiguration,
 	Listing,
 	ListingQueryParams,
-	ListingFilters,
+	ListingAttribute,
 };

@@ -3,11 +3,11 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import {
 	Listing,
-	ListingFilters,
+	ListingAttribute,
 	ListingPhoto,
 	ListingQueryParams,
 } from '../../resources/types';
-import mapListingFiltersDbToObject from './mapListingFiltersDbToObject';
+import mapListingAttributesDbToObject from './mapListingAttributesDbToObject';
 import buildGetAllListingsQuery from './buildGetAllListingsQuery';
 import mapListingDbToObject from './mapListingDbToObject';
 
@@ -42,15 +42,15 @@ const listingDbFields: Record<keyof Listing, string> = {
 	wofExpiryDate: 'wof_expiry_date',
 };
 
-async function getListingFilters(): Promise<ListingFilters[]> {
-	logger.info('Getting filters from the database');
+async function getListingAttributes(): Promise<ListingAttribute[]> {
+	logger.info('Getting listing attributes from the database');
 
 	const connection = await getPool().getConnection();
-	const query = 'SELECT * FROM listing_filters';
+	const query = 'SELECT * FROM listing_attribute';
 	const [result] = await connection.query<RowDataPacket[]>(query);
 	connection.release();
 
-	return mapListingFiltersDbToObject(result);
+	return mapListingAttributesDbToObject(result);
 }
 
 async function getAllListings(
@@ -175,7 +175,7 @@ async function updateListingWithId(
 }
 
 export {
-	getListingFilters,
+	getListingAttributes,
 	getAllListings,
 	getListingById,
 	postListing,
