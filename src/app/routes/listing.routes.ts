@@ -3,7 +3,7 @@ import { rootUrl } from './base.routes';
 import ajvSchema from '../resources/ajvSchema.json';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import {
-	getListingFilters,
+	getListingAttributes,
 	getAllListings,
 	postListing,
 	getListing,
@@ -14,9 +14,9 @@ import validateRequest from '../middlewares/requestAuthentication/validateReques
 import uploadMulter from '../utils/multerStorage';
 
 const listingRoutes = (app: Express) => {
-	app.route(rootUrl + '/listings/filters').get((req, res, next) => {
+	app.route(rootUrl + '/listings/attributes').get((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.emptyBody);
-	}, getListingFilters);
+	}, getListingAttributes);
 
 	app.route(rootUrl + '/listings')
 		.get((req, res, next) => {
