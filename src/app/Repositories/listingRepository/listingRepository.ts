@@ -96,8 +96,11 @@ async function getListingById(id: string): Promise<Listing[]> {
 
 async function postListing(listingData: Omit<Listing, 'id'>) {
 	logger.info('Adding new listing');
+
 	const today = new Date();
-	const uploadDate = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+	const uploadDate = `${today.getFullYear()}-${String(
+		today.getMonth() + 1
+	).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 	const fields = ['upload_date'];
 	const values = [uploadDate];
