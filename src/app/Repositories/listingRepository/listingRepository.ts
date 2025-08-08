@@ -16,6 +16,7 @@ const listingDbFields: Record<keyof Listing, string> = {
 	userIdFk: 'user_id_fk',
 	viewCount: 'view_count',
 	previewImgUrl: 'preview_img_url',
+	imageUrls: 'image_urls',
 	location: 'location',
 	vehicleCondition: 'vehicle_condition',
 	price: 'price',

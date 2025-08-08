@@ -8,6 +8,7 @@ function mapListingDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 			userIdFk: listing.user_id_fk,
 			viewCount: listing.view_count,
 			previewImgUrl: listing.preview_img_url,
+			imageUrls: listing.image_urls,
 			location: listing.location,
 			vehicleCondition: listing.vehicle_condition,
 			price: listing.price,

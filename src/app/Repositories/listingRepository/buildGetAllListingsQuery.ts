@@ -21,7 +21,17 @@ type QueryAndValue = {
 };
 
 function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
-	let query = 'SELECT *, COUNT(*) OVER() AS totalRows FROM listing';
+	let query = `SELECT *, COUNT(*) OVER() AS totalRows 
+				FROM (
+					SELECT 
+					l.*,
+					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
+					FROM motorix_db.listing l
+					LEFT JOIN (
+					SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
+					) lp ON l.id = lp.listing_id_fk
+					GROUP BY l.id
+				) AS result`;
 	const queryValues: (string | number)[] = [];
 
 	const searchQuery = buildSearchQuery(allQueries);
