@@ -88,7 +88,19 @@ async function getListingById(id: string): Promise<Listing[]> {
 	logger.info(`Getting listing with id '${id}' from the database`);
 
 	const conneciton = await getPool().getConnection();
-	const query = 'SELECT * FROM listing WHERE id = ?';
+	// const query = 'SELECT * FROM listing WHERE id = ?';
+	const query = `SELECT * 
+				FROM (
+					SELECT 
+					l.*,
+					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
+					FROM motorix_db.listing l
+					LEFT JOIN (
+						SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
+					) lp ON l.id = lp.listing_id_fk
+					GROUP BY l.id
+				) AS result
+				WHERE id = ?`;
 	const [result] = await conneciton.query<RowDataPacket[]>(query, [id]);
 	conneciton.release();
 
