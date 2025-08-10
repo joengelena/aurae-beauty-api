@@ -1,7 +1,7 @@
 import { Listing } from '../../resources/types';
 import { RowDataPacket } from 'mysql2';
 
-function mapListingDbToObject(listingsDb: RowDataPacket[]): Listing[] {
+function mapListingsDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 	return listingsDb.map((listing) => {
 		return {
 			id: listing.id,
@@ -37,4 +37,4 @@ function mapListingDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 	});
 }
 
-export default mapListingDbToObject;
+export default mapListingsDbToObject;

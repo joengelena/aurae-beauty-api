@@ -9,7 +9,7 @@ import {
 } from '../../resources/types';
 import mapListingAttributesDbToObject from './mapListingAttributesDbToObject';
 import buildGetAllListingsQuery from './buildGetAllListingsQuery';
-import mapListingDbToObject from './mapListingDbToObject';
+import mapListingsDbToObject from './mapListingsDbToObject';
 
 const listingDbFields: Record<keyof Listing, string> = {
 	id: 'id',
@@ -77,7 +77,7 @@ async function getAllListings(
 	const totalPages = Math.ceil(totalRows / limit);
 
 	return {
-		data: mapListingDbToObject(result),
+		data: mapListingsDbToObject(result),
 		pageNumber: Number(allQueries.pageNumber),
 		totalPages,
 		totalRows,
@@ -104,7 +104,7 @@ async function getListingById(id: string): Promise<Listing[]> {
 	const [result] = await conneciton.query<RowDataPacket[]>(query, [id]);
 	conneciton.release();
 
-	return mapListingDbToObject(result);
+	return mapListingsDbToObject(result);
 }
 
 async function postListing(listingData: Omit<Listing, 'id'>) {

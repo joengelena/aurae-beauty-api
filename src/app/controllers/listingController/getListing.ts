@@ -14,7 +14,7 @@ async function getListing(req: Request, res: Response) {
 			return;
 		}
 
-		res.status(200).send(listing);
+		res.status(200).send(listing[0]);
 		return;
 	} catch (error) {
 		logger.error(
