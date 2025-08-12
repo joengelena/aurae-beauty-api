@@ -4,7 +4,6 @@ import logger from '../../../config/logger';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
 	const userId = req.params.userId;
-	logger.info(`Viewing user with id '${userId}'`);
 
 	try {
 		const users = await userRepository.getUserById(userId);
