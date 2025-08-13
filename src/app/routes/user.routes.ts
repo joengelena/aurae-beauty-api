@@ -87,6 +87,22 @@ const usersRoutes = (app: Express) => {
 		},
 		sendEmailValidation
 	);
+
+	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdAndListingId);
+		}
+		// controller to add to watchlist
+	);
+
+	app.route(rootUrl + '/user/watchlist-remove/:listingId').post(
+		validateRequest,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdAndListingId);
+		}
+		// controller to remove from watchlist
+	);
 };
 
 export default usersRoutes;
