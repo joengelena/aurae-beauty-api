@@ -17,6 +17,10 @@ import validateRequest from '../middlewares/requestAuthentication/validateReques
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import { asyncHandler } from '../utils/asyncHandler';
+import {
+	watchlistAdd,
+	watchlistRemove,
+} from '../controllers/watchlistController';
 
 const usersRoutes = (app: Express) => {
 	// Publics routes
@@ -91,17 +95,17 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
 		validateRequest,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdAndListingId);
-		}
-		// controller to add to watchlist
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		watchlistAdd
 	);
 
-	app.route(rootUrl + '/user/watchlist-remove/:listingId').post(
+	app.route(rootUrl + '/user/watchlist-remove/:listingId').delete(
 		validateRequest,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdAndListingId);
-		}
-		// controller to remove from watchlist
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		watchlistRemove
 	);
 };
 
