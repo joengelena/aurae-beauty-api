@@ -31,9 +31,7 @@
 			},
 			"email": {
 				"type": "string",
-				"format": "email",
-				"minLength": 1,
-				"maxLength": 255
+				"format": "email"
 			},
 			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
