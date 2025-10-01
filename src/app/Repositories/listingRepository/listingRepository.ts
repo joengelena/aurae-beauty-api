@@ -89,9 +89,9 @@ async function getListingById(id: string): Promise<Listing[]> {
 
 	const conneciton = await getPool().getConnection();
 	// const query = 'SELECT * FROM listing WHERE id = ?';
-	const query = `SELECT * 
+	const query = `SELECT *
 				FROM (
-					SELECT 
+					SELECT
 					l.*,
 					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
 					FROM motorix_db.listing l
