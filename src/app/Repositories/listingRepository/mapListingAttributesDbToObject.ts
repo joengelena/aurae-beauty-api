@@ -2,12 +2,12 @@ import { RowDataPacket } from 'mysql2';
 import { ListingAttribute } from '../../resources/types';
 
 function mapListingAttributesDbToObject(
-	ListingAttributes: RowDataPacket[]
+	listingAttributes: RowDataPacket[]
 ): ListingAttribute[] {
-	return ListingAttributes.map((listingAttribute) => {
+	return listingAttributes.map((listingAttribute) => {
 		return {
 			name: listingAttribute.name,
-			attributeValues: listingAttribute.attribute_values as Array<string>,
+			attributeValues: listingAttribute.attribute_values as string[],
 		};
 	});
 }
