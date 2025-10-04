@@ -21,8 +21,8 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 
 	const connection = await getPool().getConnection();
 	const query = `INSERT into User
-        (id, first_name, last_name, username, phone_number, email, password, is_email_verified, is_phone_number_verified) values
-        (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (id, first_name, last_name, username, phone_number, email, is_email_verified, is_phone_number_verified) values
+        (?, ?, ?, ?, ?, ?, ?, ?)`;
 	const [result] = await connection.query<ResultSetHeader>(query, [
 		id,
 		firstName,
@@ -30,7 +30,6 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 		username,
 		phoneNumber,
 		email,
-		password,
 		isEmailVerified,
 		isPhoneNumberVerified,
 	]);

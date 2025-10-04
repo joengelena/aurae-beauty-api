@@ -5,6 +5,7 @@ import logger from './logger';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import listingRoutes from '../app/routes/listing.routes';
+import userSupabaseRoutes from '../app/routes/userSupabase.routes';
 import { Request, Response, NextFunction } from 'express';
 
 export default () => {
@@ -38,6 +39,7 @@ export default () => {
 	// ROUTES
 	usersRoutes(app);
 	listingRoutes(app);
+	userSupabaseRoutes(app); // V2 Supabase Auth routes
 
 	app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 		logger.error({

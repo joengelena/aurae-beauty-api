@@ -1,4 +1,21 @@
-# Project Architecture Overview
+# Motorix API
+
+RESTful API for the Motorix vehicle marketplace application with dual authentication systems.
+
+## 🔐 Authentication Systems
+
+### V1 - Legacy Authentication (MySQL-based)
+- Routes: `/api/v1/user/*`
+- JWT-based authentication with MySQL password storage
+- Uses auth tokens, CSRF tokens, and JWT verification
+- Email verification via nodemailer
+
+### V2 - Supabase Authentication (Recommended)
+- Routes: `/api/v1/v2/user/*`
+- Supabase Auth for user management
+- Passwords managed by Supabase (not stored in MySQL)
+- HttpOnly cookies for secure token storage
+- Auto email confirmation for development (configurable for production)
 
 ## 🗺️ Folder Structure & Responsibilities
 
@@ -36,9 +53,11 @@
   - Environment variables (dotenv)
   - Database connection settings
   - Third-party API keys & endpoints
+  - Supabase client configuration (admin & auth clients)
 
 ## 🛡️ Security Flow for Private Routes
 
+### V1 Routes (Legacy)
 - Every **private API route** requires:
   1. **Authentication Token** (Auth Token)
   2. **CSRF Token** for cross-site request forgery protection
@@ -48,9 +67,33 @@
   - The **user ID** extracted from the token is stored in the `request` object.
   - This allows all downstream middlewares, controllers, and repositories to **easily access the current user's ID** during the request lifecycle.
 
+### V2 Routes (Supabase)
+- Private routes use **Supabase JWT verification**
+- Tokens stored in httpOnly cookies (`sb-access-token`, `sb-refresh-token`)
+- `supabaseAuth` middleware validates JWT from cookies
+- User ID extracted from Supabase JWT and stored in request object
+
+## 🚀 Getting Started
+
+### Environment Setup
+1. Copy `.env.example` to `.env`
+2. Configure database credentials (MySQL)
+3. Add Supabase credentials:
+   - `SUPABASE_URL` - Your Supabase project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` - Service role key (admin operations)
+   - `SUPABASE_ANON_KEY` - Anon key (authentication operations)
+4. Configure other services (Cloudinary, Email, etc.)
+
+### Installation
+```bash
+npm install
+npm run dev
+```
+
 ## ✅ Summary
 This structure ensures:
 - **Separation of concerns** (clean code organization)
 - **Security & validation layers** are handled early
 - Controllers stay focused on business logic
 - Database interactions remain decoupled and testable
+- Dual authentication systems for flexibility and migration path
