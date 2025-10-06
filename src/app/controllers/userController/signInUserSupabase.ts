@@ -5,12 +5,20 @@ import AppError from '../../utils/errors/appError';
 
 /**
  * Sign in user using Supabase Auth
- * Stores tokens in httpOnly cookies for security
+ * Supports both web (httpOnly cookies) and Flutter (token response) clients
+ * - Web clients: tokens stored in httpOnly cookies
+ * - Flutter clients: tokens returned in response body (set X-Client-Type: flutter header)
  */
 async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 	const { email, password } = req.body;
+	const clientType = req.headers['x-client-type']?.toString().toLowerCase();
+	const isFlutterClient = clientType === 'flutter';
 
-	logger.info(`Signing in user with email: ${email} (Supabase)`);
+	logger.info(
+		`Signing in user with email: ${email} (Supabase, client: ${
+			clientType || 'web'
+		})`
+	);
 
 	try {
 		// Sign in with Supabase using auth client (anon key)
@@ -21,7 +29,9 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 
 		if (error || !data.user || !data.session) {
 			logger.warn(
-				`Failed to sign in user: ${error?.message || 'No session returned'}`
+				`Failed to sign in user: ${
+					error?.message || 'No session returned'
+				}`
 			);
 
 			// Handle common errors
@@ -43,27 +53,40 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 
 		logger.info(`User ${data.user.id} signed in successfully`);
 
-		// Store tokens in httpOnly cookies for security
-		res.cookie('sb-access-token', data.session.access_token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'strict',
-			maxAge: data.session.expires_in * 1000, // Convert to milliseconds
-		});
+		if (isFlutterClient) {
+			// For Flutter clients: return tokens in response body
+			res.status(200).send({
+				message: 'Sign in successful',
+				userId: data.user.id,
+				email: data.user.email,
+				accessToken: data.session.access_token,
+				refreshToken: data.session.refresh_token,
+				expiresIn: data.session.expires_in,
+				expiresAt: data.session.expires_at,
+			});
+		} else {
+			// For web clients: store tokens in httpOnly cookies for security
+			res.cookie('sb-access-token', data.session.access_token, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+				maxAge: data.session.expires_in * 1000, // Convert to milliseconds
+			});
 
-		res.cookie('sb-refresh-token', data.session.refresh_token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'strict',
-			maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-		});
+			res.cookie('sb-refresh-token', data.session.refresh_token, {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+			});
 
-		// Return user info only (no tokens in response body)
-		res.status(200).send({
-			message: 'Sign in successful',
-			userId: data.user.id,
-			email: data.user.email,
-		});
+			// Return user info only (no tokens in response body)
+			res.status(200).send({
+				message: 'Sign in successful',
+				userId: data.user.id,
+				email: data.user.email,
+			});
+		}
 	} catch (error) {
 		if (error instanceof AppError) {
 			throw error;
