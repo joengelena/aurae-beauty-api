@@ -23,15 +23,7 @@ import {
 } from '../controllers/watchlistController';
 
 const usersRoutes = (app: Express) => {
-	// Publics routes
-	app.route(rootUrl + '/user/signup').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.signUpUser);
-	}, asyncHandler(signUpUser));
-
-	app.route(rootUrl + '/user/signin').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.signInUser);
-	}, signInUser);
-
+	// Public routes
 	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, forgotPassword);
@@ -52,14 +44,6 @@ const usersRoutes = (app: Express) => {
 	}, viewUser);
 
 	// Privates routes
-	app.route(rootUrl + '/user/signout').post(
-		validateRequest,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-		},
-		signOutUser
-	);
-
 	app.route(rootUrl + '/user')
 		.delete(
 			validateRequest,

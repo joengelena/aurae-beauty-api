@@ -10,28 +10,18 @@ import signUpUserSupabase from '../controllers/userController/signUpUserSupabase
 import signInUserSupabase from '../controllers/userController/signInUserSupabase';
 import signOutUserSupabase from '../controllers/userController/signOutUserSupabase';
 
-/**
- * V2 User Routes using Supabase Authentication
- * These routes run in parallel with existing v1 routes for testing
- */
-const userSupabaseRoutes = (app: Express) => {
+const userAuthRoutes = (app: Express) => {
 	// Public routes
-	app.route(rootUrl + '/v2/user/signup').post(
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.signUpUser);
-		},
-		asyncHandler(signUpUserSupabase)
-	);
+	app.route(rootUrl + '/user/signup').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.signUpUser);
+	}, asyncHandler(signUpUserSupabase));
 
-	app.route(rootUrl + '/v2/user/signin').post(
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.signInUser);
-		},
-		asyncHandler(signInUserSupabase)
-	);
+	app.route(rootUrl + '/user/signin').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.signInUser);
+	}, asyncHandler(signInUserSupabase));
 
-	// Private routes (require Supabase JWT)
-	app.route(rootUrl + '/v2/user/signout').post(
+	// Private routes
+	app.route(rootUrl + '/user/signout').post(
 		supabaseAuth,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
@@ -40,4 +30,4 @@ const userSupabaseRoutes = (app: Express) => {
 	);
 };
 
-export default userSupabaseRoutes;
+export default userAuthRoutes;
