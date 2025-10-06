@@ -1,9 +1,6 @@
 import { Express } from 'express';
 import { rootUrl } from './base.routes';
 import {
-	signUpUser,
-	signInUser,
-	signOutUser,
 	viewUser,
 	updateUser,
 	updatePasswordUser,
@@ -16,7 +13,6 @@ import {
 import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
-import { asyncHandler } from '../utils/asyncHandler';
 import {
 	watchlistAdd,
 	watchlistRemove,
