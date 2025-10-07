@@ -5,8 +5,6 @@ import {
 	updateUser,
 	updatePasswordUser,
 	forgotPassword,
-	sendEmailValidation,
-	validateEmailVerificationToken,
 	deleteUser,
 	resetPassword,
 } from '../controllers/userController';
@@ -30,10 +28,6 @@ const usersRoutes = (app: Express) => {
 		},
 		resetPassword
 	);
-
-	app.route(rootUrl + '/user/validate-email-link').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.emptyBody);
-	}, validateEmailVerificationToken);
 
 	app.route(rootUrl + '/users/:userId').get((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.emptyBody);
@@ -62,14 +56,6 @@ const usersRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);
 		},
 		updatePasswordUser
-	);
-
-	app.route(rootUrl + '/user/send-email-verification-link').post(
-		supabaseAuthenticateReq,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-		},
-		sendEmailValidation
 	);
 
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
