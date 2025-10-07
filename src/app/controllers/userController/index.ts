@@ -1,6 +1,6 @@
-import signInUser from './signInUser';
-import signUpUser from './signUpUser';
-import signOutUser from './signOutUser';
+import signInUserSupabase from './signInUserSupabase';
+import signOutUserSupabase from './signOutUserSupabase';
+import signUpUserSupabase from './signUpUserSupabase';
 import viewUser from './viewUser';
 import updateUser from './updateUser';
 import updatePasswordUser from './updatePasswordUser';
@@ -11,9 +11,9 @@ import deleteUser from './deleteUser';
 import resetPassword from './resetPassword';
 
 export {
-	signInUser,
-	signUpUser,
-	signOutUser,
+	signUpUserSupabase,
+	signInUserSupabase,
+	signOutUserSupabase,
 	viewUser,
 	updateUser,
 	updatePasswordUser,

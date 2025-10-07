@@ -4,11 +4,11 @@ import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import { asyncHandler } from '../utils/asyncHandler';
 import supabaseAuth from '../middlewares/supabaseAuth';
-
-// Supabase Auth Controllers
-import signUpUserSupabase from '../controllers/userController/signUpUserSupabase';
-import signInUserSupabase from '../controllers/userController/signInUserSupabase';
-import signOutUserSupabase from '../controllers/userController/signOutUserSupabase';
+import {
+	signInUserSupabase,
+	signUpUserSupabase,
+	signOutUserSupabase,
+} from '../controllers/userController';
 
 const userAuthRoutes = (app: Express) => {
 	// Public routes
