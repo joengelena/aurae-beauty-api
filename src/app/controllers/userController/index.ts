@@ -5,7 +5,7 @@ import viewUser from './viewUser';
 import updateUser from './updateUser';
 import updatePasswordUser from './updatePasswordUser';
 import forgotPassword from './forgotPassword';
-import deleteUser from './deleteUser';
+import deleteUserSupabase from './deleteUserSupabase';
 import resetPassword from './resetPassword';
 
 export {
@@ -16,6 +16,6 @@ export {
 	updateUser,
 	updatePasswordUser,
 	forgotPassword,
-	deleteUser,
+	deleteUserSupabase,
 	resetPassword,
 };

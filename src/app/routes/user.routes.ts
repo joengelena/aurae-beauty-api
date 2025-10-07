@@ -5,7 +5,7 @@ import {
 	updateUser,
 	updatePasswordUser,
 	forgotPassword,
-	deleteUser,
+	deleteUserSupabase,
 	resetPassword,
 } from '../controllers/userController';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -40,7 +40,7 @@ const usersRoutes = (app: Express) => {
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.deleteUser);
 			},
-			deleteUser
+			deleteUserSupabase
 		)
 		.patch(
 			supabaseAuthenticateReq,
