@@ -3,7 +3,7 @@ import { rootUrl } from './base.routes';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import { asyncHandler } from '../utils/asyncHandler';
-import supabaseAuth from '../middlewares/supabaseAuth';
+import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import {
 	signInUserSupabase,
 	signUpUserSupabase,
@@ -22,7 +22,7 @@ const userAuthRoutes = (app: Express) => {
 
 	// Private routes
 	app.route(rootUrl + '/user/signout').post(
-		supabaseAuth,
+		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},

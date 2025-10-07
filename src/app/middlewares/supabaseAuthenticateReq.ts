@@ -6,7 +6,11 @@ import logger from '../../config/logger';
  * Middleware to verify Supabase JWT token and authenticate requests.
  * Extracts user ID from token and attaches it to req.body.currentUserId
  */
-async function supabaseAuth(req: Request, res: Response, next: NextFunction) {
+async function supabaseAuthenticateReq(
+	req: Request,
+	res: Response,
+	next: NextFunction
+) {
 	try {
 		logger.info('Verifying Supabase JWT token');
 
@@ -35,7 +39,9 @@ async function supabaseAuth(req: Request, res: Response, next: NextFunction) {
 
 		if (error || !user) {
 			logger.warn(
-				`Failed to verify Supabase token: ${error?.message || 'No user found'}`
+				`Failed to verify Supabase token: ${
+					error?.message || 'No user found'
+				}`
 			);
 			res.status(401).send({
 				error: 'Unauthorized: Invalid or expired token',
@@ -57,4 +63,4 @@ async function supabaseAuth(req: Request, res: Response, next: NextFunction) {
 	}
 }
 
-export default supabaseAuth;
+export default supabaseAuthenticateReq;
