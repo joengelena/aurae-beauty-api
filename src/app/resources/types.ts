@@ -4,14 +4,9 @@ type User = {
 	lastName: string;
 	username: string;
 	email: string;
-	password: string;
 	phoneNumber: string;
 	isEmailVerified: 0 | 1;
 	isPhoneNumberVerified: 0 | 1;
-};
-
-type UserEmailValidationStatus = {
-	is_email_verified: 0 | 1;
 };
 
 type ListingPhoto = {
@@ -105,7 +100,6 @@ type ListingAttribute = {
 
 export {
 	User,
-	UserEmailValidationStatus,
 	ListingPhoto,
 	AppConfiguration,
 	Listing,
