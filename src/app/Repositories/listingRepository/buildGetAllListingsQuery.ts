@@ -21,9 +21,9 @@ type QueryAndValue = {
 };
 
 function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
-	let query = `SELECT *, COUNT(*) OVER() AS totalRows 
+	let query = `SELECT *, COUNT(*) OVER() AS totalRows
 				FROM (
-					SELECT 
+					SELECT
 					l.*,
 					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
 					FROM motorix_db.listing l
