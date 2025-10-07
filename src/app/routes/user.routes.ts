@@ -10,13 +10,13 @@ import {
 	deleteUser,
 	resetPassword,
 } from '../controllers/userController';
-import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import {
 	watchlistAdd,
 	watchlistRemove,
 } from '../controllers/watchlistController';
+import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 
 const usersRoutes = (app: Express) => {
 	// Public routes
@@ -42,14 +42,14 @@ const usersRoutes = (app: Express) => {
 	// Privates routes
 	app.route(rootUrl + '/user')
 		.delete(
-			validateRequest,
+			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.deleteUser);
 			},
 			deleteUser
 		)
 		.patch(
-			validateRequest,
+			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.updateUser);
 			},
@@ -57,7 +57,7 @@ const usersRoutes = (app: Express) => {
 		);
 
 	app.route(rootUrl + '/user/update-password').patch(
-		validateRequest,
+		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);
 		},
@@ -65,7 +65,7 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/send-email-verification-link').post(
-		validateRequest,
+		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
@@ -73,7 +73,7 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
-		validateRequest,
+		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
@@ -81,7 +81,7 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/watchlist-remove/:listingId').delete(
-		validateRequest,
+		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
