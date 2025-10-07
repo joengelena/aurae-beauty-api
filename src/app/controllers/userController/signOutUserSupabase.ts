@@ -5,6 +5,9 @@ import AppError from '../../utils/errors/appError';
 
 /**
  * Sign out user using Supabase Auth
+ * Supports both web (cookie clearing) and Flutter (token invalidation) clients
+ * - Web clients: clears httpOnly cookies
+ * - Flutter clients: invalidates session (set X-Client-Type: flutter header)
  * Requires valid JWT token in Authorization header (verified by supabaseAuth middleware)
  */
 async function signOutUserSupabase(
@@ -12,8 +15,12 @@ async function signOutUserSupabase(
 	res: Response
 ): Promise<void> {
 	const userId = req.body.currentUserId; // Set by supabaseAuth middleware
+	const clientType = req.headers['x-client-type']?.toString().toLowerCase();
+	const isFlutterClient = clientType === 'flutter';
 
-	logger.info(`Signing out user: ${userId} (Supabase)`);
+	logger.info(
+		`Signing out user: ${userId} (Supabase, client: ${clientType || 'web'})`
+	);
 
 	try {
 		// Sign out user (invalidates all sessions for this user)
@@ -26,19 +33,23 @@ async function signOutUserSupabase(
 
 		logger.info(`User ${userId} signed out successfully`);
 
-		// Clear httpOnly cookies
-		res.clearCookie('sb-access-token', {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'strict',
-		});
+		if (!isFlutterClient) {
+			// For web clients: clear httpOnly cookies
+			res.clearCookie('sb-access-token', {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+			});
 
-		res.clearCookie('sb-refresh-token', {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'strict',
-		});
+			res.clearCookie('sb-refresh-token', {
+				httpOnly: true,
+				secure: process.env.NODE_ENV === 'production',
+				sameSite: 'lax',
+			});
+		}
 
+		// For both clients: confirm sign out
+		// Flutter apps should clear tokens from secure storage on client side
 		res.status(200).send({
 			message: 'Sign out successful',
 		});
