@@ -8,6 +8,7 @@ import {
 	signInUserSupabase,
 	signUpUserSupabase,
 	signOutUserSupabase,
+	refreshTokenSupabase,
 } from '../controllers/userController';
 
 const userAuthRoutes = (app: Express) => {
@@ -19,6 +20,10 @@ const userAuthRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/signin').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.signInUser);
 	}, asyncHandler(signInUserSupabase));
+
+	app.route(rootUrl + '/user/refresh-token').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.refreshToken);
+	}, asyncHandler(refreshTokenSupabase));
 
 	// Private routes
 	app.route(rootUrl + '/user/signout').post(

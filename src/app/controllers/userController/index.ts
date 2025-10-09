@@ -6,6 +6,7 @@ import updateUser from './updateUser';
 import deleteUserSupabase from './deleteUserSupabase';
 import forgotPasswordSupabase from './forgotPasswordSupabase';
 import changePasswordSupabase from './changePasswordSupabase';
+import refreshTokenSupabase from './refreshTokenSupabase';
 
 export {
 	signUpUserSupabase,
@@ -16,4 +17,5 @@ export {
 	viewUser,
 	updateUser,
 	deleteUserSupabase,
+	refreshTokenSupabase,
 };
