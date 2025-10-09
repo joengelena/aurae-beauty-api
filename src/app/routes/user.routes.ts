@@ -4,9 +4,9 @@ import {
 	viewUser,
 	updateUser,
 	updatePasswordUser,
-	forgotPassword,
 	deleteUserSupabase,
 	resetPassword,
+	forgotPasswordSupabase,
 } from '../controllers/userController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
@@ -20,7 +20,7 @@ const usersRoutes = (app: Express) => {
 	// Public routes
 	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
-	}, forgotPassword);
+	}, forgotPasswordSupabase);
 
 	app.route(rootUrl + '/user/forgot-password/reset-password/:token').post(
 		(req, res, next) => {
