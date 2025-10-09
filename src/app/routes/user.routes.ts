@@ -3,9 +3,8 @@ import { rootUrl } from './base.routes';
 import {
 	viewUser,
 	updateUser,
-	updatePasswordUser,
 	deleteUserSupabase,
-	resetPassword,
+	changePasswordSupabase,
 	forgotPasswordSupabase,
 } from '../controllers/userController';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -22,11 +21,12 @@ const usersRoutes = (app: Express) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, forgotPasswordSupabase);
 
-	app.route(rootUrl + '/user/forgot-password/reset-password/:token').post(
+	app.route(rootUrl + '/user/change-password').post(
+		supabaseAuthenticateReq,
 		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.ResetPassword);
+			validateRequestBody(req, res, next, ajvSchema.ChangePassword);
 		},
-		resetPassword
+		changePasswordSupabase
 	);
 
 	app.route(rootUrl + '/users/:userId').get((req, res, next) => {
@@ -49,14 +49,6 @@ const usersRoutes = (app: Express) => {
 			},
 			updateUser
 		);
-
-	app.route(rootUrl + '/user/update-password').patch(
-		supabaseAuthenticateReq,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.updateUserPassword);
-		},
-		updatePasswordUser
-	);
 
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
 		supabaseAuthenticateReq,

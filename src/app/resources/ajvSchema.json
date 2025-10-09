@@ -122,15 +122,9 @@
 		"required": ["email"],
 		"additionalProperties": false
 	},
-	"ResetPassword": {
+	"ChangePassword": {
 		"type": "object",
 		"properties": {
-			"email": {
-				"type": "string",
-				"format": "email",
-				"minLength": 1,
-				"maxLength": 255
-			},
 			"newPassword": {
 				"type": "string",
 				"minLength": 1,
