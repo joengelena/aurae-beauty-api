@@ -70,7 +70,6 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 		username: 'username',
 		email: 'email',
 		phoneNumber: 'phone_number',
-		password: 'password',
 	};
 
 	if (!id) {
