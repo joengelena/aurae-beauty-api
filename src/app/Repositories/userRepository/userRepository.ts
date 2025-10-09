@@ -37,17 +37,6 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 	return result;
 }
 
-async function getUserByEmail(email: string): Promise<User[]> {
-	logger.info(`Getting user with email '${email}' from the database`);
-
-	const connection = await getPool().getConnection();
-	const query = 'SELECT * FROM User WHERE email = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [email]);
-	connection.release();
-
-	return mapUserDbToObject(result);
-}
-
 async function getUserById(id: string): Promise<User[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
 
@@ -108,7 +97,6 @@ async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
 
 export {
 	signUpUser,
-	getUserByEmail,
 	getUserById,
 	updateUser,
 	deleteUserWithId,

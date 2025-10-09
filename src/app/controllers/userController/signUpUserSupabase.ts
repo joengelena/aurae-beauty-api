@@ -67,7 +67,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				lastName,
 				username,
 				email,
-				password: '', // Password is managed by Supabase, not stored in MySQL
 				phoneNumber,
 				isEmailVerified: FALSE,
 				isPhoneNumberVerified: FALSE,
@@ -90,7 +89,10 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					splitErrorMessage[splitErrorMessage.length - 1];
 
 				if (lastWordInErrorMessage.includes('username')) {
-					throw new AppError(403, 'Forbidden. Username already in use');
+					throw new AppError(
+						403,
+						'Forbidden. Username already in use'
+					);
 				}
 
 				if (lastWordInErrorMessage.includes('phone_number')) {
