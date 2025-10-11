@@ -39,16 +39,16 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				error?.message.includes('Invalid login credentials') ||
 				error?.message.includes('Email not confirmed')
 			) {
-				res.status(403).send({
-					error: 'Invalid credentials. Please check your email and password.',
-				});
+				res.status(403).send(
+					'Invalid credentials. Please check your email and password.'
+				);
 				return;
 			}
-
-			throw new AppError(
-				500,
-				`Sign in failed: ${error?.message || 'Unknown error'}`
+			logger.error(
+				`Error signing in user with email '${email}': ${error}`
 			);
+			res.status(500).send('Internal server error');
+			return;
 		}
 
 		logger.info(`User ${data.user.id} signed in successfully`);
@@ -88,12 +88,9 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 			});
 		}
 	} catch (error) {
-		if (error instanceof AppError) {
-			throw error;
-		}
-
-		logger.error(`Unexpected error during sign in: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		logger.error(`Error signing in user with email '${email}': ${error}`);
+		res.status(500).send('Internal server error');
+		return;
 	}
 }
 
