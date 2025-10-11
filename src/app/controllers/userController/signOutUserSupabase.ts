@@ -10,13 +10,19 @@ import AppError from '../../utils/errors/appError';
  * - Flutter clients: invalidates session (set X-Client-Type: flutter header)
  * Requires valid JWT token in Authorization header (verified by supabaseAuth middleware)
  */
-async function signOutUserSupabase(
-	req: Request,
-	res: Response
-): Promise<void> {
+async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId; // Set by supabaseAuth middleware
 	const clientType = req.headers['x-client-type']?.toString().toLowerCase();
 	const isFlutterClient = clientType === 'flutter';
+
+	let token = req.cookies['sb-access-token'];
+
+	if (!token) {
+		const authHeader = req.headers.authorization;
+		if (authHeader && authHeader.startsWith('Bearer ')) {
+			token = authHeader.split(' ')[1];
+		}
+	}
 
 	logger.info(
 		`Signing out user: ${userId} (Supabase, client: ${clientType || 'web'})`
@@ -24,7 +30,7 @@ async function signOutUserSupabase(
 
 	try {
 		// Sign out user (invalidates all sessions for this user)
-		const { error } = await supabaseAdmin.auth.admin.signOut(userId);
+		const { error } = await supabaseAdmin.auth.admin.signOut(token);
 
 		if (error) {
 			logger.error(`Failed to sign out user: ${error.message}`);
