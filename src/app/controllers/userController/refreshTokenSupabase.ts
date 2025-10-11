@@ -23,10 +23,7 @@ async function refreshTokenSupabase(
 
 		if (!refreshToken) {
 			logger.warn('Refresh token not provided');
-			res.status(401).send({
-				error: 'Unauthorized: No refresh token provided',
-			});
-			return;
+			throw new AppError(401, 'Unauthorized: No refresh token provided');
 		}
 
 		const { data, error } = await supabaseAuth.auth.refreshSession({
@@ -39,11 +36,7 @@ async function refreshTokenSupabase(
 					error?.message || 'No session returned'
 				}`
 			);
-
-			res.status(401).send({
-				error: 'Unauthorized: Invalid or expired refresh token',
-			});
-			return;
+			throw new AppError(401, 'Unauthorized: Invalid or expired refresh token');
 		}
 
 		logger.info(

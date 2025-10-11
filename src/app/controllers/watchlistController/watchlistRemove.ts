@@ -1,39 +1,44 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import { removeFromWatchlist } from '../../repositories/watchlistRepository/watchlistRepository';
+import AppError from '../../utils/errors/appError';
 
-async function watchlistRemove(req: Request, res: Response) {
+async function watchlistRemove(req: Request, res: Response): Promise<void> {
+	const { currentUserId } = req.body;
+	const listingId = req.params.listingId;
+
+	logger.info(`Removing listing ${listingId} from watchlist for user ${currentUserId}`);
+
 	try {
-		const { currentUserId } = req.body;
-		const listingId = req.params.listingId;
-
 		const result = await removeFromWatchlist(
 			currentUserId,
 			Number(listingId)
 		);
 
 		if (result.affectedRows === 1) {
-			res.status(200).send();
-			return;
+			res.status(200).send({
+				message: 'Removed from watchlist successfully',
+			});
+		} else {
+			throw new AppError(400, 'Could not remove from watchlist');
+		}
+	} catch (error) {
+		if (error instanceof AppError) {
+			throw error;
 		}
 
-		res.status(400).send('Could not add to watchlist');
-		return;
-	} catch (error) {
-		logger.error(`Error removing from watchlist: ${error}`);
-
 		if (error.code === 'ER_DUP_ENTRY') {
-			res.status(409).send('Already in watchlist');
-			return;
+			logger.warn(`Duplicate entry error for user ${currentUserId}, listing ${listingId}`);
+			throw new AppError(409, 'Already in watchlist');
 		}
 
 		if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-			res.status(400).send('Invalid user or listing ID');
-			return;
+			logger.warn(`Invalid user or listing ID: user ${currentUserId}, listing ${listingId}`);
+			throw new AppError(400, 'Invalid user or listing ID');
 		}
 
-		res.status(500).send('Internal server error');
-		return;
+		logger.error(`Unexpected error during remove from watchlist: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

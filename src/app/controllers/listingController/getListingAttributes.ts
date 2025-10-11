@@ -1,19 +1,22 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
+import AppError from '../../utils/errors/appError';
 
-async function getListingAttributes(req: Request, res: Response) {
+async function getListingAttributes(req: Request, res: Response): Promise<void> {
 	logger.info('Getting listing attributes from the database');
 
 	try {
 		const attributes = await listingRepository.getListingAttributes();
 
 		res.status(200).send(attributes);
-		return;
 	} catch (error) {
-		logger.error(`Error getting listing attributes: ${error}`);
-		res.status(500).send('Internal server error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during get listing attributes: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

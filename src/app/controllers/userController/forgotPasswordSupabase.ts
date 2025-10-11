@@ -1,19 +1,18 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import { supabaseAuth } from '../../../config/supabase';
+import AppError from '../../utils/errors/appError';
 
-async function forgotPasswordSupabase(req: Request, res: Response) {
+async function forgotPasswordSupabase(req: Request, res: Response): Promise<void> {
+	const { email } = req.body;
+
+	logger.info(
+		`Processing forgot password request for user with email: ${email}`
+	);
+
 	try {
-		logger.info(
-			'Processing forgot password request for user with email: ' +
-				req.body.email
-		);
-
-		const { email } = req.body;
-
 		if (!email) {
-			res.status(400).send('Email is required');
-			return;
+			throw new AppError(400, 'Email is required');
 		}
 
 		// Supabase handles password reset emails automatically
@@ -26,20 +25,21 @@ async function forgotPasswordSupabase(req: Request, res: Response) {
 
 		if (error) {
 			logger.error(`Error sending password reset email: ${error.message}`);
-
 			// Don't expose whether the user exists or not for security reasons
 			// Return success message regardless
-			res.status(200).send('If an account exists with this email, a password reset link has been sent');
-			return;
 		}
 
 		logger.info(`Password reset email sent successfully to: ${email}`);
-		res.status(200).send('If an account exists with this email, a password reset link has been sent');
-		return;
+		res.status(200).send({
+			message: 'If an account exists with this email, a password reset link has been sent',
+		});
 	} catch (error) {
-		logger.error(`Error processing forgot password request: ${error}`);
-		res.status(500).send('Internal server error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during forgot password: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

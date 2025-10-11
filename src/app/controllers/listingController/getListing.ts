@@ -1,27 +1,28 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
+import AppError from '../../utils/errors/appError';
 
-async function getListing(req: Request, res: Response) {
-	logger.info(`Getting listing with id '${req.params.id}'`);
+async function getListing(req: Request, res: Response): Promise<void> {
+	const listingId = req.params.id;
+
+	logger.info(`Getting listing with id '${listingId}'`);
 
 	try {
-		const listingId = req.params.id;
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			res.status(404).send('Not found. No listing with specified id');
-			return;
+			throw new AppError(404, 'Not found. No listing with specified id');
 		}
 
 		res.status(200).send(listing[0]);
-		return;
 	} catch (error) {
-		logger.error(
-			`Error getting listing with id '${req.params.id}': ${error}`
-		);
-		res.status(500).send('Internal server error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during get listing: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

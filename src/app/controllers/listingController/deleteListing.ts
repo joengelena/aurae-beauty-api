@@ -1,26 +1,26 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
+import AppError from '../../utils/errors/appError';
 
-async function deleteListing(req: Request, res: Response) {
-	logger.info(`Deleting listing with id '${req.params.id}'`);
+async function deleteListing(req: Request, res: Response): Promise<void> {
+	const listingId = req.params.id;
+	const currentUserId = req.body.currentUserId;
+
+	logger.info(`Deleting listing with id '${listingId}'`);
 
 	try {
-		const listingId = req.params.id;
-		const currentUserId = req.body.currentUserId;
-
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			res.status(404).send('Not found. No listing with specified id');
-			return;
+			throw new AppError(404, 'Not found. No listing with specified id');
 		}
 
 		if (currentUserId !== listing[0].userIdFk) {
-			res.status(403).send(
+			throw new AppError(
+				403,
 				'Forbidden. Invalid credentials. You are not the owner of this listing'
 			);
-			return;
 		}
 
 		const deleteListingResult = await listingRepository.deleteListingWithId(
@@ -28,16 +28,19 @@ async function deleteListing(req: Request, res: Response) {
 		);
 
 		if (deleteListingResult.affectedRows === 0) {
-			res.status(404).send('Not found. No listing with specified id');
-			return;
+			throw new AppError(404, 'Not found. No listing with specified id');
 		}
 
-		res.status(200).send('Listing deleted successfully');
-		return;
+		res.status(200).send({
+			message: 'Listing deleted successfully',
+		});
 	} catch (error) {
-		logger.error(`Error deleting listing: ${error}`);
-		res.status(500).send('Internal server error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during delete listing: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

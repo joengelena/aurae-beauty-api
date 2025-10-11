@@ -1,41 +1,51 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
+import AppError from '../../utils/errors/appError';
 
-async function updateLising(req: Request, res: Response) {
-	logger.info(`Updating listing with id '${req.params.id}'`);
+async function updateLising(req: Request, res: Response): Promise<void> {
+	const listingId = req.params.id;
+	const { currentUserId, ...newListingData } = req.body;
+
+	logger.info(`Updating listing with id '${listingId}'`);
 
 	try {
-		const listingId = req.params.id;
-		const { currentUserId, ...newListingData } = req.body;
-
 		if (Object.keys(newListingData).length === 0) {
-			res.status(400).send('Bad request. No fields to update');
-			return;
+			throw new AppError(400, 'Bad request. No fields to update');
 		}
 
 		const listing = await listingRepository.getListingById(listingId);
 
+		if (listing.length === 0) {
+			throw new AppError(404, 'Not found. No listing with specified id');
+		}
+
 		if (currentUserId !== listing[0].userIdFk) {
-			res.status(403).send(
+			throw new AppError(
+				403,
 				'Forbidden. Invalid credentials. You are not the owner of this listing'
 			);
-			return;
 		}
 
 		const editListingResult = await listingRepository.updateListingWithId(
-			req.params.id,
+			listingId,
 			newListingData
 		);
 
 		if (editListingResult.affectedRows === 1) {
-			res.status(200).send();
-			return;
+			res.status(200).send({
+				message: 'Listing updated successfully',
+			});
+		} else {
+			throw new AppError(500, 'Failed to update listing');
 		}
 	} catch (error) {
-		logger.error(`Error editing listing: ${error}`);
-		res.status(500).send('Internal Server Error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during update listing: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 
