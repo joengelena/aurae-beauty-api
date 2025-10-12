@@ -23,7 +23,7 @@ async function postListing(req: Request, res: Response): Promise<void> {
 		const files = req.files as Express.Multer.File[];
 
 		if (files.length === 0) {
-			throw new AppError(400, 'Bad request. No images for listing');
+			throw new AppError(400, 'Please upload at least one image for your listing.');
 		}
 
 		const uploadedImagesUrls = await uploadImages(files);
@@ -47,7 +47,7 @@ async function postListing(req: Request, res: Response): Promise<void> {
 				listingId: result.insertId,
 			});
 		} else {
-			throw new AppError(500, 'Failed to create listing');
+			throw new AppError(500, 'Unable to create your listing. Please try again.');
 		}
 	} catch (error) {
 		if (error instanceof AppError) {
@@ -55,7 +55,7 @@ async function postListing(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during post listing: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to create your listing. Please try again.');
 	}
 }
 
