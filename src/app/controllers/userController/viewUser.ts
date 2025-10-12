@@ -12,7 +12,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		const users = await userRepository.getUserById(userId);
 
 		if (users.length === 0) {
-			throw new AppError(404, 'Not found. No user with specified id');
+			throw new AppError(404, 'User not found.');
 		}
 
 		const user = {
@@ -30,7 +30,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during view user: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to load user profile. Please try again.');
 	}
 }
 

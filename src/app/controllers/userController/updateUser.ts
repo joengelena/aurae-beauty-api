@@ -23,7 +23,7 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during user update: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to update your profile. Please try again.');
 	}
 }
 

@@ -19,7 +19,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 		const user = await userRepository.getUserById(currentUserId);
 
 		if (user.length === 0) {
-			throw new AppError(404, 'User not found');
+			throw new AppError(404, 'Account not found.');
 		}
 
 		const { error: signInError } =
@@ -32,7 +32,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			logger.warn(
 				`Password verification failed for user ${currentUserId}: ${signInError.message}`
 			);
-			throw new AppError(403, 'Invalid password');
+			throw new AppError(403, 'Incorrect password. Please try again.');
 		}
 
 		logger.info(`Password verified for user ${currentUserId}`);
@@ -43,7 +43,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			);
 
 			if (deleteUserResult.affectedRows !== 1) {
-				throw new AppError(404, 'User not found in database');
+				throw new AppError(404, 'Account not found.');
 			}
 
 			logger.info(
@@ -53,7 +53,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			logger.error(
 				`Failed to delete user from MySQL: ${dbError.message}`
 			);
-			throw new AppError(500, 'Failed to delete user from database');
+			throw new AppError(500, 'Unable to delete your account. Please try again.');
 		}
 
 		const { error: deleteError } =
@@ -65,7 +65,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			);
 			throw new AppError(
 				500,
-				`User deleted from database but failed to delete from auth system: ${deleteError.message}`
+				'Your account data was partially deleted. Please contact support for assistance.'
 			);
 		}
 
@@ -80,7 +80,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during user deletion: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to delete your account. Please try again later.');
 	}
 }
 

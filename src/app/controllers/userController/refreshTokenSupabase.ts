@@ -23,7 +23,7 @@ async function refreshTokenSupabase(
 
 		if (!refreshToken) {
 			logger.warn('Refresh token not provided');
-			throw new AppError(401, 'Unauthorized: No refresh token provided');
+			throw new AppError(401, 'Your session has expired. Please sign in again.');
 		}
 
 		const { data, error } = await supabaseAuth.auth.refreshSession({
@@ -36,7 +36,7 @@ async function refreshTokenSupabase(
 					error?.message || 'No session returned'
 				}`
 			);
-			throw new AppError(401, 'Unauthorized: Invalid or expired refresh token');
+			throw new AppError(401, 'Your session has expired. Please sign in again.');
 		}
 
 		logger.info(
@@ -80,7 +80,7 @@ async function refreshTokenSupabase(
 		}
 
 		logger.error(`Unexpected error during token refresh: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Something went wrong. Please sign in again.');
 	}
 }
 

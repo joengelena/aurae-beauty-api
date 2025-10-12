@@ -21,7 +21,6 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 	);
 
 	try {
-		// Sign in with Supabase using auth client (anon key)
 		const { data, error } = await supabaseAuth.auth.signInWithPassword({
 			email,
 			password,
@@ -34,14 +33,13 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				}`
 			);
 
-			// Handle common errors
 			if (
 				error?.message.includes('Invalid login credentials') ||
 				error?.message.includes('Email not confirmed')
 			) {
 				throw new AppError(
-					403,
-					'Invalid credentials. Please check your email and password.'
+					401,
+					'Incorrect email or password. Please try again.'
 				);
 			}
 
@@ -50,14 +48,13 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 			);
 			throw new AppError(
 				500,
-				`Failed to sign in user: ${error?.message || 'No session returned'}`
+				'Unable to sign in right now. Please try again later.'
 			);
 		}
 
 		logger.info(`User ${data.user.id} signed in successfully`);
 
 		if (isFlutterClient) {
-			// For Flutter clients: return tokens in response body
 			res.status(200).send({
 				message: 'Sign in successful',
 				userId: data.user.id,
@@ -68,7 +65,6 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				expiresAt: data.session.expires_at,
 			});
 		} else {
-			// For web clients: store tokens in httpOnly cookies for security
 			res.cookie('sb-access-token', data.session.access_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
@@ -83,7 +79,6 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			});
 
-			// Return user info only (no tokens in response body)
 			res.status(200).send({
 				message: 'Sign in successful',
 				userId: data.user.id,
@@ -96,7 +91,7 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during sign in: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Something went wrong. Please try again.');
 	}
 }
 

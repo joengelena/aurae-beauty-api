@@ -3,22 +3,25 @@ import logger from '../../../config/logger';
 import { supabaseAdmin } from '../../../config/supabase';
 import AppError from '../../utils/errors/appError';
 
-async function changePasswordSupabase(req: Request, res: Response): Promise<void> {
+async function changePasswordSupabase(
+	req: Request,
+	res: Response
+): Promise<void> {
 	const { newPassword, currentUserId } = req.body;
 
-	logger.info(`Processing password change request for user: ${currentUserId}`);
+	logger.info(
+		`Processing password change request for user: ${currentUserId}`
+	);
 
 	try {
 		if (!newPassword) {
-			throw new AppError(400, 'New password is required');
+			throw new AppError(400, 'Please provide a new password.');
 		}
 
-		// currentUserId is set by supabaseAuthenticateReq middleware
 		if (!currentUserId) {
-			throw new AppError(401, 'Unauthorized');
+			throw new AppError(401, 'Please sign in to change your password.');
 		}
 
-		// Update the user's password using admin client
 		const { error } = await supabaseAdmin.auth.admin.updateUserById(
 			currentUserId,
 			{ password: newPassword }
@@ -26,7 +29,10 @@ async function changePasswordSupabase(req: Request, res: Response): Promise<void
 
 		if (error) {
 			logger.error(`Error changing password: ${error.message}`);
-			throw new AppError(500, `Failed to change password: ${error.message}`);
+			throw new AppError(
+				500,
+				'Unable to change your password. Please try again.'
+			);
 		}
 
 		logger.info(`Password changed successfully for user: ${currentUserId}`);
@@ -38,8 +44,13 @@ async function changePasswordSupabase(req: Request, res: Response): Promise<void
 			throw error;
 		}
 
-		logger.error(`Unexpected error during password change: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		logger.error(
+			`Unexpected error during password change: ${error.message}`
+		);
+		throw new AppError(
+			500,
+			'Unable to change your password. Please try again.'
+		);
 	}
 }
 
