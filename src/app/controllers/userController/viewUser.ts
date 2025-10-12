@@ -1,16 +1,18 @@
 import { Request, Response } from 'express';
 import * as userRepository from '../../repositories/userRepository/userRepository';
 import logger from '../../../config/logger';
+import AppError from '../../utils/errors/appError';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
 	const userId = req.params.userId;
+
+	logger.info(`Viewing user with id '${userId}'`);
 
 	try {
 		const users = await userRepository.getUserById(userId);
 
 		if (users.length === 0) {
-			res.status(404).send('Not found. No user with specified id');
-			return;
+			throw new AppError(404, 'Not found. No user with specified id');
 		}
 
 		const user = {
@@ -22,11 +24,13 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		};
 
 		res.status(200).send(user);
-		return;
 	} catch (error) {
-		logger.error(`Error viewing user: ${error}`);
-		res.status(500).send('Internal server error');
-		return;
+		if (error instanceof AppError) {
+			throw error;
+		}
+
+		logger.error(`Unexpected error during view user: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

@@ -1,25 +1,21 @@
-import signInUser from './signInUser';
-import signUpUser from './signUpUser';
-import signOutUser from './signOutUser';
+import signInUserSupabase from './signInUserSupabase';
+import signOutUserSupabase from './signOutUserSupabase';
+import signUpUserSupabase from './signUpUserSupabase';
 import viewUser from './viewUser';
 import updateUser from './updateUser';
-import updatePasswordUser from './updatePasswordUser';
-import forgotPassword from './forgotPassword';
-import sendEmailValidation from './sendEmailValidation';
-import validateEmailVerificationToken from './validateEmailVerificationToken';
-import deleteUser from './deleteUser';
-import resetPassword from './resetPassword';
+import deleteUserSupabase from './deleteUserSupabase';
+import forgotPasswordSupabase from './forgotPasswordSupabase';
+import changePasswordSupabase from './changePasswordSupabase';
+import refreshTokenSupabase from './refreshTokenSupabase';
 
 export {
-	signInUser,
-	signUpUser,
-	signOutUser,
+	signUpUserSupabase,
+	signInUserSupabase,
+	signOutUserSupabase,
+	forgotPasswordSupabase,
+	changePasswordSupabase,
 	viewUser,
 	updateUser,
-	updatePasswordUser,
-	forgotPassword,
-	sendEmailValidation,
-	validateEmailVerificationToken,
-	deleteUser,
-	resetPassword,
+	deleteUserSupabase,
+	refreshTokenSupabase,
 };

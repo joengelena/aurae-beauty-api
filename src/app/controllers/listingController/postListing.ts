@@ -3,8 +3,9 @@ import { Request, Response } from 'express';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 import uploadImages from '../../utils/cloudinary/uploadImages';
 import { Listing } from '../../resources/types';
+import AppError from '../../utils/errors/appError';
 
-async function postListing(req: Request, res: Response) {
+async function postListing(req: Request, res: Response): Promise<void> {
 	logger.info('Posting new listing');
 
 	try {
@@ -22,9 +23,9 @@ async function postListing(req: Request, res: Response) {
 		const files = req.files as Express.Multer.File[];
 
 		if (files.length === 0) {
-			res.status(400).send('Bad request. No images for listing');
-			return;
+			throw new AppError(400, 'Bad request. No images for listing');
 		}
+
 		const uploadedImagesUrls = await uploadImages(files);
 		listingData.previewImgUrl = uploadedImagesUrls[0];
 
@@ -45,15 +46,16 @@ async function postListing(req: Request, res: Response) {
 			res.status(201).send({
 				listingId: result.insertId,
 			});
-			return;
+		} else {
+			throw new AppError(500, 'Failed to create listing');
+		}
+	} catch (error) {
+		if (error instanceof AppError) {
+			throw error;
 		}
 
-		res.status(500).send('Internal server error');
-		return;
-	} catch (error) {
-		logger.error(`Error posting listing: ${error}`);
-		res.status(500).send('Internal server error');
-		return;
+		logger.error(`Unexpected error during post listing: ${error.message}`);
+		throw new AppError(500, 'Internal Server Error');
 	}
 }
 

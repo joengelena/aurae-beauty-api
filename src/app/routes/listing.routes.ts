@@ -10,8 +10,8 @@ import {
 	updateLising,
 	deleteListing,
 } from '../controllers/listingController';
-import validateRequest from '../middlewares/requestAuthentication/validateRequest';
 import uploadMulter from '../utils/multerStorage';
+import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 
 const listingRoutes = (app: Express) => {
 	app.route(rootUrl + '/listings/attributes').get((req, res, next) => {
@@ -25,7 +25,7 @@ const listingRoutes = (app: Express) => {
 		.post(
 			// Order matters when uploading images
 			uploadMulter.array('images', 10),
-			validateRequest,
+			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postListing);
 			},
@@ -37,14 +37,14 @@ const listingRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		}, getListing)
 		.patch(
-			validateRequest,
+			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.updateListing);
 			},
 			updateLising
 		)
 		.delete(
-			validateRequest,
+			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
