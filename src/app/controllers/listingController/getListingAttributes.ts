@@ -16,7 +16,7 @@ async function getListingAttributes(req: Request, res: Response): Promise<void> 
 		}
 
 		logger.error(`Unexpected error during get listing attributes: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to load filter options. Please try again.');
 	}
 }
 

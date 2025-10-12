@@ -17,7 +17,7 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 				message: 'Added to watchlist successfully',
 			});
 		} else {
-			throw new AppError(400, 'Could not add to watchlist');
+			throw new AppError(400, 'Unable to add this listing to your watchlist. Please try again.');
 		}
 	} catch (error) {
 		if (error instanceof AppError) {
@@ -26,16 +26,16 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 
 		if (error.code === 'ER_DUP_ENTRY') {
 			logger.warn(`Listing ${listingId} already in watchlist for user ${currentUserId}`);
-			throw new AppError(409, 'Already in watchlist');
+			throw new AppError(409, 'This listing is already in your watchlist.');
 		}
 
 		if (error.code === 'ER_NO_REFERENCED_ROW_2') {
 			logger.warn(`Invalid user or listing ID: user ${currentUserId}, listing ${listingId}`);
-			throw new AppError(400, 'Invalid user or listing ID');
+			throw new AppError(404, 'This listing no longer exists or has been removed.');
 		}
 
 		logger.error(`Unexpected error during add to watchlist: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Something went wrong. Please try again later.');
 	}
 }
 

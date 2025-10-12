@@ -11,19 +11,19 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 
 	try {
 		if (Object.keys(newListingData).length === 0) {
-			throw new AppError(400, 'Bad request. No fields to update');
+			throw new AppError(400, 'No changes to update.');
 		}
 
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			throw new AppError(404, 'Not found. No listing with specified id');
+			throw new AppError(404, 'This listing is no longer available.');
 		}
 
 		if (currentUserId !== listing[0].userIdFk) {
 			throw new AppError(
 				403,
-				'Forbidden. Invalid credentials. You are not the owner of this listing'
+				'You can only edit your own listings.'
 			);
 		}
 
@@ -37,7 +37,7 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 				message: 'Listing updated successfully',
 			});
 		} else {
-			throw new AppError(500, 'Failed to update listing');
+			throw new AppError(500, 'Unable to update your listing. Please try again.');
 		}
 	} catch (error) {
 		if (error instanceof AppError) {
@@ -45,7 +45,7 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during update listing: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to update your listing. Please try again.');
 	}
 }
 

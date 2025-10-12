@@ -13,13 +13,13 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			throw new AppError(404, 'Not found. No listing with specified id');
+			throw new AppError(404, 'This listing is no longer available.');
 		}
 
 		if (currentUserId !== listing[0].userIdFk) {
 			throw new AppError(
 				403,
-				'Forbidden. Invalid credentials. You are not the owner of this listing'
+				'You can only delete your own listings.'
 			);
 		}
 
@@ -28,7 +28,7 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 		);
 
 		if (deleteListingResult.affectedRows === 0) {
-			throw new AppError(404, 'Not found. No listing with specified id');
+			throw new AppError(404, 'This listing is no longer available.');
 		}
 
 		res.status(200).send({
@@ -40,7 +40,7 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during delete listing: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to delete your listing. Please try again.');
 	}
 }
 

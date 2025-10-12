@@ -29,18 +29,16 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 	);
 
 	try {
-		// Sign out user (invalidates all sessions for this user)
 		const { error } = await supabaseAdmin.auth.admin.signOut(token);
 
 		if (error) {
 			logger.error(`Failed to sign out user: ${error.message}`);
-			throw new AppError(500, `Sign out failed: ${error.message}`);
+			throw new AppError(500, 'Unable to sign out. Please try again.');
 		}
 
 		logger.info(`User ${userId} signed out successfully`);
 
 		if (!isFlutterClient) {
-			// For web clients: clear httpOnly cookies
 			res.clearCookie('sb-access-token', {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
@@ -54,8 +52,6 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 			});
 		}
 
-		// For both clients: confirm sign out
-		// Flutter apps should clear tokens from secure storage on client side
 		res.status(200).send({
 			message: 'Sign out successful',
 		});
@@ -65,7 +61,7 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during sign out: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Something went wrong. Please try again.');
 	}
 }
 

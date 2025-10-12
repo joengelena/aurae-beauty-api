@@ -19,7 +19,7 @@ async function getAllListings(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during get all listings: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to load listings. Please try again.');
 	}
 }
 

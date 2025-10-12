@@ -12,7 +12,7 @@ async function getListing(req: Request, res: Response): Promise<void> {
 		const listing = await listingRepository.getListingById(listingId);
 
 		if (listing.length === 0) {
-			throw new AppError(404, 'Not found. No listing with specified id');
+			throw new AppError(404, 'This listing is no longer available.');
 		}
 
 		res.status(200).send(listing[0]);
@@ -22,7 +22,7 @@ async function getListing(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during get listing: ${error.message}`);
-		throw new AppError(500, 'Internal Server Error');
+		throw new AppError(500, 'Unable to load this listing. Please try again.');
 	}
 }
 
