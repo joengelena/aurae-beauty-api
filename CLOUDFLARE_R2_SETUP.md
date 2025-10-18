@@ -4,7 +4,7 @@ This guide explains how to set up Cloudflare R2 for the Motorix API.
 
 ## Overview
 
-Cloudflare R2 has replaced Cloudinary as the image storage solution. R2 is an S3-compatible object storage service with zero egress fees.
+Cloudflare R2 is used as the image storage solution for the Motorix API. R2 is an S3-compatible object storage service with zero egress fees.
 
 ## Prerequisites
 
@@ -177,17 +177,18 @@ src/app/utils/cloudflare/
 
 ---
 
-## Cost Comparison
+## Pricing
 
-| Service | Storage | Egress | Operations |
-|---------|---------|--------|------------|
-| **R2** | $0.015/GB/month | **$0** | $0.36/million writes |
-| **Cloudinary** | Free tier: 25GB | Free tier: 25GB/month | Included |
+| Resource | Cost |
+|---------|------|
+| **Storage** | $0.015/GB/month |
+| **Egress** | **$0** (unlimited bandwidth) |
+| **Operations** | $0.36/million writes |
 
 **R2 Advantages:**
 - ✅ Zero egress fees (unlimited bandwidth)
 - ✅ S3-compatible (standard API)
-- ✅ Better pricing at scale
+- ✅ Cost-effective pricing at scale
 - ✅ Cloudflare's global network
 
 ---
@@ -224,31 +225,6 @@ src/app/utils/cloudflare/
 - Implement client-side image compression
 - Increase timeout in Multer config
 - Use R2 multipart upload for files >100MB
-
----
-
-## Migration from Cloudinary
-
-**Existing Cloudinary images will continue to work** - no immediate migration needed.
-
-### Optional: Bulk Migration Script
-
-If you want to migrate existing Cloudinary images to R2:
-
-```typescript
-// scripts/migrateToR2.ts
-import { migrateImageFromCloudinaryToR2 } from './migrationHelper';
-
-// Fetch all listings with Cloudinary URLs
-const listings = await fetchAllListings();
-
-for (const listing of listings) {
-  if (listing.previewImgUrl.includes('cloudinary.com')) {
-    const newUrl = await migrateImageFromCloudinaryToR2(listing.previewImgUrl);
-    await updateListingImageUrl(listing.id, newUrl);
-  }
-}
-```
 
 ---
 
