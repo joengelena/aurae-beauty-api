@@ -14,24 +14,25 @@ import {
 	watchlistRemove,
 } from '../controllers/watchlistController';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const usersRoutes = (app: Express) => {
 	// Public routes
 	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
-	}, forgotPasswordSupabase);
+	}, asyncHandler(forgotPasswordSupabase));
 
 	app.route(rootUrl + '/user/change-password').post(
 		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.ChangePassword);
 		},
-		changePasswordSupabase
+		asyncHandler(changePasswordSupabase)
 	);
 
 	app.route(rootUrl + '/users/:userId').get((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.emptyBody);
-	}, viewUser);
+	}, asyncHandler(viewUser));
 
 	// Privates routes
 	app.route(rootUrl + '/user')
@@ -40,14 +41,14 @@ const usersRoutes = (app: Express) => {
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.deleteUser);
 			},
-			deleteUserSupabase
+			asyncHandler(deleteUserSupabase)
 		)
 		.patch(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.updateUser);
 			},
-			updateUser
+			asyncHandler(updateUser)
 		);
 
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
@@ -55,7 +56,7 @@ const usersRoutes = (app: Express) => {
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
-		watchlistAdd
+		asyncHandler(watchlistAdd)
 	);
 
 	app.route(rootUrl + '/user/watchlist-remove/:listingId').delete(
@@ -63,7 +64,7 @@ const usersRoutes = (app: Express) => {
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
-		watchlistRemove
+		asyncHandler(watchlistRemove)
 	);
 };
 

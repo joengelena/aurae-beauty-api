@@ -87,7 +87,7 @@ RESTful API for the Motorix vehicle marketplace application with dual authentica
     - `SUPABASE_URL` - Your Supabase project URL
     - `SUPABASE_SERVICE_ROLE_KEY` - Service role key (admin operations)
     - `SUPABASE_ANON_KEY` - Anon key (authentication operations)
-4. Configure other services (Cloudinary, Email, etc.)
+4. Configure Cloudflare R2 for image storage (see `CLOUDFLARE_R2_SETUP.md`)
 
 ### Installation
 

@@ -18,7 +18,6 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		const user = {
 			firstName: users[0].firstName,
 			lastName: users[0].lastName,
-			username: users[0].username,
 			phoneNumber: users[0].phoneNumber,
 			email: users[0].email,
 		};

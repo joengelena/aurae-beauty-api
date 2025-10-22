@@ -1,4 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import mysql from 'mysql2/promise';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import {
@@ -107,7 +108,10 @@ async function getListingById(id: string): Promise<Listing[]> {
 	return mapListingsDbToObject(result);
 }
 
-async function postListing(listingData: Omit<Listing, 'id'>) {
+async function postListing(
+	listingData: Omit<Listing, 'id'>,
+	connection?: mysql.Pool | mysql.PoolConnection
+) {
 	logger.info('Adding new listing');
 
 	const today = new Date();
@@ -123,11 +127,15 @@ async function postListing(listingData: Omit<Listing, 'id'>) {
 		values.push(value.toString());
 	}
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `INSERT INTO listing (${fields.join(', ')})
 					values (${values.map(() => '?').join(', ')})`;
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
@@ -145,6 +153,31 @@ async function postListingPhotoPath(listingPhotoData: ListingPhoto) {
 		listingPhotoData.photoPath,
 	]);
 	connection.release();
+
+	return result;
+}
+
+async function postListingPhotoPaths(
+	listingId: number,
+	photoPaths: string[],
+	connection: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
+	logger.info(
+		`Batch adding ${photoPaths.length} photo paths for listing id: ${listingId}`
+	);
+
+	if (photoPaths.length === 0) {
+		throw new Error('No photo paths provided for batch insert');
+	}
+
+	// Build batch insert query
+	const values = photoPaths.flatMap((path, index) => [listingId, index, path]);
+	const placeholders = photoPaths.map(() => '(?, ?, ?)').join(', ');
+
+	const query = `INSERT INTO listing_photo (listing_id_fk, photo_order, photo_path)
+                 VALUES ${placeholders}`;
+
+	const [result] = await connection.query<ResultSetHeader>(query, values);
 
 	return result;
 }
@@ -196,6 +229,7 @@ export {
 	getListingById,
 	postListing,
 	postListingPhotoPath,
+	postListingPhotoPaths,
 	deleteListingWithId,
 	updateListingWithId,
 };

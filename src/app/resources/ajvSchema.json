@@ -23,7 +23,6 @@
 		"properties": {
 			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"username": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"phoneNumber": {
 				"type": "string",
 				"minLength": 1,
@@ -38,7 +37,6 @@
 		"required": [
 			"firstName",
 			"lastName",
-			"username",
 			"email",
 			"password",
 			"phoneNumber"
@@ -70,7 +68,6 @@
 			},
 			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"username": { "type": "string", "minLength": 1, "maxLength": 50 },
 			"phoneNumber": {
 				"type": "string",
 				"minLength": 1,
