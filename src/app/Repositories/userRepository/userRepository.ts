@@ -9,7 +9,6 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 		id,
 		firstName,
 		lastName,
-		username,
 		email,
 		phoneNumber,
 		isEmailVerified,
@@ -20,13 +19,12 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 
 	const connection = await getPool().getConnection();
 	const query = `INSERT into User
-        (id, first_name, last_name, username, phone_number, email, is_email_verified, is_phone_number_verified) values
-        (?, ?, ?, ?, ?, ?, ?, ?)`;
+        (id, first_name, last_name, phone_number, email, is_email_verified, is_phone_number_verified) values
+        (?, ?, ?, ?, ?, ?, ?)`;
 	const [result] = await connection.query<ResultSetHeader>(query, [
 		id,
 		firstName,
 		lastName,
-		username,
 		phoneNumber,
 		email,
 		isEmailVerified,
@@ -56,7 +54,6 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 	const databaseFields: { [key: string]: string } = {
 		firstName: 'first_name',
 		lastName: 'last_name',
-		username: 'username',
 		email: 'email',
 		phoneNumber: 'phone_number',
 	};

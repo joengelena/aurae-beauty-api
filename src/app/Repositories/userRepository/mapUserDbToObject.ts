@@ -7,7 +7,6 @@ function mapUserDbToObject(usersDb: RowDataPacket[]): User[] {
 			id: user.id,
 			firstName: user.first_name,
 			lastName: user.last_name,
-			username: user.username,
 			email: user.email,
 			phoneNumber: user.phone_number,
 			isEmailVerified: user.is_email_verified,

@@ -6,7 +6,7 @@ import AppError from '../../utils/errors/appError';
 import { FALSE } from '../../resources/constants';
 
 async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
-	const { firstName, lastName, username, email, password, phoneNumber } =
+	const { firstName, lastName, email, password, phoneNumber } =
 		req.body;
 
 	logger.info(`Signing up new user with email: ${email} (Supabase)`);
@@ -20,7 +20,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				user_metadata: {
 					firstName,
 					lastName,
-					username,
 					phoneNumber,
 				},
 			});
@@ -61,7 +60,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				id: supabaseUserId,
 				firstName,
 				lastName,
-				username,
 				email,
 				phoneNumber,
 				isEmailVerified: FALSE,
@@ -82,13 +80,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				const splitErrorMessage = dbError.sqlMessage.split(' ');
 				const lastWordInErrorMessage =
 					splitErrorMessage[splitErrorMessage.length - 1];
-
-				if (lastWordInErrorMessage.includes('username')) {
-					throw new AppError(
-						409,
-						'This username is already taken. Please choose a different one.'
-					);
-				}
 
 				if (lastWordInErrorMessage.includes('phone_number')) {
 					throw new AppError(
