@@ -54,7 +54,6 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 	const databaseFields: { [key: string]: string } = {
 		firstName: 'first_name',
 		lastName: 'last_name',
-		email: 'email',
 		phoneNumber: 'phone_number',
 	};
 
