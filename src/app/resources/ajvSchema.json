@@ -74,7 +74,7 @@
 				"maxLength": 12
 			}
 		},
-		"required": "currentUserId",
+		"required": ["currentUserId"],
 		"additionalProperties": false
 	},
 	"updateUserPassword": {
