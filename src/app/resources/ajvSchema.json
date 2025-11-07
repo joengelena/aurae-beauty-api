@@ -266,6 +266,10 @@
 				"minLength": 36,
 				"maxLength": 36
 			},
+			"status": {
+				"type": "string",
+				"enum": ["active", "sold", "expired"]
+			},
 			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"vehicleCondition": {
 				"type": "string",

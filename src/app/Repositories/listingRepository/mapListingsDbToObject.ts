@@ -6,6 +6,7 @@ function mapListingsDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 		return {
 			id: listing.id,
 			userIdFk: listing.user_id_fk,
+			status: listing.status,
 			viewCount: listing.view_count,
 			previewImgUrl: listing.preview_img_url,
 			imageUrls: listing.image_urls,

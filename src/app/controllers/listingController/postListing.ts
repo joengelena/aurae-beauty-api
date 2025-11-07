@@ -21,6 +21,7 @@ async function postListing(req: Request, res: Response): Promise<void> {
 		>;
 
 		postListingDetails.userIdFk = currentUserId;
+		postListingDetails.status = 'active';
 
 		// Files are in the order that it was sent in the request
 		// therefore order matters

@@ -17,6 +17,7 @@ type ListingPhoto = {
 type Listing = {
 	id: number;
 	userIdFk: string;
+	status: 'active' | 'sold' | 'expired';
 	viewCount: number;
 	previewImgUrl: string;
 	imageUrls: string;
