@@ -41,6 +41,10 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	const paginationQuery = buildPaginationQuery(allQueries);
 
 	const whereClause = [];
+
+	whereClause.push('status = ?');
+	queryValues.push('active');
+
 	if (searchQuery.query.length > 0) {
 		whereClause.push(searchQuery.query);
 		queryValues.push(...searchQuery.values);
