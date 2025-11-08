@@ -4,7 +4,7 @@ import ajvSchema from '../resources/ajvSchema.json';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import {
 	getListingAttributes,
-	getAllActiveListings,
+	getAllListings,
 	postListing,
 	getListing,
 	updateLising,
@@ -22,7 +22,7 @@ const listingRoutes = (app: Express) => {
 	app.route(rootUrl + '/listings')
 		.get((req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		}, asyncHandler(getAllActiveListings))
+		}, asyncHandler(getAllListings))
 		.post(
 			// Order matters when uploading images
 			uploadMulter.array('images', 10),

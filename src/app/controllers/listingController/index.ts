@@ -1,5 +1,5 @@
 import getListingAttributes from './getListingAttributes';
-import getAllActiveListings from './getAllListings';
+import getAllListings from './getAllListings';
 import postListing from './postListing';
 import getListing from './getListing';
 import updateLising from './updateListing';
@@ -7,7 +7,7 @@ import deleteListing from './deleteListing';
 
 export {
 	getListingAttributes,
-	getAllActiveListings,
+	getAllListings,
 	postListing,
 	getListing,
 	updateLising,

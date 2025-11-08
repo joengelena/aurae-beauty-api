@@ -56,7 +56,7 @@ async function getListingAttributes(): Promise<ListingAttribute[]> {
 	return mapListingAttributesDbToObject(result);
 }
 
-async function getAllActiveListings(
+async function getAllListings(
 	allQueries: Partial<ListingQueryParams>
 ): Promise<{
 	data: Listing[];
@@ -90,6 +90,7 @@ async function getListingById(id: string): Promise<Listing[]> {
 	logger.info(`Getting listing with id '${id}' from the database`);
 
 	const conneciton = await getPool().getConnection();
+	// const query = 'SELECT * FROM listing WHERE id = ?';
 	const query = `SELECT *
 				FROM (
 					SELECT
@@ -171,11 +172,7 @@ async function postListingPhotoPaths(
 	}
 
 	// Build batch insert query
-	const values = photoPaths.flatMap((path, index) => [
-		listingId,
-		index,
-		path,
-	]);
+	const values = photoPaths.flatMap((path, index) => [listingId, index, path]);
 	const placeholders = photoPaths.map(() => '(?, ?, ?)').join(', ');
 
 	const query = `INSERT INTO listing_photo (listing_id_fk, photo_order, photo_path)
@@ -229,7 +226,7 @@ async function updateListingWithId(
 
 export {
 	getListingAttributes,
-	getAllActiveListings,
+	getAllListings,
 	getListingById,
 	postListing,
 	postListingPhotoPath,
