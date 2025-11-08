@@ -49,10 +49,6 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	const paginationQuery = buildPaginationQuery(allQueries);
 
 	const whereClause = [];
-
-	whereClause.push('status = ?');
-	queryValues.push('active');
-
 	if (searchQuery.query.length > 0) {
 		whereClause.push(searchQuery.query);
 		queryValues.push(...searchQuery.values);
@@ -159,6 +155,7 @@ function buildEqualFilterQuery(
 ): QueryAndValue {
 	const equalFilterConditions: EqualFilterCondition[] = [
 		{ key: 'userIdFk', column: 'user_id_fk' },
+		{ key: 'status', column: 'status' },
 		{ key: 'location', column: 'location' },
 		{ key: 'vehicleCondition', column: 'vehicle_condition' },
 		{ key: 'uploadDate', column: 'upload_date' },
