@@ -82,6 +82,7 @@ type ListingQueryParams = {
 	// Equal filters
 	userIdFk: string;
 	location: string;
+	status: string;
 	vehicleCondition: string;
 	uploadDate: string;
 	make: string;

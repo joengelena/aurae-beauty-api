@@ -147,6 +147,7 @@ function buildEqualFilterQuery(
 ): QueryAndValue {
 	const equalFilterConditions: EqualFilterCondition[] = [
 		{ key: 'userIdFk', column: 'user_id_fk' },
+		{ key: 'status', column: 'status' },
 		{ key: 'location', column: 'location' },
 		{ key: 'vehicleCondition', column: 'vehicle_condition' },
 		{ key: 'uploadDate', column: 'upload_date' },
