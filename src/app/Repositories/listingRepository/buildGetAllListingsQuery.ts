@@ -21,18 +21,26 @@ type QueryAndValue = {
 };
 
 function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
+	const currentUserId = allQueries.currentUserId;
+
 	let query = `SELECT *, COUNT(*) OVER() AS totalRows
 				FROM (
 					SELECT
 					l.*,
-					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
+					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls,
+					${currentUserId ? `IF(w.user_id_fk IS NOT NULL, 1, 0) AS isInWatchlist` : '0 AS isInWatchlist'}
 					FROM motorix_db.listing l
 					LEFT JOIN (
 					SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
 					) lp ON l.id = lp.listing_id_fk
+					${currentUserId ? `LEFT JOIN motorix_db.watchlist w ON l.id = w.listing_id_fk AND w.user_id_fk = ?` : ''}
 					GROUP BY l.id
 				) AS result`;
 	const queryValues: (string | number)[] = [];
+
+	if (currentUserId) {
+		queryValues.push(currentUserId);
+	}
 
 	const searchQuery = buildSearchQuery(allQueries);
 	const betweenFilterQuery = buildBetweenFilterQuery(allQueries);

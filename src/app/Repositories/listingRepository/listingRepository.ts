@@ -12,7 +12,7 @@ import mapListingAttributesDbToObject from './mapListingAttributesDbToObject';
 import buildGetAllListingsQuery from './buildGetAllListingsQuery';
 import mapListingsDbToObject from './mapListingsDbToObject';
 
-const listingDbFields: Record<keyof Listing, string> = {
+const listingDbFields: Partial<Record<keyof Listing, string>> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
 	status: 'status',

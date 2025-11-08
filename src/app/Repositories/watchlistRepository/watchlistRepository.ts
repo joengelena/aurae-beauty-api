@@ -1,6 +1,7 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
-import { ResultSetHeader } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import mapListingsDbToObject from '../listingRepository/mapListingsDbToObject';
 
 async function addToWatchlist(
 	userId: string,
@@ -43,4 +44,28 @@ async function removeFromWatchlist(
 	return result;
 }
 
-export { addToWatchlist, removeFromWatchlist };
+async function getUserWatchlist(userId: string): Promise<any[]> {
+	logger.info(`Getting watchlist from the database: userId ${userId}`);
+
+	const connection = await getPool().getConnection();
+	const query = `
+		SELECT
+			l.*,
+			COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
+		FROM watchlist w
+		INNER JOIN listing l ON w.listing_id_fk = l.id
+		LEFT JOIN (
+			SELECT * FROM listing_photo ORDER BY photo_order
+		) lp ON l.id = lp.listing_id_fk
+		WHERE w.user_id_fk = ?
+		GROUP BY l.id
+		ORDER BY w.added_at DESC
+	`;
+
+	const [rows] = await connection.query<RowDataPacket[]>(query, [userId]);
+	connection.release();
+
+	return mapListingsDbToObject(rows);
+}
+
+export { addToWatchlist, removeFromWatchlist, getUserWatchlist };

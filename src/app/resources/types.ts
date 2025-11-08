@@ -45,6 +45,7 @@ type Listing = {
 	cylinders: number | null;
 	regoExpiryDate: string | null;
 	wofExpiryDate: string | null;
+	isInWatchlist?: number;
 };
 
 type AppConfiguration = {
@@ -91,6 +92,7 @@ type ListingQueryParams = {
 	driveType: string;
 	color: string;
 	transmission: string;
+	currentUserId?: string;
 };
 
 type ListingAttribute = {
