@@ -1,0 +1,186 @@
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { getPool } from '../../../config/db';
+import logger from '../../../config/logger';
+import { UserVehicle } from '../../resources/types';
+import mapVehicleDbToObject from './mapVehicleDbToObject';
+
+const vehicleDbFields: Record<keyof UserVehicle, string> = {
+	id: 'id',
+	userIdFk: 'user_id_fk',
+	make: 'make',
+	model: 'model',
+	year: 'year',
+	licensePlate: 'license_plate',
+	vin: 'vin',
+	color: 'color',
+	fuelType: 'fuel_type',
+	transmission: 'transmission',
+	odometerReading: 'odometer_reading',
+	odometerUnit: 'odometer_unit',
+	regoExpiryDate: 'rego_expiry_date',
+	wofExpiryDate: 'wof_expiry_date',
+	vehiclePhotoUrl: 'vehicle_photo_url',
+	isPrimary: 'is_primary',
+	purchaseDate: 'purchase_date',
+	notes: 'notes',
+	createdAt: 'created_at',
+	updatedAt: 'updated_at',
+};
+
+async function getAllVehiclesByUserId(userId: string): Promise<UserVehicle[]> {
+	logger.info(`Getting all vehicles for user '${userId}' from the database`);
+
+	const connection = await getPool().getConnection();
+	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY is_primary DESC, created_at DESC`;
+	const [result] = await connection.query<RowDataPacket[]>(query, [userId]);
+	connection.release();
+
+	return mapVehicleDbToObject(result);
+}
+
+async function getVehicleById(vehicleId: number): Promise<UserVehicle | null> {
+	logger.info(`Getting vehicle with id '${vehicleId}' from the database`);
+
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM user_vehicles WHERE id = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId]);
+	connection.release();
+
+	if (result.length === 0) {
+		return null;
+	}
+
+	return mapVehicleDbToObject(result)[0];
+}
+
+async function postVehicle(
+	vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<ResultSetHeader> {
+	logger.info('Adding new vehicle to the database');
+
+	const fields: string[] = [];
+	const values: any[] = [];
+
+	for (const [key, value] of Object.entries(vehicleData)) {
+		if (value !== undefined) {
+			fields.push(vehicleDbFields[key as keyof UserVehicle]);
+			values.push(value);
+		}
+	}
+
+	const connection = await getPool().getConnection();
+	const query = `INSERT INTO user_vehicles (${fields.join(', ')})
+                   VALUES (${fields.map(() => '?').join(', ')})`;
+	const [result] = await connection.query<ResultSetHeader>(query, values);
+	connection.release();
+
+	return result;
+}
+
+async function updateVehicleById(
+	vehicleId: number,
+	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>
+): Promise<ResultSetHeader> {
+	logger.info(`Updating vehicle with id '${vehicleId}' in the database`);
+
+	if (Object.keys(updateValues).length === 0) {
+		logger.error('Trying to update vehicle with no update values');
+		throw new Error('Empty vehicle update fields');
+	}
+
+	const fields: string[] = [];
+	const values: any[] = [];
+
+	for (const [key, value] of Object.entries(updateValues)) {
+		if (value !== undefined) {
+			fields.push(`${vehicleDbFields[key as keyof UserVehicle]} = ?`);
+			values.push(value);
+		}
+	}
+
+	values.push(vehicleId);
+
+	const connection = await getPool().getConnection();
+	const query = `UPDATE user_vehicles SET ${fields.join(', ')} WHERE id = ?`;
+	const [result] = await connection.query<ResultSetHeader>(query, values);
+	connection.release();
+
+	return result;
+}
+
+async function deleteVehicleById(vehicleId: number): Promise<ResultSetHeader> {
+	logger.info(`Deleting vehicle with id '${vehicleId}' from the database`);
+
+	const connection = await getPool().getConnection();
+	const query = 'DELETE FROM user_vehicles WHERE id = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [vehicleId]);
+	connection.release();
+
+	return result;
+}
+
+async function unsetPrimaryVehicleForUser(userId: string): Promise<ResultSetHeader> {
+	logger.info(`Unsetting primary vehicle for user '${userId}'`);
+
+	const connection = await getPool().getConnection();
+	const query = 'UPDATE user_vehicles SET is_primary = 0 WHERE user_id_fk = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [userId]);
+	connection.release();
+
+	return result;
+}
+
+async function getVehiclesWithUpcomingRegoExpiry(
+	userId: string,
+	daysAhead: number
+): Promise<UserVehicle[]> {
+	logger.info(
+		`Getting vehicles with rego expiring in next ${daysAhead} days for user '${userId}'`
+	);
+
+	const connection = await getPool().getConnection();
+	const query = `
+		SELECT * FROM user_vehicles
+		WHERE user_id_fk = ?
+		AND rego_expiry_date IS NOT NULL
+		AND rego_expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
+		ORDER BY rego_expiry_date ASC
+	`;
+	const [result] = await connection.query<RowDataPacket[]>(query, [userId, daysAhead]);
+	connection.release();
+
+	return mapVehicleDbToObject(result);
+}
+
+async function getVehiclesWithUpcomingWofExpiry(
+	userId: string,
+	daysAhead: number
+): Promise<UserVehicle[]> {
+	logger.info(
+		`Getting vehicles with WOF expiring in next ${daysAhead} days for user '${userId}'`
+	);
+
+	const connection = await getPool().getConnection();
+	const query = `
+		SELECT * FROM user_vehicles
+		WHERE user_id_fk = ?
+		AND wof_expiry_date IS NOT NULL
+		AND wof_expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
+		ORDER BY wof_expiry_date ASC
+	`;
+	const [result] = await connection.query<RowDataPacket[]>(query, [userId, daysAhead]);
+	connection.release();
+
+	return mapVehicleDbToObject(result);
+}
+
+export {
+	getAllVehiclesByUserId,
+	getVehicleById,
+	postVehicle,
+	updateVehicleById,
+	deleteVehicleById,
+	unsetPrimaryVehicleForUser,
+	getVehiclesWithUpcomingRegoExpiry,
+	getVehiclesWithUpcomingWofExpiry,
+};
