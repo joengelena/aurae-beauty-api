@@ -6,6 +6,7 @@ import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import listingRoutes from '../app/routes/listing.routes';
 import userAuthRoutes from '../app/routes/userAuth.routes';
+import vehicleRoutes from '../app/routes/vehicle.routes';
 import { Request, Response, NextFunction } from 'express';
 
 export default () => {
@@ -40,6 +41,7 @@ export default () => {
 	usersRoutes(app);
 	listingRoutes(app);
 	userAuthRoutes(app);
+	vehicleRoutes(app);
 
 	app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 		logger.error({
