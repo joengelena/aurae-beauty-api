@@ -13,6 +13,7 @@ import {
 import uploadMulter from '../utils/multerStorage';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
+import optionalSupabaseAuth from '../middlewares/optionalSupabaseAuth';
 
 const listingRoutes = (app: Express) => {
 	app.route(rootUrl + '/listings/attributes').get((req, res, next) => {

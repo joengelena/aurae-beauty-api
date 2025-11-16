@@ -9,6 +9,15 @@ async function getAllListings(req: Request, res: Response): Promise<void> {
 
 	try {
 		const query: Partial<ListingQueryParams> = req.query;
+		const currentUserId = req.body.currentUserId;
+
+		// Add currentUserId to query params if user is authenticated
+		if (currentUserId) {
+			query.currentUserId = currentUserId;
+			logger.info(`Adding currentUserId to query: ${currentUserId}`);
+		} else {
+			logger.info('No currentUserId found, fetching listings without watchlist status');
+		}
 
 		const listings = await listingRepository.getAllListings(query);
 

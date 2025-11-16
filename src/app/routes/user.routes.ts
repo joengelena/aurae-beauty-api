@@ -12,6 +12,7 @@ import ajvSchema from '../resources/ajvSchema.json';
 import {
 	watchlistAdd,
 	watchlistRemove,
+	watchlistGet,
 } from '../controllers/watchlistController';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -50,6 +51,14 @@ const usersRoutes = (app: Express) => {
 			},
 			asyncHandler(updateUser)
 		);
+
+	app.route(rootUrl + '/user/watchlist').get(
+		supabaseAuthenticateReq,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		watchlistGet
+	);
 
 	app.route(rootUrl + '/user/watchlist-add/:listingId').post(
 		supabaseAuthenticateReq,
