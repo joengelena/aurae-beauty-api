@@ -46,13 +46,20 @@ async function getAllVehiclesByUserId(
 	return mapVehicleDbToObject(result);
 }
 
-async function getVehicleById(vehicleId: number): Promise<UserVehicle | null> {
+async function getVehicleById(
+	vehicleId: number,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<UserVehicle | null> {
 	logger.info(`Getting vehicle with id '${vehicleId}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'SELECT * FROM user_vehicles WHERE id = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId]);
-	connection.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [vehicleId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	if (result.length === 0) {
 		return null;

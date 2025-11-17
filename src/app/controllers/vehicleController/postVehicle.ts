@@ -106,7 +106,10 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		logger.info(`Vehicle created with id '${result.insertId}' for user '${userId}'`);
 
 		// Fetch the created vehicle BEFORE committing (within transaction boundary)
-		const createdVehicle = await vehicleRepository.getVehicleById(result.insertId);
+		const createdVehicle = await vehicleRepository.getVehicleById(
+			result.insertId,
+			connection
+		);
 
 		await connection.commit();
 		connection.release();
