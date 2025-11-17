@@ -1,4 +1,5 @@
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import mysql from 'mysql2/promise';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { UserVehicle } from '../../resources/types';
@@ -54,7 +55,8 @@ async function getVehicleById(vehicleId: number): Promise<UserVehicle | null> {
 }
 
 async function postVehicle(
-	vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'>
+	vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'>,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info('Adding new vehicle to the database');
 
@@ -68,11 +70,15 @@ async function postVehicle(
 		}
 	}
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `INSERT INTO user_vehicles (${fields.join(', ')})
                    VALUES (${fields.map(() => '?').join(', ')})`;
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
@@ -119,13 +125,20 @@ async function deleteVehicleById(vehicleId: number): Promise<ResultSetHeader> {
 	return result;
 }
 
-async function unsetPrimaryVehicleForUser(userId: string): Promise<ResultSetHeader> {
+async function unsetPrimaryVehicleForUser(
+	userId: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
 	logger.info(`Unsetting primary vehicle for user '${userId}'`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'UPDATE user_vehicles SET is_primary = 0 WHERE user_id_fk = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [userId]);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, [userId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }

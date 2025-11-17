@@ -342,5 +342,94 @@
 		},
 		"required": ["currentUserId"],
 		"additionalProperties": false
+	},
+	"postVehicle": {
+		"type": "object",
+		"properties": {
+			"currentUserId": {
+				"type": "string",
+				"format": "uuid",
+				"minLength": 36,
+				"maxLength": 36
+			},
+			"make": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 100
+			},
+			"model": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 100
+			},
+			"year": {
+				"type": "integer",
+				"minimum": 1900,
+				"maximum": 2100
+			},
+			"licensePlate": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 20
+			},
+			"vin": {
+				"type": "string",
+				"minLength": 17,
+				"maxLength": 17
+			},
+			"color": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"fuelType": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"transmission": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
+			"odometerReading": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 9999999
+			},
+			"odometerUnit": {
+				"type": "string",
+				"enum": ["km", "mi"]
+			},
+			"regoExpiryDate": {
+				"type": "string",
+				"format": "date"
+			},
+			"wofExpiryDate": {
+				"type": "string",
+				"format": "date"
+			},
+			"vehiclePhotoUrl": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 500
+			},
+			"isPrimary": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 1
+			},
+			"purchaseDate": {
+				"type": "string",
+				"format": "date"
+			},
+			"notes": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 10000
+			}
+		},
+		"required": ["currentUserId", "make", "model", "year"],
+		"additionalProperties": false
 	}
 }
