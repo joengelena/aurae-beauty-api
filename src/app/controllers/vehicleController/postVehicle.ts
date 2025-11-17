@@ -28,45 +28,49 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Creating new vehicle for user '${userId}'`);
 
+	// Validate dates BEFORE acquiring connection to avoid holding resources
+	const today = new Date();
+	const oneYearAgo = new Date(today);
+	oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+	if (regoExpiryDate) {
+		const regoDate = new Date(regoExpiryDate);
+		if (regoDate < oneYearAgo) {
+			throw new AppError(
+				400,
+				'Registration expiry date cannot be more than 1 year in the past'
+			);
+		}
+	}
+
+	if (wofExpiryDate) {
+		const wofDate = new Date(wofExpiryDate);
+		if (wofDate < oneYearAgo) {
+			throw new AppError(
+				400,
+				'WOF expiry date cannot be more than 1 year in the past'
+			);
+		}
+	}
+
+	if (purchaseDate) {
+		const purchaseDateObj = new Date(purchaseDate);
+		if (purchaseDateObj > today) {
+			throw new AppError(400, 'Purchase date cannot be in the future');
+		}
+	}
+
+	// Acquire connection only after validation passes
 	const connection = await getPool().getConnection();
 
 	try {
-		// Date validation: Check expiry dates are not too far in the past
-		const today = new Date();
-		const oneYearAgo = new Date(today);
-		oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-		if (regoExpiryDate) {
-			const regoDate = new Date(regoExpiryDate);
-			if (regoDate < oneYearAgo) {
-				throw new AppError(
-					400,
-					'Registration expiry date cannot be more than 1 year in the past'
-				);
-			}
-		}
-
-		if (wofExpiryDate) {
-			const wofDate = new Date(wofExpiryDate);
-			if (wofDate < oneYearAgo) {
-				throw new AppError(
-					400,
-					'WOF expiry date cannot be more than 1 year in the past'
-				);
-			}
-		}
-
-		if (purchaseDate) {
-			const purchaseDateObj = new Date(purchaseDate);
-			if (purchaseDateObj > today) {
-				throw new AppError(400, 'Purchase date cannot be in the future');
-			}
-		}
-
 		await connection.beginTransaction();
 
-		// Check if user has any existing vehicles
-		const existingVehicles = await vehicleRepository.getAllVehiclesByUserId(userId);
+		// Check if user has any existing vehicles (within transaction to prevent race conditions)
+		const existingVehicles = await vehicleRepository.getAllVehiclesByUserId(
+			userId,
+			connection
+		);
 
 		// Auto-set as primary if this is the user's first vehicle
 		const shouldBePrimary = isPrimary === 1 || existingVehicles.length === 0;
@@ -99,13 +103,13 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 
 		const result = await vehicleRepository.postVehicle(vehicleData, connection);
 
-		await connection.commit();
-		connection.release();
-
 		logger.info(`Vehicle created with id '${result.insertId}' for user '${userId}'`);
 
-		// Fetch and return the created vehicle
+		// Fetch the created vehicle BEFORE committing (within transaction boundary)
 		const createdVehicle = await vehicleRepository.getVehicleById(result.insertId);
+
+		await connection.commit();
+		connection.release();
 
 		res.status(201).send({
 			message: 'Vehicle created successfully',

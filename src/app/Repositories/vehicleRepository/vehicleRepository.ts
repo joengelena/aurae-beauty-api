@@ -28,13 +28,20 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	updatedAt: 'updated_at',
 };
 
-async function getAllVehiclesByUserId(userId: string): Promise<UserVehicle[]> {
+async function getAllVehiclesByUserId(
+	userId: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<UserVehicle[]> {
 	logger.info(`Getting all vehicles for user '${userId}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY is_primary DESC, created_at DESC`;
-	const [result] = await connection.query<RowDataPacket[]>(query, [userId]);
-	connection.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [userId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return mapVehicleDbToObject(result);
 }
@@ -45,6 +52,26 @@ async function getVehicleById(vehicleId: number): Promise<UserVehicle | null> {
 	const connection = await getPool().getConnection();
 	const query = 'SELECT * FROM user_vehicles WHERE id = ?';
 	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId]);
+	connection.release();
+
+	if (result.length === 0) {
+		return null;
+	}
+
+	return mapVehicleDbToObject(result)[0];
+}
+
+async function getVehicleByIdAndUserId(
+	vehicleId: number,
+	userId: string
+): Promise<UserVehicle | null> {
+	logger.info(
+		`Getting vehicle with id '${vehicleId}' for user '${userId}' from the database`
+	);
+
+	const connection = await getPool().getConnection();
+	const query = 'SELECT * FROM user_vehicles WHERE id = ? AND user_id_fk = ?';
+	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId, userId]);
 	connection.release();
 
 	if (result.length === 0) {
@@ -190,6 +217,7 @@ async function getVehiclesWithUpcomingWofExpiry(
 export {
 	getAllVehiclesByUserId,
 	getVehicleById,
+	getVehicleByIdAndUserId,
 	postVehicle,
 	updateVehicleById,
 	deleteVehicleById,

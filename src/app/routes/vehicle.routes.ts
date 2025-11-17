@@ -1,6 +1,10 @@
 import { Express } from 'express';
 import { rootUrl } from './base.routes';
-import { getAllVehicles, postVehicle } from '../controllers/vehicleController';
+import {
+	getAllVehicles,
+	getVehicleById,
+	postVehicle,
+} from '../controllers/vehicleController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -23,6 +27,14 @@ const vehicleRoutes = (app: Express) => {
 			},
 			asyncHandler(postVehicle)
 		);
+
+	app.route(rootUrl + '/user/vehicles/:id').get(
+		supabaseAuthenticateReq,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		asyncHandler(getVehicleById)
+	);
 };
 
 export default vehicleRoutes;
