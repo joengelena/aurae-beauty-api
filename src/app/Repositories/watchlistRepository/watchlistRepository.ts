@@ -1,45 +1,56 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import mysql from 'mysql2/promise';
 import mapListingsDbToObject from '../listingRepository/mapListingsDbToObject';
 
 async function addToWatchlist(
 	userId: string,
-	listingId: number
+	listingId: number,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info(
 		`Adding watchlist to the database: userId ${userId} / listingId ${listingId}`
 	);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `INSERT INTO watchlist
         (user_id_fk, listing_id_fk) VALUES
         (?, ?)`;
-	const [result] = await connection.query<ResultSetHeader>(query, [
+	const [result] = await conn.query<ResultSetHeader>(query, [
 		userId,
 		listingId,
 	]);
-	connection.release();
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
 
 async function removeFromWatchlist(
 	userId: string,
-	listingId: number
+	listingId: number,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info(
 		`Removing watchlist from the database: userId ${userId} / listingId ${listingId}`
 	);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query =
 		'DELETE FROM watchlist WHERE user_id_fk = ? AND listing_id_fk = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [
+	const [result] = await conn.query<ResultSetHeader>(query, [
 		userId,
 		listingId,
 	]);
-	connection.release();
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }

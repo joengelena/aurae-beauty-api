@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { removeFromWatchlist } from '../../repositories/watchlistRepository/watchlistRepository';
 import AppError from '../../utils/errors/appError';
@@ -9,10 +10,13 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Removing listing ${listingId} from watchlist for user ${currentUserId}`);
 
+	const connection = await getPool().getConnection();
+
 	try {
 		const result = await removeFromWatchlist(
 			currentUserId,
-			Number(listingId)
+			Number(listingId),
+			connection
 		);
 
 		if (result.affectedRows === 1) {
@@ -39,6 +43,8 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during remove from watchlist: ${error.message}`);
 		throw new AppError(500, 'Something went wrong. Please try again later.');
+	} finally {
+		connection.release();
 	}
 }
 

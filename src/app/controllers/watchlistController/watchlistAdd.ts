@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { addToWatchlist } from '../../repositories/watchlistRepository/watchlistRepository';
 import AppError from '../../utils/errors/appError';
@@ -9,8 +10,10 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Adding listing ${listingId} to watchlist for user ${currentUserId}`);
 
+	const connection = await getPool().getConnection();
+
 	try {
-		const result = await addToWatchlist(currentUserId, Number(listingId));
+		const result = await addToWatchlist(currentUserId, Number(listingId), connection);
 
 		if (result.affectedRows === 1) {
 			res.status(200).send({
@@ -36,6 +39,8 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during add to watchlist: ${error.message}`);
 		throw new AppError(500, 'Something went wrong. Please try again later.');
+	} finally {
+		connection.release();
 	}
 }
 
