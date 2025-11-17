@@ -60,52 +60,57 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		}
 	}
 
-	// Acquire connection only after validation passes
 	const connection = await getPool().getConnection();
 
 	try {
 		await connection.beginTransaction();
 
-		// Check if user has any existing vehicles (within transaction to prevent race conditions)
 		const existingVehicles = await vehicleRepository.getAllVehiclesByUserId(
 			userId,
 			connection
 		);
 
-		// Auto-set as primary if this is the user's first vehicle
-		const shouldBePrimary = isPrimary === 1 || existingVehicles.length === 0;
+		const shouldBePrimary =
+			isPrimary === 1 || existingVehicles.length === 0;
 
-		// If this vehicle is being set as primary, unset all other primary vehicles
 		if (shouldBePrimary) {
-			await vehicleRepository.unsetPrimaryVehicleForUser(userId, connection);
+			await vehicleRepository.unsetPrimaryVehicleForUser(
+				userId,
+				connection
+			);
 			logger.info(`Unset all primary vehicles for user '${userId}'`);
 		}
 
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> = {
-			userIdFk: userId,
-			make,
-			model,
-			year,
-			licensePlate: licensePlate ?? null,
-			vin: vin ?? null,
-			color: color ?? null,
-			fuelType: fuelType ?? null,
-			transmission: transmission ?? null,
-			odometerReading: odometerReading ?? null,
-			odometerUnit: odometerUnit ?? 'km',
-			regoExpiryDate: regoExpiryDate ?? null,
-			wofExpiryDate: wofExpiryDate ?? null,
-			vehiclePhotoUrl: vehiclePhotoUrl ?? null,
-			isPrimary: shouldBePrimary ? 1 : 0,
-			purchaseDate: purchaseDate ?? null,
-			notes: notes ?? null,
-		};
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> =
+			{
+				userIdFk: userId,
+				make,
+				model,
+				year,
+				licensePlate: licensePlate ?? null,
+				vin: vin ?? null,
+				color: color ?? null,
+				fuelType: fuelType ?? null,
+				transmission: transmission ?? null,
+				odometerReading: odometerReading ?? null,
+				odometerUnit: odometerUnit ?? 'km',
+				regoExpiryDate: regoExpiryDate ?? null,
+				wofExpiryDate: wofExpiryDate ?? null,
+				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
+				isPrimary: shouldBePrimary ? 1 : 0,
+				purchaseDate: purchaseDate ?? null,
+				notes: notes ?? null,
+			};
 
-		const result = await vehicleRepository.postVehicle(vehicleData, connection);
+		const result = await vehicleRepository.postVehicle(
+			vehicleData,
+			connection
+		);
 
-		logger.info(`Vehicle created with id '${result.insertId}' for user '${userId}'`);
+		logger.info(
+			`Vehicle created with id '${result.insertId}' for user '${userId}'`
+		);
 
-		// Fetch the created vehicle BEFORE committing (within transaction boundary)
 		const createdVehicle = await vehicleRepository.getVehicleById(
 			result.insertId,
 			connection
@@ -126,7 +131,9 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 			throw error;
 		}
 
-		logger.error(`Unexpected error during vehicle creation: ${error.message}`);
+		logger.error(
+			`Unexpected error during vehicle creation: ${error.message}`
+		);
 		throw new AppError(500, 'Unable to create vehicle. Please try again.');
 	}
 }
