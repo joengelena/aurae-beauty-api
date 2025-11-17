@@ -1,10 +1,14 @@
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import mysql from 'mysql2/promise';
 import { User } from '../../resources/types';
 import mapUserDbToObject from './mapUserDbToObject';
 
-async function signUpUser(params: User): Promise<ResultSetHeader> {
+async function signUpUser(
+	params: User,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
 	const {
 		id,
 		firstName,
@@ -17,11 +21,12 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 
 	logger.info(`Signing up new user with email '${email}' to the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `INSERT into User
         (id, first_name, last_name, phone_number, email, is_email_verified, is_phone_number_verified) values
         (?, ?, ?, ?, ?, ?, ?)`;
-	const [result] = await connection.query<ResultSetHeader>(query, [
+	const [result] = await conn.query<ResultSetHeader>(query, [
 		id,
 		firstName,
 		lastName,
@@ -30,27 +35,39 @@ async function signUpUser(params: User): Promise<ResultSetHeader> {
 		isEmailVerified,
 		isPhoneNumberVerified,
 	]);
-	connection.release();
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
 
-async function getUserById(id: string): Promise<User[]> {
+async function getUserById(
+	id: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<User[]> {
 	logger.info(`Getting user with id '${id}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'SELECT * FROM User WHERE id = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [id]);
-	connection.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [id]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return mapUserDbToObject(result);
 }
 
-async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
+async function updateUser(
+	params: Partial<User>,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
 	logger.info(`Updating user with id '${params.id}' in the database`);
 
 	const { id, ...updateFields } = params;
-	const connection = await getPool().getConnection();
 	const databaseFields: { [key: string]: string } = {
 		firstName: 'first_name',
 		lastName: 'last_name',
@@ -72,21 +89,33 @@ async function updateUser(params: Partial<User>): Promise<ResultSetHeader> {
 
 	values.push(id);
 
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `UPDATE User SET ${fields} WHERE id = ?`;
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
 
-async function deleteUserWithId(id: string): Promise<ResultSetHeader> {
+async function deleteUserWithId(
+	id: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
 	logger.info(`Deleting user with id '${id}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'DELETE FROM User WHERE id = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [id]);
+	const [result] = await conn.query<ResultSetHeader>(query, [id]);
 	logger.info(`User with id '${id}' successfully deleted`);
-	connection.release();
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }

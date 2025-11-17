@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import { supabaseAdmin, supabaseAuth } from '../../../config/supabase';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
@@ -15,8 +16,10 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Deleting user: ${currentUserId} (Supabase)`);
 
+	const connection = await getPool().getConnection();
+
 	try {
-		const user = await userRepository.getUserById(currentUserId);
+		const user = await userRepository.getUserById(currentUserId, connection);
 
 		if (user.length === 0) {
 			throw new AppError(404, 'Account not found.');
@@ -39,7 +42,8 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 		try {
 			const deleteUserResult = await userRepository.deleteUserWithId(
-				currentUserId
+				currentUserId,
+				connection
 			);
 
 			if (deleteUserResult.affectedRows !== 1) {
@@ -81,6 +85,8 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during user deletion: ${error.message}`);
 		throw new AppError(500, 'Unable to delete your account. Please try again later.');
+	} finally {
+		connection.release();
 	}
 }
 

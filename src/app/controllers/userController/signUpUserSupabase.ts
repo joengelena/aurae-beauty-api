@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import { supabaseAdmin } from '../../../config/supabase';
 import * as userRepository from '../../repositories/userRepository/userRepository';
 import logger from '../../../config/logger';
@@ -55,16 +56,21 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 			`User created in Supabase with ID: ${supabaseUserId}, syncing to MySQL`
 		);
 
+		const connection = await getPool().getConnection();
+
 		try {
-			await userRepository.signUpUser({
-				id: supabaseUserId,
-				firstName,
-				lastName,
-				email,
-				phoneNumber,
-				isEmailVerified: FALSE,
-				isPhoneNumberVerified: FALSE,
-			});
+			await userRepository.signUpUser(
+				{
+					id: supabaseUserId,
+					firstName,
+					lastName,
+					email,
+					phoneNumber,
+					isEmailVerified: FALSE,
+					isPhoneNumberVerified: FALSE,
+				},
+				connection
+			);
 
 			logger.info(
 				`User ${supabaseUserId} successfully synced to MySQL database`
@@ -98,6 +104,8 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				500,
 				'Unable to complete your registration. Please try again.'
 			);
+		} finally {
+			connection.release();
 		}
 
 		res.status(201).send({
