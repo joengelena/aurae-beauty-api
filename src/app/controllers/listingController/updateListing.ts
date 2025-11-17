@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 import AppError from '../../utils/errors/appError';
@@ -9,12 +10,14 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Updating listing with id '${listingId}'`);
 
-	try {
-		if (Object.keys(newListingData).length === 0) {
-			throw new AppError(400, 'No changes to update.');
-		}
+	if (Object.keys(newListingData).length === 0) {
+		throw new AppError(400, 'No changes to update.');
+	}
 
-		const listing = await listingRepository.getListingById(listingId);
+	const connection = await getPool().getConnection();
+
+	try {
+		const listing = await listingRepository.getListingById(listingId, connection);
 
 		if (listing.length === 0) {
 			throw new AppError(404, 'This listing is no longer available.');
@@ -29,7 +32,8 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 
 		const editListingResult = await listingRepository.updateListingWithId(
 			listingId,
-			newListingData
+			newListingData,
+			connection
 		);
 
 		if (editListingResult.affectedRows === 1) {
@@ -46,6 +50,8 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during update listing: ${error.message}`);
 		throw new AppError(500, 'Unable to update your listing. Please try again.');
+	} finally {
+		connection.release();
 	}
 }
 

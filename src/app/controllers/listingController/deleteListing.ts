@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 import AppError from '../../utils/errors/appError';
@@ -9,8 +10,10 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Deleting listing with id '${listingId}'`);
 
+	const connection = await getPool().getConnection();
+
 	try {
-		const listing = await listingRepository.getListingById(listingId);
+		const listing = await listingRepository.getListingById(listingId, connection);
 
 		if (listing.length === 0) {
 			throw new AppError(404, 'This listing is no longer available.');
@@ -24,7 +27,8 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 		}
 
 		const deleteListingResult = await listingRepository.deleteListingWithId(
-			listingId
+			listingId,
+			connection
 		);
 
 		if (deleteListingResult.affectedRows === 0) {
@@ -41,6 +45,8 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during delete listing: ${error.message}`);
 		throw new AppError(500, 'Unable to delete your listing. Please try again.');
+	} finally {
+		connection.release();
 	}
 }
 

@@ -86,10 +86,14 @@ async function getAllListings(
 	};
 }
 
-async function getListingById(id: string): Promise<Listing[]> {
+async function getListingById(
+	id: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<Listing[]> {
 	logger.info(`Getting listing with id '${id}' from the database`);
 
-	const conneciton = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	// const query = 'SELECT * FROM listing WHERE id = ?';
 	const query = `SELECT *
 				FROM (
@@ -103,8 +107,11 @@ async function getListingById(id: string): Promise<Listing[]> {
 					GROUP BY l.id
 				) AS result
 				WHERE id = ?`;
-	const [result] = await conneciton.query<RowDataPacket[]>(query, [id]);
-	conneciton.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [id]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return mapListingsDbToObject(result);
 }
@@ -183,20 +190,28 @@ async function postListingPhotoPaths(
 	return result;
 }
 
-async function deleteListingWithId(id: string) {
+async function deleteListingWithId(
+	id: string,
+	connection?: mysql.Pool | mysql.PoolConnection
+) {
 	logger.info(`Deleting listing with id '${id}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'DELETE FROM listing WHERE id = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [id]);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, [id]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
 
 async function updateListingWithId(
 	id: string,
-	updateValues: Omit<Partial<Listing>, 'id' | 'userIdFk'>
+	updateValues: Omit<Partial<Listing>, 'id' | 'userIdFk'>,
+	connection?: mysql.Pool | mysql.PoolConnection
 ) {
 	logger.info(`Updating listing with id '${id}' in the database`);
 
@@ -213,13 +228,17 @@ async function updateListingWithId(
 		values.push(value);
 	}
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = `UPDATE listing SET ${fields.join(', ')} WHERE id = ?`;
 
 	values.push(id);
 
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }
