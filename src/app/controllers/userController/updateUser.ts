@@ -12,6 +12,8 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 	const connection = await getPool().getConnection();
 
 	try {
+		await connection.beginTransaction();
+
 		await userRepository.updateUser(
 			{
 				id: currentUserId,
@@ -20,18 +22,22 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 			connection
 		);
 
+		await connection.commit();
+		connection.release();
+
 		res.status(200).send({
 			message: 'User updated successfully',
 		});
 	} catch (error) {
+		await connection.rollback();
+		connection.release();
+
 		if (error instanceof AppError) {
 			throw error;
 		}
 
 		logger.error(`Unexpected error during user update: ${error.message}`);
 		throw new AppError(500, 'Unable to update your profile. Please try again.');
-	} finally {
-		connection.release();
 	}
 }
 

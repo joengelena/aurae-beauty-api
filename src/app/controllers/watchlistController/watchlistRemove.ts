@@ -13,6 +13,8 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 	const connection = await getPool().getConnection();
 
 	try {
+		await connection.beginTransaction();
+
 		const result = await removeFromWatchlist(
 			currentUserId,
 			Number(listingId),
@@ -20,6 +22,9 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 		);
 
 		if (result.affectedRows === 1) {
+			await connection.commit();
+			connection.release();
+
 			res.status(200).send({
 				message: 'Removed from watchlist successfully',
 			});
@@ -27,6 +32,9 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'This listing is not in your watchlist.');
 		}
 	} catch (error) {
+		await connection.rollback();
+		connection.release();
+
 		if (error instanceof AppError) {
 			throw error;
 		}
@@ -43,8 +51,6 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during remove from watchlist: ${error.message}`);
 		throw new AppError(500, 'Something went wrong. Please try again later.');
-	} finally {
-		connection.release();
 	}
 }
 

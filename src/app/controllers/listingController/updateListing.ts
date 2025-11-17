@@ -17,6 +17,8 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 	const connection = await getPool().getConnection();
 
 	try {
+		await connection.beginTransaction();
+
 		const listing = await listingRepository.getListingById(listingId, connection);
 
 		if (listing.length === 0) {
@@ -37,6 +39,9 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 		);
 
 		if (editListingResult.affectedRows === 1) {
+			await connection.commit();
+			connection.release();
+
 			res.status(200).send({
 				message: 'Listing updated successfully',
 			});
@@ -44,14 +49,15 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 			throw new AppError(500, 'Unable to update your listing. Please try again.');
 		}
 	} catch (error) {
+		await connection.rollback();
+		connection.release();
+
 		if (error instanceof AppError) {
 			throw error;
 		}
 
 		logger.error(`Unexpected error during update listing: ${error.message}`);
 		throw new AppError(500, 'Unable to update your listing. Please try again.');
-	} finally {
-		connection.release();
 	}
 }
 

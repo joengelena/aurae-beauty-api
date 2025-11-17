@@ -13,9 +13,14 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 	const connection = await getPool().getConnection();
 
 	try {
+		await connection.beginTransaction();
+
 		const result = await addToWatchlist(currentUserId, Number(listingId), connection);
 
 		if (result.affectedRows === 1) {
+			await connection.commit();
+			connection.release();
+
 			res.status(200).send({
 				message: 'Added to watchlist successfully',
 			});
@@ -23,6 +28,9 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 			throw new AppError(400, 'Unable to add this listing to your watchlist. Please try again.');
 		}
 	} catch (error) {
+		await connection.rollback();
+		connection.release();
+
 		if (error instanceof AppError) {
 			throw error;
 		}
@@ -39,8 +47,6 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 
 		logger.error(`Unexpected error during add to watchlist: ${error.message}`);
 		throw new AppError(500, 'Something went wrong. Please try again later.');
-	} finally {
-		connection.release();
 	}
 }
 

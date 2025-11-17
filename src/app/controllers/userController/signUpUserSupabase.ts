@@ -59,6 +59,8 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 		const connection = await getPool().getConnection();
 
 		try {
+			await connection.beginTransaction();
+
 			await userRepository.signUpUser(
 				{
 					id: supabaseUserId,
@@ -72,10 +74,16 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				connection
 			);
 
+			await connection.commit();
+			connection.release();
+
 			logger.info(
 				`User ${supabaseUserId} successfully synced to MySQL database`
 			);
 		} catch (dbError) {
+			await connection.rollback();
+			connection.release();
+
 			logger.error(
 				`Failed to sync user to MySQL: ${dbError.message}, rolling back Supabase user`
 			);
@@ -104,8 +112,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				500,
 				'Unable to complete your registration. Please try again.'
 			);
-		} finally {
-			connection.release();
 		}
 
 		res.status(201).send({

@@ -13,6 +13,8 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 	const connection = await getPool().getConnection();
 
 	try {
+		await connection.beginTransaction();
+
 		const listing = await listingRepository.getListingById(listingId, connection);
 
 		if (listing.length === 0) {
@@ -35,18 +37,22 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'This listing is no longer available.');
 		}
 
+		await connection.commit();
+		connection.release();
+
 		res.status(200).send({
 			message: 'Listing deleted successfully',
 		});
 	} catch (error) {
+		await connection.rollback();
+		connection.release();
+
 		if (error instanceof AppError) {
 			throw error;
 		}
 
 		logger.error(`Unexpected error during delete listing: ${error.message}`);
 		throw new AppError(500, 'Unable to delete your listing. Please try again.');
-	} finally {
-		connection.release();
 	}
 }
 
