@@ -372,11 +372,6 @@
 				"minLength": 1,
 				"maxLength": 20
 			},
-			"vin": {
-				"type": "string",
-				"minLength": 17,
-				"maxLength": 17
-			},
 			"color": {
 				"type": "string",
 				"minLength": 1,

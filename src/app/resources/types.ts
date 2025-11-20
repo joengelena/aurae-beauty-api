@@ -110,7 +110,6 @@ type UserVehicle = {
 	model: string;
 	year: number;
 	licensePlate: string | null;
-	vin: string | null;
 	color: string | null;
 	fuelType: string | null;
 	transmission: string | null;

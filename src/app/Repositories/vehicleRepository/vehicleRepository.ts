@@ -12,7 +12,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	model: 'model',
 	year: 'year',
 	licensePlate: 'license_plate',
-	vin: 'vin',
 	color: 'color',
 	fuelType: 'fuel_type',
 	transmission: 'transmission',

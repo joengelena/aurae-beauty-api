@@ -12,7 +12,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		model,
 		year,
 		licensePlate,
-		vin,
 		color,
 		fuelType,
 		transmission,
@@ -81,14 +80,12 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 			logger.info(`Unset all primary vehicles for user '${userId}'`);
 		}
 
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> =
-			{
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> ={
 				userIdFk: userId,
 				make,
 				model,
 				year,
 				licensePlate: licensePlate ?? null,
-				vin: vin ?? null,
 				color: color ?? null,
 				fuelType: fuelType ?? null,
 				transmission: transmission ?? null,

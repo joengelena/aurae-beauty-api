@@ -10,7 +10,6 @@ function mapVehicleDbToObject(vehiclesDb: RowDataPacket[]): UserVehicle[] {
 			model: vehicle.model,
 			year: vehicle.year,
 			licensePlate: vehicle.license_plate,
-			vin: vehicle.vin,
 			color: vehicle.color,
 			fuelType: vehicle.fuel_type,
 			transmission: vehicle.transmission,
