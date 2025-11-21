@@ -118,7 +118,6 @@ type UserVehicle = {
 	regoExpiryDate: string | null;
 	wofExpiryDate: string | null;
 	vehiclePhotoUrl: string | null;
-	isPrimary: 0 | 1;
 	purchaseDate: string | null;
 	notes: string | null;
 	createdAt: Date;

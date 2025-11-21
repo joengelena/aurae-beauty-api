@@ -20,7 +20,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		regoExpiryDate,
 		wofExpiryDate,
 		vehiclePhotoUrl,
-		isPrimary,
 		purchaseDate,
 		notes,
 	} = req.body;
@@ -64,23 +63,7 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.beginTransaction();
 
-		const existingVehicles = await vehicleRepository.getAllVehiclesByUserId(
-			userId,
-			connection
-		);
-
-		const shouldBePrimary =
-			isPrimary === 1 || existingVehicles.length === 0;
-
-		if (shouldBePrimary) {
-			await vehicleRepository.unsetPrimaryVehicleForUser(
-				userId,
-				connection
-			);
-			logger.info(`Unset all primary vehicles for user '${userId}'`);
-		}
-
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> ={
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> = {
 				userIdFk: userId,
 				make,
 				model,
@@ -94,7 +77,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				regoExpiryDate: regoExpiryDate ?? null,
 				wofExpiryDate: wofExpiryDate ?? null,
 				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
-				isPrimary: shouldBePrimary ? 1 : 0,
 				purchaseDate: purchaseDate ?? null,
 				notes: notes ?? null,
 			};

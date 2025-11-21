@@ -20,7 +20,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	regoExpiryDate: 'rego_expiry_date',
 	wofExpiryDate: 'wof_expiry_date',
 	vehiclePhotoUrl: 'vehicle_photo_url',
-	isPrimary: 'is_primary',
 	purchaseDate: 'purchase_date',
 	notes: 'notes',
 	createdAt: 'created_at',
@@ -35,7 +34,7 @@ async function getAllVehiclesByUserId(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || (await getPool().getConnection());
-	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY is_primary DESC, created_at DESC`;
+	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY created_at DESC`;
 	const [result] = await conn.query<RowDataPacket[]>(query, [userId]);
 
 	if (!useProvidedConnection) {
@@ -158,24 +157,6 @@ async function deleteVehicleById(vehicleId: number): Promise<ResultSetHeader> {
 	return result;
 }
 
-async function unsetPrimaryVehicleForUser(
-	userId: string,
-	connection?: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
-	logger.info(`Unsetting primary vehicle for user '${userId}'`);
-
-	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = 'UPDATE user_vehicles SET is_primary = 0 WHERE user_id_fk = ?';
-	const [result] = await conn.query<ResultSetHeader>(query, [userId]);
-
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
-	}
-
-	return result;
-}
-
 async function getVehiclesWithUpcomingRegoExpiry(
 	userId: string,
 	daysAhead: number
@@ -227,7 +208,6 @@ export {
 	postVehicle,
 	updateVehicleById,
 	deleteVehicleById,
-	unsetPrimaryVehicleForUser,
 	getVehiclesWithUpcomingRegoExpiry,
 	getVehiclesWithUpcomingWofExpiry,
 };

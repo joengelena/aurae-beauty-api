@@ -18,7 +18,6 @@ function mapVehicleDbToObject(vehiclesDb: RowDataPacket[]): UserVehicle[] {
 			regoExpiryDate: vehicle.rego_expiry_date,
 			wofExpiryDate: vehicle.wof_expiry_date,
 			vehiclePhotoUrl: vehicle.vehicle_photo_url,
-			isPrimary: vehicle.is_primary,
 			purchaseDate: vehicle.purchase_date,
 			notes: vehicle.notes,
 			createdAt: vehicle.created_at,
