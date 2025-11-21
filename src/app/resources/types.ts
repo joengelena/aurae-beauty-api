@@ -115,8 +115,8 @@ type UserVehicle = {
 	transmission: string | null;
 	odometerReading: number | null;
 	odometerUnit: string;
-	regoExpiryDate: string | null;
-	wofExpiryDate: string | null;
+	regoExpiryDate: string;
+	wofExpiryDate: string;
 	vehiclePhotoUrl: string | null;
 	notes: string | null;
 	createdAt: Date;

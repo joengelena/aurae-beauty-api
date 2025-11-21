@@ -415,7 +415,7 @@
 				"maxLength": 10000
 			}
 		},
-		"required": ["currentUserId", "make", "model", "year"],
+		"required": ["currentUserId", "make", "model", "year", "regoExpiryDate", "wofExpiryDate"],
 		"additionalProperties": false
 	}
 }

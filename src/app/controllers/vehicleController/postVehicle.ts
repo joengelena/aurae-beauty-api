@@ -26,28 +26,23 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	logger.info(`Creating new vehicle for user '${userId}'`);
 
 	// Validate dates BEFORE acquiring connection to avoid holding resources
-	const today = new Date();
-	const oneYearAgo = new Date(today);
-	oneYearAgo.setFullYear(today.getFullYear() - 1);
+	const oneYearAgo = new Date();
+	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-	if (regoExpiryDate) {
-		const regoDate = new Date(regoExpiryDate);
-		if (regoDate < oneYearAgo) {
-			throw new AppError(
-				400,
-				'Registration expiry date cannot be more than 1 year in the past'
-			);
-		}
+	const regoDate = new Date(regoExpiryDate);
+	if (regoDate < oneYearAgo) {
+		throw new AppError(
+			400,
+			'Registration expiry date cannot be more than 1 year in the past'
+		);
 	}
 
-	if (wofExpiryDate) {
-		const wofDate = new Date(wofExpiryDate);
-		if (wofDate < oneYearAgo) {
-			throw new AppError(
-				400,
-				'WOF expiry date cannot be more than 1 year in the past'
-			);
-		}
+	const wofDate = new Date(wofExpiryDate);
+	if (wofDate < oneYearAgo) {
+		throw new AppError(
+			400,
+			'WOF expiry date cannot be more than 1 year in the past'
+		);
 	}
 
 	const connection = await getPool().getConnection();
@@ -66,8 +61,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				transmission: transmission ?? null,
 				odometerReading: odometerReading ?? null,
 				odometerUnit: odometerUnit ?? 'km',
-				regoExpiryDate: regoExpiryDate ?? null,
-				wofExpiryDate: wofExpiryDate ?? null,
+				regoExpiryDate,
+				wofExpiryDate,
 				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
 				notes: notes ?? null,
 			};
