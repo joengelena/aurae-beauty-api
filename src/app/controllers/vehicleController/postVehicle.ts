@@ -20,7 +20,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		regoExpiryDate,
 		wofExpiryDate,
 		vehiclePhotoUrl,
-		purchaseDate,
 		notes,
 	} = req.body;
 
@@ -51,13 +50,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		}
 	}
 
-	if (purchaseDate) {
-		const purchaseDateObj = new Date(purchaseDate);
-		if (purchaseDateObj > today) {
-			throw new AppError(400, 'Purchase date cannot be in the future');
-		}
-	}
-
 	const connection = await getPool().getConnection();
 
 	try {
@@ -77,7 +69,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				regoExpiryDate: regoExpiryDate ?? null,
 				wofExpiryDate: wofExpiryDate ?? null,
 				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
-				purchaseDate: purchaseDate ?? null,
 				notes: notes ?? null,
 			};
 

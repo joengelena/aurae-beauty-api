@@ -20,7 +20,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	regoExpiryDate: 'rego_expiry_date',
 	wofExpiryDate: 'wof_expiry_date',
 	vehiclePhotoUrl: 'vehicle_photo_url',
-	purchaseDate: 'purchase_date',
 	notes: 'notes',
 	createdAt: 'created_at',
 	updatedAt: 'updated_at',
