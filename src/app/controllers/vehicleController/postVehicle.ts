@@ -4,6 +4,8 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { UserVehicle } from '../../resources/types';
 import { getPool } from '../../../config/db';
+import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
+import { validateFile } from '../../utils/cloudflare/validation';
 
 async function postVehicle(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -19,11 +21,23 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		odometerUnit,
 		regoExpiryDate,
 		wofExpiryDate,
-		vehiclePhotoUrl,
 		notes,
 	} = req.body;
 
 	logger.info(`Creating new vehicle for user '${userId}'`);
+
+	// Get uploaded file
+	const file = req.file as Express.Multer.File | undefined;
+
+	// Validate file if provided (optional)
+	let vehiclePhotoUrl: string | null = null;
+	if (file) {
+		validateFile(file);
+		logger.info(`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`);
+		const uploadResult = await uploadSingleImage(file);
+		vehiclePhotoUrl = uploadResult.url;
+		logger.info(`Successfully uploaded vehicle image: ${uploadResult.key}`);
+	}
 
 	// Validate dates BEFORE acquiring connection to avoid holding resources
 	const oneYearAgo = new Date();
@@ -63,7 +77,7 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				odometerUnit: odometerUnit ?? 'km',
 				regoExpiryDate,
 				wofExpiryDate,
-				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
+				vehiclePhotoUrl,
 				notes: notes ?? null,
 			};
 

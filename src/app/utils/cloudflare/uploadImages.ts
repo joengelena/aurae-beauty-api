@@ -106,3 +106,4 @@ async function uploadImages(
 }
 
 export default uploadImages;
+export { uploadSingleImage };

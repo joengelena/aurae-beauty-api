@@ -404,11 +404,6 @@
 				"type": "string",
 				"format": "date"
 			},
-			"vehiclePhotoUrl": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 500
-			},
 			"notes": {
 				"type": "string",
 				"minLength": 1,

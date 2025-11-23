@@ -9,6 +9,7 @@ import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
+import uploadMulter from '../utils/multerStorage';
 
 const vehicleRoutes = (app: Express) => {
 	// Protected routes
@@ -21,6 +22,7 @@ const vehicleRoutes = (app: Express) => {
 			asyncHandler(getAllVehicles)
 		)
 		.post(
+			uploadMulter.single('image'),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postVehicle);
