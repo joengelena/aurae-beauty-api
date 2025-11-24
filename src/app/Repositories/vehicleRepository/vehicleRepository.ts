@@ -154,13 +154,20 @@ async function updateVehicleById(
 	return result;
 }
 
-async function deleteVehicleById(vehicleId: number): Promise<ResultSetHeader> {
+async function deleteVehicleById(
+	vehicleId: number,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
 	logger.info(`Deleting vehicle with id '${vehicleId}' from the database`);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'DELETE FROM user_vehicles WHERE id = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [vehicleId]);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, [vehicleId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }

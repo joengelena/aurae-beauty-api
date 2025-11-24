@@ -5,6 +5,7 @@ import {
 	getVehicleById,
 	postVehicle,
 	patchVehicle,
+	deleteVehicle,
 } from '../controllers/vehicleController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
@@ -46,6 +47,13 @@ const vehicleRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.patchVehicle);
 			},
 			asyncHandler(patchVehicle)
+		)
+		.delete(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(deleteVehicle)
 		);
 };
 
