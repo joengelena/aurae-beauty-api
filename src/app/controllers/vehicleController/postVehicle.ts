@@ -6,6 +6,7 @@ import { UserVehicle } from '../../resources/types';
 import { getPool } from '../../../config/db';
 import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
 import { validateFile } from '../../utils/cloudflare/validation';
+import { validateExpiryDate } from '../../utils/validation/vehicleValidation';
 
 async function postVehicle(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -40,24 +41,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	}
 
 	// Validate dates BEFORE acquiring connection to avoid holding resources
-	const oneYearAgo = new Date();
-	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-	const regoDate = new Date(regoExpiryDate);
-	if (regoDate < oneYearAgo) {
-		throw new AppError(
-			400,
-			'Registration expiry date cannot be more than 1 year in the past'
-		);
-	}
-
-	const wofDate = new Date(wofExpiryDate);
-	if (wofDate < oneYearAgo) {
-		throw new AppError(
-			400,
-			'WOF expiry date cannot be more than 1 year in the past'
-		);
-	}
+	validateExpiryDate(regoExpiryDate, 'Registration expiry date');
+	validateExpiryDate(wofExpiryDate, 'WOF expiry date');
 
 	const connection = await getPool().getConnection();
 

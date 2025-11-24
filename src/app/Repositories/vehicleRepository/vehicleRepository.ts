@@ -67,16 +67,21 @@ async function getVehicleById(
 
 async function getVehicleByIdAndUserId(
 	vehicleId: number,
-	userId: string
+	userId: string,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<UserVehicle | null> {
 	logger.info(
 		`Getting vehicle with id '${vehicleId}' for user '${userId}' from the database`
 	);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'SELECT * FROM user_vehicles WHERE id = ? AND user_id_fk = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId, userId]);
-	connection.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [vehicleId, userId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	if (result.length === 0) {
 		return null;
@@ -116,7 +121,8 @@ async function postVehicle(
 
 async function updateVehicleById(
 	vehicleId: number,
-	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>
+	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info(`Updating vehicle with id '${vehicleId}' in the database`);
 
@@ -125,22 +131,25 @@ async function updateVehicleById(
 		throw new Error('Empty vehicle update fields');
 	}
 
-	const fields: string[] = [];
-	const values: any[] = [];
+	const fields = [];
+	const values = [];
 
 	for (const [key, value] of Object.entries(updateValues)) {
-		if (value !== undefined) {
-			fields.push(`${vehicleDbFields[key as keyof UserVehicle]} = ?`);
-			values.push(value);
-		}
+		fields.push(`${vehicleDbFields[key as keyof UserVehicle]} = ?`);
+		values.push(value);
 	}
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
+	const query = `UPDATE user_vehicles SET ${fields.join(', ')} WHERE id = ?`;
 
 	values.push(vehicleId);
 
-	const connection = await getPool().getConnection();
-	const query = `UPDATE user_vehicles SET ${fields.join(', ')} WHERE id = ?`;
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	return result;
 }

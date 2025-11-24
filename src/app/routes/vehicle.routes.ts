@@ -4,6 +4,7 @@ import {
 	getAllVehicles,
 	getVehicleById,
 	postVehicle,
+	patchVehicle,
 } from '../controllers/vehicleController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
@@ -30,13 +31,22 @@ const vehicleRoutes = (app: Express) => {
 			asyncHandler(postVehicle)
 		);
 
-	app.route(rootUrl + '/user/vehicles/:id').get(
-		supabaseAuthenticateReq,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-		},
-		asyncHandler(getVehicleById)
-	);
+	app.route(rootUrl + '/user/vehicles/:id')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getVehicleById)
+		)
+		.patch(
+			uploadMulter.single('image'),
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.patchVehicle);
+			},
+			asyncHandler(patchVehicle)
+		);
 };
 
 export default vehicleRoutes;
