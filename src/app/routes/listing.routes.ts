@@ -9,6 +9,7 @@ import {
 	getListing,
 	updateLising,
 	deleteListing,
+	incrementViewCount,
 } from '../controllers/listingController';
 import uploadMulter from '../utils/multerStorage';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -52,6 +53,11 @@ const listingRoutes = (app: Express) => {
 			},
 			asyncHandler(deleteListing)
 		);
+
+	app.route(rootUrl + '/listings/:id/view')
+		.post((req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.emptyBody);
+		}, asyncHandler(incrementViewCount));
 };
 
 export default listingRoutes;
