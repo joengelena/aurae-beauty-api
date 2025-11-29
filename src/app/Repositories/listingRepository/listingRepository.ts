@@ -243,6 +243,17 @@ async function updateListingWithId(
 	return result;
 }
 
+async function incrementViewCount(id: string): Promise<ResultSetHeader> {
+	logger.info(`Incrementing view count for listing id '${id}'`);
+
+	const connection = await getPool().getConnection();
+	const query = 'UPDATE listing SET view_count = view_count + 1 WHERE id = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [id]);
+	connection.release();
+
+	return result;
+}
+
 export {
 	getListingAttributes,
 	getAllListings,
@@ -252,4 +263,5 @@ export {
 	postListingPhotoPaths,
 	deleteListingWithId,
 	updateListingWithId,
+	incrementViewCount,
 };
