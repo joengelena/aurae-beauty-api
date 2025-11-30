@@ -1,6 +1,16 @@
 import { UserVehicle } from '../../resources/types';
 import { RowDataPacket } from 'mysql2';
 
+// Helper function to format Date to YYYY-MM-DD string
+function formatDateToString(date: Date | null): string {
+	if (!date) return '';
+	const d = new Date(date);
+	const year = d.getFullYear();
+	const month = String(d.getMonth() + 1).padStart(2, '0');
+	const day = String(d.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
 function mapVehicleDbToObject(vehiclesDb: RowDataPacket[]): UserVehicle[] {
 	return vehiclesDb.map((vehicle) => {
 		return {
@@ -10,17 +20,14 @@ function mapVehicleDbToObject(vehiclesDb: RowDataPacket[]): UserVehicle[] {
 			model: vehicle.model,
 			year: vehicle.year,
 			licensePlate: vehicle.license_plate,
-			vin: vehicle.vin,
 			color: vehicle.color,
 			fuelType: vehicle.fuel_type,
 			transmission: vehicle.transmission,
 			odometerReading: vehicle.odometer_reading,
 			odometerUnit: vehicle.odometer_unit,
-			regoExpiryDate: vehicle.rego_expiry_date,
-			wofExpiryDate: vehicle.wof_expiry_date,
+			regoExpiryDate: formatDateToString(vehicle.rego_expiry_date),
+			wofExpiryDate: formatDateToString(vehicle.wof_expiry_date),
 			vehiclePhotoUrl: vehicle.vehicle_photo_url,
-			isPrimary: vehicle.is_primary,
-			purchaseDate: vehicle.purchase_date,
 			notes: vehicle.notes,
 			createdAt: vehicle.created_at,
 			updatedAt: vehicle.updated_at,

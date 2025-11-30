@@ -12,7 +12,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	model: 'model',
 	year: 'year',
 	licensePlate: 'license_plate',
-	vin: 'vin',
 	color: 'color',
 	fuelType: 'fuel_type',
 	transmission: 'transmission',
@@ -21,8 +20,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	regoExpiryDate: 'rego_expiry_date',
 	wofExpiryDate: 'wof_expiry_date',
 	vehiclePhotoUrl: 'vehicle_photo_url',
-	isPrimary: 'is_primary',
-	purchaseDate: 'purchase_date',
 	notes: 'notes',
 	createdAt: 'created_at',
 	updatedAt: 'updated_at',
@@ -36,7 +33,7 @@ async function getAllVehiclesByUserId(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || (await getPool().getConnection());
-	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY is_primary DESC, created_at DESC`;
+	const query = `SELECT * FROM user_vehicles WHERE user_id_fk = ? ORDER BY created_at DESC`;
 	const [result] = await conn.query<RowDataPacket[]>(query, [userId]);
 
 	if (!useProvidedConnection) {
@@ -70,16 +67,21 @@ async function getVehicleById(
 
 async function getVehicleByIdAndUserId(
 	vehicleId: number,
-	userId: string
+	userId: string,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<UserVehicle | null> {
 	logger.info(
 		`Getting vehicle with id '${vehicleId}' for user '${userId}' from the database`
 	);
 
-	const connection = await getPool().getConnection();
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
 	const query = 'SELECT * FROM user_vehicles WHERE id = ? AND user_id_fk = ?';
-	const [result] = await connection.query<RowDataPacket[]>(query, [vehicleId, userId]);
-	connection.release();
+	const [result] = await conn.query<RowDataPacket[]>(query, [vehicleId, userId]);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
 
 	if (result.length === 0) {
 		return null;
@@ -119,7 +121,8 @@ async function postVehicle(
 
 async function updateVehicleById(
 	vehicleId: number,
-	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>
+	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>,
+	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info(`Updating vehicle with id '${vehicleId}' in the database`);
 
@@ -128,47 +131,39 @@ async function updateVehicleById(
 		throw new Error('Empty vehicle update fields');
 	}
 
-	const fields: string[] = [];
-	const values: any[] = [];
+	const fields = [];
+	const values = [];
 
 	for (const [key, value] of Object.entries(updateValues)) {
-		if (value !== undefined) {
-			fields.push(`${vehicleDbFields[key as keyof UserVehicle]} = ?`);
-			values.push(value);
-		}
+		fields.push(`${vehicleDbFields[key as keyof UserVehicle]} = ?`);
+		values.push(value);
 	}
-
-	values.push(vehicleId);
-
-	const connection = await getPool().getConnection();
-	const query = `UPDATE user_vehicles SET ${fields.join(', ')} WHERE id = ?`;
-	const [result] = await connection.query<ResultSetHeader>(query, values);
-	connection.release();
-
-	return result;
-}
-
-async function deleteVehicleById(vehicleId: number): Promise<ResultSetHeader> {
-	logger.info(`Deleting vehicle with id '${vehicleId}' from the database`);
-
-	const connection = await getPool().getConnection();
-	const query = 'DELETE FROM user_vehicles WHERE id = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [vehicleId]);
-	connection.release();
-
-	return result;
-}
-
-async function unsetPrimaryVehicleForUser(
-	userId: string,
-	connection?: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
-	logger.info(`Unsetting primary vehicle for user '${userId}'`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || (await getPool().getConnection());
-	const query = 'UPDATE user_vehicles SET is_primary = 0 WHERE user_id_fk = ?';
-	const [result] = await conn.query<ResultSetHeader>(query, [userId]);
+	const query = `UPDATE user_vehicles SET ${fields.join(', ')} WHERE id = ?`;
+
+	values.push(vehicleId);
+
+	const [result] = await conn.query<ResultSetHeader>(query, values);
+
+	if (!useProvidedConnection) {
+		(conn as mysql.PoolConnection).release();
+	}
+
+	return result;
+}
+
+async function deleteVehicleById(
+	vehicleId: number,
+	connection?: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
+	logger.info(`Deleting vehicle with id '${vehicleId}' from the database`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || (await getPool().getConnection());
+	const query = 'DELETE FROM user_vehicles WHERE id = ?';
+	const [result] = await conn.query<ResultSetHeader>(query, [vehicleId]);
 
 	if (!useProvidedConnection) {
 		(conn as mysql.PoolConnection).release();
@@ -228,7 +223,6 @@ export {
 	postVehicle,
 	updateVehicleById,
 	deleteVehicleById,
-	unsetPrimaryVehicleForUser,
 	getVehiclesWithUpcomingRegoExpiry,
 	getVehiclesWithUpcomingWofExpiry,
 };

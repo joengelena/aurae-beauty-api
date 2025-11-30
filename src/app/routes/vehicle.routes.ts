@@ -4,11 +4,14 @@ import {
 	getAllVehicles,
 	getVehicleById,
 	postVehicle,
+	patchVehicle,
+	deleteVehicle,
 } from '../controllers/vehicleController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
+import uploadMulter from '../utils/multerStorage';
 
 const vehicleRoutes = (app: Express) => {
 	// Protected routes
@@ -21,6 +24,7 @@ const vehicleRoutes = (app: Express) => {
 			asyncHandler(getAllVehicles)
 		)
 		.post(
+			uploadMulter.single('image'),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postVehicle);
@@ -28,13 +32,29 @@ const vehicleRoutes = (app: Express) => {
 			asyncHandler(postVehicle)
 		);
 
-	app.route(rootUrl + '/user/vehicles/:id').get(
-		supabaseAuthenticateReq,
-		(req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
-		},
-		asyncHandler(getVehicleById)
-	);
+	app.route(rootUrl + '/user/vehicles/:id')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getVehicleById)
+		)
+		.patch(
+			uploadMulter.single('image'),
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.patchVehicle);
+			},
+			asyncHandler(patchVehicle)
+		)
+		.delete(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(deleteVehicle)
+		);
 };
 
 export default vehicleRoutes;

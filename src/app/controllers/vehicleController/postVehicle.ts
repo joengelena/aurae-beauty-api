@@ -4,6 +4,9 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { UserVehicle } from '../../resources/types';
 import { getPool } from '../../../config/db';
+import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
+import { validateFile } from '../../utils/cloudflare/validation';
+import { validateExpiryDate } from '../../utils/validation/vehicleValidation';
 
 async function postVehicle(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -12,7 +15,6 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		model,
 		year,
 		licensePlate,
-		vin,
 		color,
 		fuelType,
 		transmission,
@@ -20,85 +22,47 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		odometerUnit,
 		regoExpiryDate,
 		wofExpiryDate,
-		vehiclePhotoUrl,
-		isPrimary,
-		purchaseDate,
 		notes,
 	} = req.body;
 
 	logger.info(`Creating new vehicle for user '${userId}'`);
 
+	// Get uploaded file
+	const file = req.file as Express.Multer.File | undefined;
+
+	// Validate file if provided (optional)
+	let vehiclePhotoUrl: string | null = null;
+	if (file) {
+		validateFile(file);
+		logger.info(`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`);
+		const uploadResult = await uploadSingleImage(file);
+		vehiclePhotoUrl = uploadResult.url;
+		logger.info(`Successfully uploaded vehicle image: ${uploadResult.key}`);
+	}
+
 	// Validate dates BEFORE acquiring connection to avoid holding resources
-	const today = new Date();
-	const oneYearAgo = new Date(today);
-	oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-	if (regoExpiryDate) {
-		const regoDate = new Date(regoExpiryDate);
-		if (regoDate < oneYearAgo) {
-			throw new AppError(
-				400,
-				'Registration expiry date cannot be more than 1 year in the past'
-			);
-		}
-	}
-
-	if (wofExpiryDate) {
-		const wofDate = new Date(wofExpiryDate);
-		if (wofDate < oneYearAgo) {
-			throw new AppError(
-				400,
-				'WOF expiry date cannot be more than 1 year in the past'
-			);
-		}
-	}
-
-	if (purchaseDate) {
-		const purchaseDateObj = new Date(purchaseDate);
-		if (purchaseDateObj > today) {
-			throw new AppError(400, 'Purchase date cannot be in the future');
-		}
-	}
+	validateExpiryDate(regoExpiryDate, 'Registration expiry date');
+	validateExpiryDate(wofExpiryDate, 'WOF expiry date');
 
 	const connection = await getPool().getConnection();
 
 	try {
 		await connection.beginTransaction();
 
-		const existingVehicles = await vehicleRepository.getAllVehiclesByUserId(
-			userId,
-			connection
-		);
-
-		const shouldBePrimary =
-			isPrimary === 1 || existingVehicles.length === 0;
-
-		if (shouldBePrimary) {
-			await vehicleRepository.unsetPrimaryVehicleForUser(
-				userId,
-				connection
-			);
-			logger.info(`Unset all primary vehicles for user '${userId}'`);
-		}
-
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> =
-			{
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> = {
 				userIdFk: userId,
 				make,
 				model,
 				year,
 				licensePlate: licensePlate ?? null,
-				vin: vin ?? null,
 				color: color ?? null,
 				fuelType: fuelType ?? null,
 				transmission: transmission ?? null,
 				odometerReading: odometerReading ?? null,
 				odometerUnit: odometerUnit ?? 'km',
-				regoExpiryDate: regoExpiryDate ?? null,
-				wofExpiryDate: wofExpiryDate ?? null,
-				vehiclePhotoUrl: vehiclePhotoUrl ?? null,
-				isPrimary: shouldBePrimary ? 1 : 0,
-				purchaseDate: purchaseDate ?? null,
+				regoExpiryDate,
+				wofExpiryDate,
+				vehiclePhotoUrl,
 				notes: notes ?? null,
 			};
 
