@@ -23,7 +23,8 @@ type Listing = {
 	imageUrls: string;
 	location: string;
 	vehicleCondition: string;
-	price: number;
+	originalPrice: number;
+	discountedPrice: number | null;
 	uploadDate: Date;
 	description: string;
 	endDate: string;
