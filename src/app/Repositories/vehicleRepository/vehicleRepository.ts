@@ -17,8 +17,6 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	transmission: 'transmission',
 	odometerReading: 'odometer_reading',
 	odometerUnit: 'odometer_unit',
-	regoExpiryDate: 'rego_expiry_date',
-	wofExpiryDate: 'wof_expiry_date',
 	vehiclePhotoUrl: 'vehicle_photo_url',
 	notes: 'notes',
 	createdAt: 'created_at',
@@ -77,7 +75,10 @@ async function getVehicleByIdAndUserId(
 	const useProvidedConnection = !!connection;
 	const conn = connection || (await getPool().getConnection());
 	const query = 'SELECT * FROM user_vehicles WHERE id = ? AND user_id_fk = ?';
-	const [result] = await conn.query<RowDataPacket[]>(query, [vehicleId, userId]);
+	const [result] = await conn.query<RowDataPacket[]>(query, [
+		vehicleId,
+		userId,
+	]);
 
 	if (!useProvidedConnection) {
 		(conn as mysql.PoolConnection).release();
@@ -121,7 +122,9 @@ async function postVehicle(
 
 async function updateVehicleById(
 	vehicleId: number,
-	updateValues: Partial<Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>>,
+	updateValues: Partial<
+		Omit<UserVehicle, 'id' | 'userIdFk' | 'createdAt' | 'updatedAt'>
+	>,
 	connection?: mysql.Pool | mysql.PoolConnection
 ): Promise<ResultSetHeader> {
 	logger.info(`Updating vehicle with id '${vehicleId}' in the database`);
@@ -172,50 +175,6 @@ async function deleteVehicleById(
 	return result;
 }
 
-async function getVehiclesWithUpcomingRegoExpiry(
-	userId: string,
-	daysAhead: number
-): Promise<UserVehicle[]> {
-	logger.info(
-		`Getting vehicles with rego expiring in next ${daysAhead} days for user '${userId}'`
-	);
-
-	const connection = await getPool().getConnection();
-	const query = `
-		SELECT * FROM user_vehicles
-		WHERE user_id_fk = ?
-		AND rego_expiry_date IS NOT NULL
-		AND rego_expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
-		ORDER BY rego_expiry_date ASC
-	`;
-	const [result] = await connection.query<RowDataPacket[]>(query, [userId, daysAhead]);
-	connection.release();
-
-	return mapVehicleDbToObject(result);
-}
-
-async function getVehiclesWithUpcomingWofExpiry(
-	userId: string,
-	daysAhead: number
-): Promise<UserVehicle[]> {
-	logger.info(
-		`Getting vehicles with WOF expiring in next ${daysAhead} days for user '${userId}'`
-	);
-
-	const connection = await getPool().getConnection();
-	const query = `
-		SELECT * FROM user_vehicles
-		WHERE user_id_fk = ?
-		AND wof_expiry_date IS NOT NULL
-		AND wof_expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY)
-		ORDER BY wof_expiry_date ASC
-	`;
-	const [result] = await connection.query<RowDataPacket[]>(query, [userId, daysAhead]);
-	connection.release();
-
-	return mapVehicleDbToObject(result);
-}
-
 export {
 	getAllVehiclesByUserId,
 	getVehicleById,
@@ -223,6 +182,4 @@ export {
 	postVehicle,
 	updateVehicleById,
 	deleteVehicleById,
-	getVehiclesWithUpcomingRegoExpiry,
-	getVehiclesWithUpcomingWofExpiry,
 };
