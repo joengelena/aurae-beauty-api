@@ -18,9 +18,8 @@ function mapVehicleServiceDbToObject(
 		return {
 			id: service.id,
 			vehicleIdFk: service.vehicle_id_fk,
-			serviceName: service.service_name,
+			typeOfService: service.type_of_service,
 			serviceDate: formatDateToString(service.service_date),
-			serviceExpiryDate: formatDateToString(service.service_expiry_date),
 			serviceProviderName: service.service_provider_name,
 			cost: service.cost,
 			notes: service.notes,

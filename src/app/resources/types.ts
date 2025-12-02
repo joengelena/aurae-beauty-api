@@ -124,6 +124,18 @@ type UserVehicle = {
 	updatedAt: Date;
 };
 
+type VehicleService = {
+	id: number;
+	vehicleIdFk: number;
+	typeOfService: string;
+	serviceDate: string;
+	serviceProviderName: string | null;
+	cost: number | null;
+	notes: string | null;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
 type ServiceHistory = {
 	id: number;
 	vehicleIdFk: number;
@@ -203,6 +215,7 @@ export {
 	ListingQueryParams,
 	ListingAttribute,
 	UserVehicle,
+	VehicleService,
 	ServiceHistory,
 	ServiceReminder,
 	NotificationPreferences,

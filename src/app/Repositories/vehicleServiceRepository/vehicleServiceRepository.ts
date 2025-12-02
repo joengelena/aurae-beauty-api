@@ -10,9 +10,8 @@ const vehicleServiceDbFields: Record<
 	string
 > = {
 	vehicleIdFk: 'vehicle_id_fk',
-	serviceName: 'service_name',
+	typeOfService: 'type_of_service',
 	serviceDate: 'service_date',
-	serviceExpiryDate: 'service_expiry_date',
 	serviceProviderName: 'service_provider_name',
 	cost: 'cost',
 	notes: 'notes',
