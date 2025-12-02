@@ -175,7 +175,7 @@
 				"minLength": 1,
 				"maxLength": 255
 			},
-			"price": {
+			"originalPrice": {
 				"type": "integer",
 				"minimum": 0,
 				"maximum": 99999999999
@@ -244,7 +244,7 @@
 			"currentUserId",
 			"location",
 			"vehicleCondition",
-			"price",
+			"originalPrice",
 			"description",
 			"endDate",
 			"make",
@@ -276,7 +276,12 @@
 				"minLength": 1,
 				"maxLength": 255
 			},
-			"price": {
+			"originalPrice": {
+				"type": "integer",
+				"minimum": 0,
+				"maximum": 99999999999
+			},
+			"discountedPrice": {
 				"type": "integer",
 				"minimum": 0,
 				"maximum": 99999999999

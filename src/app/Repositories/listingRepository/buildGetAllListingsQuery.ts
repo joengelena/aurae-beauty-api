@@ -116,8 +116,8 @@ function buildBetweenFilterQuery(
 	allQueries: Partial<ListingQueryParams>
 ): QueryAndValue {
 	const betweenFilterConditions: BetweenFilterCondition[] = [
-		{ key: 'priceFrom', column: 'price', operator: '>=' },
-		{ key: 'priceTo', column: 'price', operator: '<=' },
+		{ key: 'priceFrom', column: 'original_price', operator: '>=' },
+		{ key: 'priceTo', column: 'original_price', operator: '<=' },
 		{ key: 'yearFrom', column: 'year', operator: '>=' },
 		{ key: 'yearTo', column: 'year', operator: '<=' },
 		{ key: 'kilometersFrom', column: 'kilometers', operator: '>=' },
@@ -192,8 +192,8 @@ function buildSortByQuery(
 	allQueries: Partial<ListingQueryParams>
 ): QueryAndValue {
 	const sortByConditions = [
-		{ key: 'priceDesc', column: 'price', order: 'DESC' },
-		{ key: 'priceAsc', column: 'price', order: 'ASC' },
+		{ key: 'priceDesc', column: 'original_price', order: 'DESC' },
+		{ key: 'priceAsc', column: 'original_price', order: 'ASC' },
 		{ key: 'uploadDateDesc', column: 'upload_date', order: 'DESC' },
 		{ key: 'uploadDateAsc', column: 'upload_date', order: 'ASC' },
 		{ key: 'kilometersDesc', column: 'kilometers', order: 'DESC' },
