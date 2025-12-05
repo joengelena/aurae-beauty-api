@@ -22,9 +22,13 @@ const listingRoutes = (app: Express) => {
 	}, asyncHandler(getListingAttributes));
 
 	app.route(rootUrl + '/listings')
-		.get((req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		}, asyncHandler(getAllListings))
+		.get(
+			optionalSupabaseAuth,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOptional);
+			},
+			asyncHandler(getAllListings)
+		)
 		.post(
 			// Order matters when uploading images
 			uploadMulter.array('images', 10),
@@ -54,10 +58,9 @@ const listingRoutes = (app: Express) => {
 			asyncHandler(deleteListing)
 		);
 
-	app.route(rootUrl + '/listings/:id/view')
-		.post((req, res, next) => {
-			validateRequestBody(req, res, next, ajvSchema.emptyBody);
-		}, asyncHandler(incrementViewCount));
+	app.route(rootUrl + '/listings/:id/view').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.emptyBody);
+	}, asyncHandler(incrementViewCount));
 };
 
 export default listingRoutes;

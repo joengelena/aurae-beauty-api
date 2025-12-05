@@ -21,26 +21,27 @@ type QueryAndValue = {
 };
 
 function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
-	const currentUserId = allQueries.currentUserId;
+	let baseQuery = `
+					SELECT *, COUNT(*) OVER() AS totalRows
+					FROM (
+						SELECT
+						l.*,
+						COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
+						FROM motorix_db.listing l
+						LEFT JOIN (
+						SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
+						) lp ON l.id = lp.listing_id_fk
+						GROUP BY l.id
+					) AS listingsWithImages`;
+	let query = null;
 
-	let query = `SELECT *, COUNT(*) OVER() AS totalRows
-				FROM (
-					SELECT
-					l.*,
-					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls,
-					${currentUserId ? `IF(w.user_id_fk IS NOT NULL, 1, 0) AS isInWatchlist` : '0 AS isInWatchlist'}
-					FROM motorix_db.listing l
-					LEFT JOIN (
-					SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
-					) lp ON l.id = lp.listing_id_fk
-					${currentUserId ? `LEFT JOIN motorix_db.watchlist w ON l.id = w.listing_id_fk AND w.user_id_fk = ?` : ''}
-					GROUP BY l.id
-				) AS result`;
+	// let query = `
+	// 			SELECT *, COUNT(*) OVER() AS totalRows
+	// 			FROM (
+	// 				${baseQuery}
+	// 			) AS result`;
+
 	const queryValues: (string | number)[] = [];
-
-	if (currentUserId) {
-		queryValues.push(currentUserId);
-	}
 
 	const searchQuery = buildSearchQuery(allQueries);
 	const betweenFilterQuery = buildBetweenFilterQuery(allQueries);
@@ -65,21 +66,36 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	}
 
 	if (whereClause.length > 0) {
-		query += ` WHERE ${whereClause.join(' AND ')}`;
+		baseQuery += ` WHERE ${whereClause.join(' AND ')}`;
 	}
 
 	if (sortByQuery.query.length > 0) {
-		query += ` ${sortByQuery.query}`;
+		baseQuery += ` ${sortByQuery.query}`;
 		queryValues.push(...sortByQuery.values);
 	}
 
 	if (paginationQuery.query.length > 0) {
-		query += ` ${paginationQuery.query}`;
+		baseQuery += ` ${paginationQuery.query}`;
 		queryValues.push(...paginationQuery.values);
 	}
 
+	if (allQueries.currentUserId) {
+		query = `
+				SELECT *, IF(watchlist.listing_id_fk IS NOT NULL, 1, 0) AS isInWatchlist
+				FROM (
+					${baseQuery}
+				) AS result
+				LEFT JOIN (
+					SELECT listing_id_fk
+					FROM motorix_db.watchlist
+					WHERE user_id_fk = ?
+				) as watchlist
+				on watchlist.listing_id_fk = result.id`;
+		queryValues.push(allQueries.currentUserId);
+	}
+
 	return {
-		query,
+		query: query ?? baseQuery,
 		values: queryValues,
 		limit: Number(paginationQuery.values[0]),
 	};

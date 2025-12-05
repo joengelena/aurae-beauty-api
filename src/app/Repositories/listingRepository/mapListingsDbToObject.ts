@@ -35,6 +35,7 @@ function mapListingsDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 			cylinders: listing.cylinders,
 			regoExpiryDate: listing.rego_expiry_date,
 			wofExpiryDate: listing.wof_expiry_date,
+			isInWatchlist: listing.isInWatchlist,
 		};
 	});
 }

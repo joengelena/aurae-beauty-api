@@ -67,7 +67,6 @@ async function getAllListings(
 }> {
 	const connection = await getPool().getConnection();
 	const { query, values, limit } = buildGetAllListingsQuery(allQueries);
-
 	const [result] = await connection.query<RowDataPacket[]>(query, values);
 	connection.release();
 
@@ -180,7 +179,11 @@ async function postListingPhotoPaths(
 	}
 
 	// Build batch insert query
-	const values = photoPaths.flatMap((path, index) => [listingId, index, path]);
+	const values = photoPaths.flatMap((path, index) => [
+		listingId,
+		index,
+		path,
+	]);
 	const placeholders = photoPaths.map(() => '(?, ?, ?)').join(', ');
 
 	const query = `INSERT INTO listing_photo (listing_id_fk, photo_order, photo_path)
