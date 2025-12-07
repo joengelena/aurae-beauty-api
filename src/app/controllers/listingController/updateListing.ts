@@ -48,11 +48,11 @@ async function updateLising(req: Request, res: Response): Promise<void> {
 			const uploadResult = await uploadImages(files);
 
 			// Delete old photos from database
-			await listingRepository.deleteListingPhotos(parseInt(listingId), connection);
+			await listingRepository.deleteListingPhotos(parseInt(listingId, 10), connection);
 
 			// Insert new photo URLs
 			await listingRepository.postListingPhotoPaths(
-				parseInt(listingId),
+				parseInt(listingId, 10),
 				uploadResult.urls,
 				connection
 			);

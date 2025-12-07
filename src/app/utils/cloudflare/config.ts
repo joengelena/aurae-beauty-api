@@ -5,7 +5,7 @@
  * R2 is Cloudflare's S3-compatible object storage service.
  */
 
-import { R2Config } from './types';
+import { IR2Config } from './types';
 
 /**
  * Validates that a required environment variable exists
@@ -45,7 +45,7 @@ function buildPublicUrl(): string {
  * R2 configuration object
  * Initialized once at module load time
  */
-export const r2Config: R2Config = {
+export const r2Config: IR2Config = {
 	accountId: getRequiredEnvVar('R2_ACCOUNT_ID'),
 	accessKeyId: getRequiredEnvVar('R2_ACCESS_KEY_ID'),
 	secretAccessKey: getRequiredEnvVar('R2_SECRET_ACCESS_KEY'),

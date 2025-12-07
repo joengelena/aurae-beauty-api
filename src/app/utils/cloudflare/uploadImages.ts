@@ -13,7 +13,7 @@ import {
 	getContentType,
 	buildPublicUrl,
 } from './r2Client';
-import { UploadImagesResult } from './types';
+import { IUploadImagesResult } from './types';
 
 /**
  * Uploads a single image to R2
@@ -52,7 +52,7 @@ async function uploadSingleImage(file: Express.Multer.File): Promise<{
  */
 async function uploadImages(
 	files: Express.Multer.File[]
-): Promise<UploadImagesResult> {
+): Promise<IUploadImagesResult> {
 	const uploadedFiles: { url: string; key: string; size: number }[] = [];
 
 	try {

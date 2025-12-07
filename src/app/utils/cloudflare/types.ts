@@ -2,7 +2,7 @@
  * TypeScript type definitions for Cloudflare R2 integration
  */
 
-export interface R2Config {
+export interface IR2Config {
 	accountId: string;
 	accessKeyId: string;
 	secretAccessKey: string;
@@ -10,13 +10,13 @@ export interface R2Config {
 	publicUrl: string;
 }
 
-export interface UploadImageResult {
+export interface IUploadImageResult {
 	url: string;
 	key: string;
 	size: number;
 }
 
-export interface UploadImagesResult {
+export interface IUploadImagesResult {
 	urls: string[];
 	keys: string[];
 	totalSize: number;

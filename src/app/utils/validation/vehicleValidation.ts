@@ -28,7 +28,7 @@ export function validateExpiryDate(date: string, fieldName: string): void {
  * @throws AppError if the ID is not a valid number
  */
 export function parseVehicleId(idParam: string): number {
-	const vehicleId = parseInt(idParam);
+	const vehicleId = parseInt(idParam, 10);
 	if (isNaN(vehicleId)) {
 		throw new AppError(400, 'Invalid vehicle ID');
 	}
