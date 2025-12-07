@@ -44,6 +44,8 @@ const listingRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		}, asyncHandler(getListing))
 		.patch(
+			// Allow updating multiple images (up to 10)
+			uploadMulter.array('images', 10),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.updateListing);

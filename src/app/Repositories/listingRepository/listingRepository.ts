@@ -258,6 +258,18 @@ async function incrementViewCount(id: string): Promise<ResultSetHeader> {
 	return result;
 }
 
+async function deleteListingPhotos(
+	listingId: number,
+	connection: mysql.Pool | mysql.PoolConnection
+): Promise<ResultSetHeader> {
+	logger.info(`Deleting all photo paths for listing id: ${listingId}`);
+
+	const query = 'DELETE FROM listing_photo WHERE listing_id_fk = ?';
+	const [result] = await connection.query<ResultSetHeader>(query, [listingId]);
+
+	return result;
+}
+
 export {
 	getListingAttributes,
 	getAllListings,
@@ -266,6 +278,7 @@ export {
 	postListingPhotoPath,
 	postListingPhotoPaths,
 	deleteListingWithId,
+	deleteListingPhotos,
 	updateListingWithId,
 	incrementViewCount,
 };
