@@ -57,14 +57,14 @@ async function refreshTokenSupabase(
 			res.cookie('sb-access-token', data.session.access_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
+				sameSite: 'none',
 				maxAge: data.session.expires_in * 1000,
 			});
 
 			res.cookie('sb-refresh-token', data.session.refresh_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
+				sameSite: 'none',
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			});
 
