@@ -11,7 +11,7 @@ async function incrementViewCount(req: Request, res: Response): Promise<void> {
 	try {
 		const result = await listingRepository.incrementViewCount(listingId);
 
-		if (result.affectedRows === 0) {
+		if (result.rowCount === 0) {
 			throw new AppError(404, 'Listing not found.');
 		}
 

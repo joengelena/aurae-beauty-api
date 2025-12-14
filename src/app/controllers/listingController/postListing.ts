@@ -10,7 +10,7 @@ import { getPool } from '../../../config/db';
 async function postListing(req: Request, res: Response): Promise<void> {
 	logger.info('Posting new listing');
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
 		const { currentUserId, ...listingData } = req.body;
@@ -34,25 +34,27 @@ async function postListing(req: Request, res: Response): Promise<void> {
 		const uploadResult = await uploadImages(files);
 		listingData.previewImgUrl = uploadResult.urls[0];
 
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		const result = await listingRepository.postListing(
 			listingData,
 			connection
 		);
 
+		const listingId = result.rows[0].id;
+
 		await listingRepository.postListingPhotoPaths(
-			result.insertId,
+			listingId,
 			uploadResult.urls,
 			connection
 		);
 
-		await connection.commit();
+		await connection.query('COMMIT');
 		connection.release();
 
-		if (result.affectedRows === 1) {
+		if (result.rowCount === 1) {
 			res.status(201).send({
-				listingId: result.insertId,
+				listingId,
 			});
 		} else {
 			throw new AppError(
@@ -61,7 +63,7 @@ async function postListing(req: Request, res: Response): Promise<void> {
 			);
 		}
 	} catch (error) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

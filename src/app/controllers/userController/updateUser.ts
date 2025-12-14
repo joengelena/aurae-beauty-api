@@ -9,10 +9,10 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Updating user with id '${currentUserId}'`);
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		await userRepository.updateUser(
 			{
@@ -22,14 +22,14 @@ async function updateUser(req: Request, res: Response): Promise<void> {
 			connection
 		);
 
-		await connection.commit();
+		await connection.query('COMMIT');
 		connection.release();
 
 		res.status(200).send({
 			message: 'User updated successfully',
 		});
 	} catch (error) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import AppError from '../errors/appError';
-import mysql from 'mysql2/promise';
+import { PoolClient } from 'pg';
 
 /**
  * Executes a database operation within a transaction
@@ -14,19 +14,19 @@ import mysql from 'mysql2/promise';
  * @returns Promise that resolves when operation completes
  */
 export async function withTransaction<T>(
-	operation: (connection: mysql.PoolConnection) => Promise<T>,
+	operation: (connection: PoolClient) => Promise<T>,
 	res: Response,
 	errorContext: string
 ): Promise<void> {
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 		await operation(connection);
-		await connection.commit();
+		await connection.query('COMMIT');
 		connection.release();
 	} catch (error) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

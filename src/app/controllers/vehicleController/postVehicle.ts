@@ -44,10 +44,10 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	validateExpiryDate(regoExpiryDate, 'Registration expiry date');
 	validateExpiryDate(wofExpiryDate, 'WOF expiry date');
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> = {
 				userIdFk: userId,
@@ -71,16 +71,18 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 			connection
 		);
 
+		const vehicleId = result.rows[0].id;
+
 		logger.info(
-			`Vehicle created with id '${result.insertId}' for user '${userId}'`
+			`Vehicle created with id '${vehicleId}' for user '${userId}'`
 		);
 
 		const createdVehicle = await vehicleRepository.getVehicleById(
-			result.insertId,
+			vehicleId,
 			connection
 		);
 
-		await connection.commit();
+		await connection.query('COMMIT');
 		connection.release();
 
 		res.status(201).send({
@@ -88,7 +90,7 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 			vehicle: createdVehicle,
 		});
 	} catch (error: any) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

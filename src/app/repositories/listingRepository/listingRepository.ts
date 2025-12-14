@@ -1,5 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import mysql from 'mysql2/promise';
+import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import {
@@ -11,6 +10,7 @@ import {
 import mapListingAttributesDbToObject from './mapListingAttributesDbToObject';
 import buildGetAllListingsQuery from './buildGetAllListingsQuery';
 import mapListingsDbToObject from './mapListingsDbToObject';
+import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const listingDbFields: Partial<Record<keyof Listing, string>> = {
 	id: 'id',
@@ -49,12 +49,11 @@ const listingDbFields: Partial<Record<keyof Listing, string>> = {
 async function getListingAttributes(): Promise<ListingAttribute[]> {
 	logger.info('Getting listing attributes from the database');
 
-	const connection = await getPool().getConnection();
-	const query = 'SELECT * FROM listing_attribute';
-	const [result] = await connection.query<RowDataPacket[]>(query);
-	connection.release();
+	const connection = getPool();
+	const query = convertQueryPlaceholders('SELECT * FROM "listing_attribute"');
+	const result = await connection.query(query);
 
-	return mapListingAttributesDbToObject(result);
+	return mapListingAttributesDbToObject(result.rows);
 }
 
 async function getAllListings(
@@ -65,21 +64,24 @@ async function getAllListings(
 	totalPages: number;
 	totalRows: number;
 }> {
-	const connection = await getPool().getConnection();
+	const connection = getPool();
 	const { query, values, limit } = buildGetAllListingsQuery(allQueries);
-	const [result] = await connection.query<RowDataPacket[]>(query, values);
-	connection.release();
 
-	const totalRows = result[0]?.totalRows ?? 0;
+	const result = await connection.query(
+		convertQueryPlaceholders(query),
+		values
+	);
 
-	result.forEach((listing) => {
-		delete listing.totalRows;
+	const totalRows = result.rows[0]?.total_rows ?? 0;
+
+	result.rows.forEach((listing) => {
+		delete listing.total_rows;
 	});
 
 	const totalPages = Math.ceil(totalRows / limit);
 
 	return {
-		data: mapListingsDbToObject(result),
+		data: mapListingsDbToObject(result.rows),
 		pageNumber: Number(allQueries.pageNumber),
 		totalPages,
 		totalRows,
@@ -88,38 +90,38 @@ async function getAllListings(
 
 async function getListingById(
 	id: string,
-	connection?: mysql.Pool | mysql.PoolConnection
+	connection?: Pool | PoolClient
 ): Promise<Listing[]> {
 	logger.info(`Getting listing with id '${id}' from the database`);
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	// const query = 'SELECT * FROM listing WHERE id = ?';
-	const query = `SELECT *
+	const conn = connection || getPool();
+	// const query = 'SELECT * FROM "listing" WHERE id = ?';
+	const query = convertQueryPlaceholders(`SELECT *
 				FROM (
 					SELECT
 					l.*,
-					COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
-					FROM motorix_db.listing l
+					COALESCE(JSON_AGG(lp.photo_path), '[]'::json) AS image_urls
+					FROM "listing" l
 					LEFT JOIN (
-						SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
+						SELECT * FROM "listing_photo" ORDER BY photo_order
 					) lp ON l.id = lp.listing_id_fk
 					GROUP BY l.id
 				) AS result
-				WHERE id = ?`;
-	const [result] = await conn.query<RowDataPacket[]>(query, [id]);
+				WHERE id = ?`);
+	const result = await conn.query(query, [id]);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
-	return mapListingsDbToObject(result);
+	return mapListingsDbToObject(result.rows);
 }
 
 async function postListing(
 	listingData: Omit<Listing, 'id'>,
-	connection?: mysql.Pool | mysql.PoolConnection
-) {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info('Adding new listing');
 
 	const today = new Date();
@@ -136,31 +138,35 @@ async function postListing(
 	}
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = `INSERT INTO listing (${fields.join(', ')})
-					values (${values.map(() => '?').join(', ')})`;
-	const [result] = await conn.query<ResultSetHeader>(query, values);
+	const conn = connection || getPool();
+	const query =
+		convertQueryPlaceholders(`INSERT INTO "listing" (${fields.join(', ')})
+					values (${values.map(() => '?').join(', ')}) RETURNING id`);
+	const result = await conn.query(query, values);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;
 }
 
-async function postListingPhotoPath(listingPhotoData: ListingPhoto) {
+async function postListingPhotoPath(
+	listingPhotoData: ListingPhoto
+): Promise<QueryResult> {
 	logger.info(
 		`Adding new listing photo path for listing id: ${listingPhotoData.listingIdFk} photo order: ${listingPhotoData.photoOrder}`
 	);
 
-	const connection = await getPool().getConnection();
-	const query = 'INSERT INTO listing_photo values (?, ?, ?)';
-	const [result] = await connection.query<ResultSetHeader>(query, [
+	const connection = getPool();
+	const query = convertQueryPlaceholders(
+		'INSERT INTO "listing_photo" values (?, ?, ?)'
+	);
+	const result = await connection.query(query, [
 		listingPhotoData.listingIdFk,
 		listingPhotoData.photoOrder,
 		listingPhotoData.photoPath,
 	]);
-	connection.release();
 
 	return result;
 }
@@ -168,8 +174,8 @@ async function postListingPhotoPath(listingPhotoData: ListingPhoto) {
 async function postListingPhotoPaths(
 	listingId: number,
 	photoPaths: string[],
-	connection: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
+	connection: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(
 		`Batch adding ${photoPaths.length} photo paths for listing id: ${listingId}`
 	);
@@ -186,27 +192,30 @@ async function postListingPhotoPaths(
 	]);
 	const placeholders = photoPaths.map(() => '(?, ?, ?)').join(', ');
 
-	const query = `INSERT INTO listing_photo (listing_id_fk, photo_order, photo_path)
-                 VALUES ${placeholders}`;
+	const query =
+		convertQueryPlaceholders(`INSERT INTO "listing_photo" (listing_id_fk, photo_order, photo_path)
+                 VALUES ${placeholders}`);
 
-	const [result] = await connection.query<ResultSetHeader>(query, values);
+	const result = await connection.query(query, values);
 
 	return result;
 }
 
 async function deleteListingWithId(
 	id: string,
-	connection?: mysql.Pool | mysql.PoolConnection
-) {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(`Deleting listing with id '${id}' from the database`);
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = 'DELETE FROM listing WHERE id = ?';
-	const [result] = await conn.query<ResultSetHeader>(query, [id]);
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(
+		'DELETE FROM "listing" WHERE id = ?'
+	);
+	const result = await conn.query(query, [id]);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;
@@ -215,8 +224,8 @@ async function deleteListingWithId(
 async function updateListingWithId(
 	id: string,
 	updateValues: Omit<Partial<Listing>, 'id' | 'userIdFk'>,
-	connection?: mysql.Pool | mysql.PoolConnection
-) {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(`Updating listing with id '${id}' in the database`);
 
 	if (Object.keys(updateValues).length === 0) {
@@ -233,39 +242,44 @@ async function updateListingWithId(
 	}
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = `UPDATE listing SET ${fields.join(', ')} WHERE id = ?`;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(
+		`UPDATE "listing" SET ${fields.join(', ')} WHERE id = ?`
+	);
 
 	values.push(id);
 
-	const [result] = await conn.query<ResultSetHeader>(query, values);
+	const result = await conn.query(query, values);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;
 }
 
-async function incrementViewCount(id: string): Promise<ResultSetHeader> {
+async function incrementViewCount(id: string): Promise<QueryResult> {
 	logger.info(`Incrementing view count for listing id '${id}'`);
 
-	const connection = await getPool().getConnection();
-	const query = 'UPDATE listing SET view_count = view_count + 1 WHERE id = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [id]);
-	connection.release();
+	const connection = getPool();
+	const query = convertQueryPlaceholders(
+		'UPDATE "listing" SET view_count = view_count + 1 WHERE id = ?'
+	);
+	const result = await connection.query(query, [id]);
 
 	return result;
 }
 
 async function deleteListingPhotos(
 	listingId: number,
-	connection: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
+	connection: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(`Deleting all photo paths for listing id: ${listingId}`);
 
-	const query = 'DELETE FROM listing_photo WHERE listing_id_fk = ?';
-	const [result] = await connection.query<ResultSetHeader>(query, [listingId]);
+	const query = convertQueryPlaceholders(
+		'DELETE FROM "listing_photo" WHERE listing_id_fk = ?'
+	);
+	const result = await connection.query(query, [listingId]);
 
 	return result;
 }

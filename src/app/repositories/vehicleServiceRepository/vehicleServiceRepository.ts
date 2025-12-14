@@ -1,9 +1,9 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import mysql from 'mysql2/promise';
+import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { VehicleService } from '../../resources/types';
 import mapVehicleServiceDbToObject from './mapVehicleServiceDbToObject';
+import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const vehicleServiceDbFields: Record<
 	keyof Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
@@ -19,54 +19,54 @@ const vehicleServiceDbFields: Record<
 
 async function getAllServicesByVehicleId(
 	vehicleId: number,
-	connection?: mysql.Pool | mysql.PoolConnection
+	connection?: Pool | PoolClient
 ): Promise<VehicleService[]> {
 	logger.info(
 		`Getting all services for vehicle '${vehicleId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = `
-		SELECT * FROM vehicle_service
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`
+		SELECT * FROM "vehicle_service"
 		WHERE vehicle_id_fk = ?
 		ORDER BY service_date DESC
-	`;
-	const [result] = await conn.query<RowDataPacket[]>(query, [vehicleId]);
+	`);
+	const result = await conn.query(query, [vehicleId]);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
-	return mapVehicleServiceDbToObject(result);
+	return mapVehicleServiceDbToObject(result.rows);
 }
 
 async function getServiceById(
 	serviceId: number,
-	connection?: mysql.Pool | mysql.PoolConnection
+	connection?: Pool | PoolClient
 ): Promise<VehicleService | null> {
 	logger.info(`Getting service with id '${serviceId}' from the database`);
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = 'SELECT * FROM vehicle_service WHERE id = ?';
-	const [result] = await conn.query<RowDataPacket[]>(query, [serviceId]);
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders('SELECT * FROM "vehicle_service" WHERE id = ?');
+	const result = await conn.query(query, [serviceId]);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
-	if (result.length === 0) {
+	if (result.rows.length === 0) {
 		return null;
 	}
 
-	return mapVehicleServiceDbToObject(result)[0];
+	return mapVehicleServiceDbToObject(result.rows)[0];
 }
 
 async function postService(
 	serviceData: Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
-	connection?: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info('Adding new vehicle service to the database');
 
 	const fields: string[] = [];
@@ -87,13 +87,13 @@ async function postService(
 	}
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = `INSERT INTO vehicle_service (${fields.join(', ')})
-                   VALUES (${fields.map(() => '?').join(', ')})`;
-	const [result] = await conn.query<ResultSetHeader>(query, values);
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`INSERT INTO "vehicle_service" (${fields.join(', ')})
+                   VALUES (${fields.map(() => '?').join(', ')})`);
+	const result = await conn.query(query, values);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;
@@ -104,8 +104,8 @@ async function updateServiceById(
 	updateValues: Partial<
 		Omit<VehicleService, 'id' | 'vehicleIdFk' | 'createdAt' | 'updatedAt'>
 	>,
-	connection?: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(
 		`Updating vehicle service with id '${serviceId}' in the database`
 	);
@@ -133,15 +133,15 @@ async function updateServiceById(
 	}
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = `UPDATE vehicle_service SET ${fields.join(', ')} WHERE id = ?`;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`UPDATE "vehicle_service" SET ${fields.join(', ')} WHERE id = ?`);
 
 	values.push(serviceId);
 
-	const [result] = await conn.query<ResultSetHeader>(query, values);
+	const result = await conn.query(query, values);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;
@@ -149,19 +149,19 @@ async function updateServiceById(
 
 async function deleteServiceById(
 	serviceId: number,
-	connection?: mysql.Pool | mysql.PoolConnection
-): Promise<ResultSetHeader> {
+	connection?: Pool | PoolClient
+): Promise<QueryResult> {
 	logger.info(
 		`Deleting vehicle service with id '${serviceId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
-	const conn = connection || (await getPool().getConnection());
-	const query = 'DELETE FROM vehicle_service WHERE id = ?';
-	const [result] = await conn.query<ResultSetHeader>(query, [serviceId]);
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders('DELETE FROM "vehicle_service" WHERE id = ?');
+	const result = await conn.query(query, [serviceId]);
 
-	if (!useProvidedConnection) {
-		(conn as mysql.PoolConnection).release();
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
 	}
 
 	return result;

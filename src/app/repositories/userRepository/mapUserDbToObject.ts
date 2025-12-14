@@ -1,7 +1,6 @@
 import { User } from '../../resources/types';
-import { RowDataPacket } from 'mysql2';
 
-function mapUserDbToObject(usersDb: RowDataPacket[]): User[] {
+function mapUserDbToObject(usersDb: any[]): User[] {
 	return usersDb.map((user) => {
 		return {
 			id: user.id,

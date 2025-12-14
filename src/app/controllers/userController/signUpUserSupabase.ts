@@ -56,10 +56,10 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 			`User created in Supabase with ID: ${supabaseUserId}, syncing to MySQL`
 		);
 
-		const connection = await getPool().getConnection();
+		const connection = await getPool().connect();
 
 		try {
-			await connection.beginTransaction();
+			await connection.query('BEGIN');
 
 			await userRepository.signUpUser(
 				{
@@ -74,14 +74,14 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				connection
 			);
 
-			await connection.commit();
+			await connection.query('COMMIT');
 			connection.release();
 
 			logger.info(
 				`User ${supabaseUserId} successfully synced to MySQL database`
 			);
 		} catch (dbError) {
-			await connection.rollback();
+			await connection.query('ROLLBACK');
 			connection.release();
 
 			logger.error(
