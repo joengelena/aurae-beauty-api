@@ -1,8 +1,7 @@
-import { RowDataPacket } from 'mysql2';
 import { ListingAttribute } from '../../resources/types';
 
 function mapListingAttributesDbToObject(
-	listingAttributes: RowDataPacket[]
+	listingAttributes: any[]
 ): ListingAttribute[] {
 	return listingAttributes.map((listingAttribute) => {
 		return {

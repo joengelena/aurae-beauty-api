@@ -16,7 +16,9 @@ async function getAllListings(req: Request, res: Response): Promise<void> {
 			query.currentUserId = currentUserId;
 			logger.info(`Adding currentUserId to query: ${currentUserId}`);
 		} else {
-			logger.info('No currentUserId found, fetching listings without watchlist status');
+			logger.info(
+				'No currentUserId found, fetching listings without watchlist status'
+			);
 		}
 
 		const listings = await listingRepository.getAllListings(query);
@@ -27,7 +29,9 @@ async function getAllListings(req: Request, res: Response): Promise<void> {
 			throw error;
 		}
 
-		logger.error(`Unexpected error during get all listings: ${error.message}`);
+		logger.error(
+			`Unexpected error during get all listings: ${error.message}`
+		);
 		throw new AppError(500, 'Unable to load listings. Please try again.');
 	}
 }

@@ -10,10 +10,10 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Deleting listing with id '${listingId}'`);
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		const listing = await listingRepository.getListingById(listingId, connection);
 
@@ -33,18 +33,18 @@ async function deleteListing(req: Request, res: Response): Promise<void> {
 			connection
 		);
 
-		if (deleteListingResult.affectedRows === 0) {
+		if (deleteListingResult.rowCount === 0) {
 			throw new AppError(404, 'This listing is no longer available.');
 		}
 
-		await connection.commit();
+		await connection.query('COMMIT');
 		connection.release();
 
 		res.status(200).send({
 			message: 'Listing deleted successfully',
 		});
 	} catch (error) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

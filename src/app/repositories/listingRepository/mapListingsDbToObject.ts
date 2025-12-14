@@ -1,7 +1,6 @@
 import { Listing } from '../../resources/types';
-import { RowDataPacket } from 'mysql2';
 
-function mapListingsDbToObject(listingsDb: RowDataPacket[]): Listing[] {
+function mapListingsDbToObject(listingsDb: any[]): Listing[] {
 	return listingsDb.map((listing) => {
 		return {
 			id: listing.id,
@@ -35,7 +34,7 @@ function mapListingsDbToObject(listingsDb: RowDataPacket[]): Listing[] {
 			cylinders: listing.cylinders,
 			regoExpiryDate: listing.rego_expiry_date,
 			wofExpiryDate: listing.wof_expiry_date,
-			isInWatchlist: listing.isInWatchlist,
+			isInWatchlist: listing.is_in_watchlist,
 		};
 	});
 }

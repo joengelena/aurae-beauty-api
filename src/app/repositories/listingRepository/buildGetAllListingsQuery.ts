@@ -1,4 +1,5 @@
 import { ListingQueryParams } from '../../resources/types';
+import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const MAX_PAGE_LIMIT = 100;
 const MIN_PAGE_LIMIT = 10;
@@ -22,24 +23,16 @@ type QueryAndValue = {
 
 function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	let baseQuery = `
-					SELECT *, COUNT(*) OVER() AS totalRows
+					SELECT *, COUNT(*) OVER()::integer AS total_rows
 					FROM (
 						SELECT
 						l.*,
-						COALESCE(JSON_ARRAYAGG(lp.photo_path), JSON_ARRAY()) AS image_urls
-						FROM motorix_db.listing l
-						LEFT JOIN (
-						SELECT * FROM motorix_db.listing_photo ORDER BY photo_order
-						) lp ON l.id = lp.listing_id_fk
+						COALESCE(json_agg(lp.photo_path ORDER BY lp.photo_order), '[]'::json) AS image_urls
+						FROM listing l
+						LEFT JOIN listing_photo lp ON l.id = lp.listing_id_fk
 						GROUP BY l.id
 					) AS listingsWithImages`;
 	let query = null;
-
-	// let query = `
-	// 			SELECT *, COUNT(*) OVER() AS totalRows
-	// 			FROM (
-	// 				${baseQuery}
-	// 			) AS result`;
 
 	const queryValues: (string | number)[] = [];
 
@@ -81,13 +74,13 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 
 	if (allQueries.currentUserId) {
 		query = `
-				SELECT *, IF(watchlist.listing_id_fk IS NOT NULL, 1, 0) AS isInWatchlist
+				SELECT *, CASE WHEN watchlist.listing_id_fk IS NOT NULL THEN 1 ELSE 0 END AS is_in_watchlist
 				FROM (
 					${baseQuery}
 				) AS result
 				LEFT JOIN (
 					SELECT listing_id_fk
-					FROM motorix_db.watchlist
+					FROM watchlist
 					WHERE user_id_fk = ?
 				) as watchlist
 				on watchlist.listing_id_fk = result.id`;
@@ -95,7 +88,7 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 	}
 
 	return {
-		query: query ?? baseQuery,
+		query: convertQueryPlaceholders(query ?? baseQuery),
 		values: queryValues,
 		limit: Number(paginationQuery.values[0]),
 	};

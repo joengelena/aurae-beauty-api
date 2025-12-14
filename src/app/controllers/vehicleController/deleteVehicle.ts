@@ -16,7 +16,7 @@ async function deleteVehicle(req: Request, res: Response): Promise<void> {
 
 		const result = await vehicleRepository.deleteVehicleById(vehicleId, connection);
 
-		if (result.affectedRows === 0) {
+		if (result.rowCount === 0) {
 			throw new AppError(404, 'Vehicle not found');
 		}
 

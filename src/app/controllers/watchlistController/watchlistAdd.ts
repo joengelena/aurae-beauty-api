@@ -10,15 +10,15 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Adding listing ${listingId} to watchlist for user ${currentUserId}`);
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		const result = await addToWatchlist(currentUserId, Number(listingId), connection);
 
-		if (result.affectedRows === 1) {
-			await connection.commit();
+		if (result.rowCount === 1) {
+			await connection.query('COMMIT');
 			connection.release();
 
 			res.status(200).send({
@@ -28,7 +28,7 @@ async function watchlistAdd(req: Request, res: Response): Promise<void> {
 			throw new AppError(400, 'Unable to add this listing to your watchlist. Please try again.');
 		}
 	} catch (error) {
-		await connection.rollback();
+		await connection.query('ROLLBACK');
 		connection.release();
 
 		if (error instanceof AppError) {

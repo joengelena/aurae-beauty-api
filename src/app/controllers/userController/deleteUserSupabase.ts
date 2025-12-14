@@ -16,10 +16,10 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Deleting user: ${currentUserId} (Supabase)`);
 
-	const connection = await getPool().getConnection();
+	const connection = await getPool().connect();
 
 	try {
-		await connection.beginTransaction();
+		await connection.query('BEGIN');
 
 		const user = await userRepository.getUserById(currentUserId, connection);
 
@@ -48,18 +48,18 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 				connection
 			);
 
-			if (deleteUserResult.affectedRows !== 1) {
+			if (deleteUserResult.rowCount !== 1) {
 				throw new AppError(404, 'Account not found.');
 			}
 
-			await connection.commit();
+			await connection.query('COMMIT');
 			connection.release();
 
 			logger.info(
 				`User ${currentUserId} deleted from MySQL database successfully`
 			);
 		} catch (dbError) {
-			await connection.rollback();
+			await connection.query('ROLLBACK');
 			connection.release();
 
 			logger.error(

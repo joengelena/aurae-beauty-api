@@ -45,7 +45,7 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 			connection
 		);
 
-		if (result.affectedRows !== 1) {
+		if (result.rowCount !== 1) {
 			throw new AppError(500, 'Unable to update vehicle. Please try again.');
 		}
 

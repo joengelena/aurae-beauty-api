@@ -1,5 +1,4 @@
 import { UserVehicle } from '../../resources/types';
-import { RowDataPacket } from 'mysql2';
 
 // Helper function to format Date to YYYY-MM-DD string
 function formatDateToString(date: Date | null): string {
@@ -11,7 +10,7 @@ function formatDateToString(date: Date | null): string {
 	return `${year}-${month}-${day}`;
 }
 
-function mapVehicleDbToObject(vehiclesDb: RowDataPacket[]): UserVehicle[] {
+function mapVehicleDbToObject(vehiclesDb: any[]): UserVehicle[] {
 	return vehiclesDb.map((vehicle) => {
 		return {
 			id: vehicle.id,

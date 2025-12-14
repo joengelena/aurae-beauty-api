@@ -1,6 +1,6 @@
 import AppError from '../errors/appError';
 import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
-import mysql from 'mysql2/promise';
+import { Pool, PoolClient } from 'pg';
 
 /**
  * Validates that a date is not more than 1 year in the past
@@ -45,7 +45,7 @@ export function parseVehicleId(idParam: string): number {
 export async function verifyVehicleOwnership(
 	vehicleId: number,
 	userId: string,
-	connection?: mysql.Pool | mysql.PoolConnection
+	connection?: Pool | PoolClient
 ): Promise<void> {
 	const vehicle = await vehicleRepository.getVehicleByIdAndUserId(
 		vehicleId,
