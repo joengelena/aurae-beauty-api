@@ -126,6 +126,18 @@
 		"required": ["email"],
 		"additionalProperties": false
 	},
+	"resetPassword": {
+		"type": "object",
+		"properties": {
+			"newPassword": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			}
+		},
+		"required": ["newPassword"],
+		"additionalProperties": false
+	},
 	"ChangePassword": {
 		"type": "object",
 		"properties": {

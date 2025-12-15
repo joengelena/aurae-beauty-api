@@ -5,6 +5,7 @@ import {
 	updateUser,
 	deleteUserSupabase,
 	changePasswordSupabase,
+	resetPasswordSupabase,
 	forgotPasswordSupabase,
 } from '../controllers/userController';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -22,6 +23,10 @@ const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/forgot-password').post((req, res, next) => {
 		validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 	}, asyncHandler(forgotPasswordSupabase));
+
+	app.route(rootUrl + '/user/reset-password').post((req, res, next) => {
+		validateRequestBody(req, res, next, ajvSchema.resetPassword);
+	}, asyncHandler(resetPasswordSupabase));
 
 	app.route(rootUrl + '/user/change-password').post(
 		supabaseAuthenticateReq,

@@ -24,7 +24,7 @@ async function forgotPasswordSupabase(
 		const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
 			redirectTo:
 				process.env.PASSWORD_RESET_REDIRECT_URL ||
-				`${process.env.FRONTEND_URL}/reset-password`,
+				`${process.env.FRONTEND_URL}/profile/reset-password`,
 		});
 
 		if (error) {
