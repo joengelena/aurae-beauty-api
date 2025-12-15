@@ -23,7 +23,10 @@ async function refreshTokenSupabase(
 
 		if (!refreshToken) {
 			logger.warn('Refresh token not provided');
-			throw new AppError(401, 'Your session has expired. Please sign in again.');
+			throw new AppError(
+				401,
+				'Your session has expired. Please sign in again.'
+			);
 		}
 
 		const { data, error } = await supabaseAuth.auth.refreshSession({
@@ -36,7 +39,10 @@ async function refreshTokenSupabase(
 					error?.message || 'No session returned'
 				}`
 			);
-			throw new AppError(401, 'Your session has expired. Please sign in again.');
+			throw new AppError(
+				401,
+				'Your session has expired. Please sign in again.'
+			);
 		}
 
 		logger.info(
@@ -57,14 +63,14 @@ async function refreshTokenSupabase(
 			res.cookie('sb-access-token', data.session.access_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'none',
+				sameSite: 'lax',
 				maxAge: data.session.expires_in * 1000,
 			});
 
 			res.cookie('sb-refresh-token', data.session.refresh_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'none',
+				sameSite: 'lax',
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			});
 
