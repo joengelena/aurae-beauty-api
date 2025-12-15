@@ -51,13 +51,13 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 			if (isOriginAllowed) {
 				res.clearCookie('sb-access-token', {
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
+					secure: true,
 					sameSite: 'none',
 				});
 
 				res.clearCookie('sb-refresh-token', {
 					httpOnly: true,
-					secure: process.env.NODE_ENV === 'production',
+					secure: true,
 					sameSite: 'none',
 				});
 			}
