@@ -69,6 +69,7 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: 'lax',
+				domain: 'localhost',
 				maxAge: data.session.expires_in * 1000, // Convert to milliseconds
 			});
 
@@ -76,6 +77,7 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				sameSite: 'lax',
+				domain: 'localhost',
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			});
 
