@@ -52,11 +52,13 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 				res.clearCookie('sb-access-token', {
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'none',
 				});
 
 				res.clearCookie('sb-refresh-token', {
 					httpOnly: true,
 					secure: process.env.NODE_ENV === 'production',
+					sameSite: 'none',
 				});
 			}
 		}

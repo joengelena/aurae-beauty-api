@@ -88,12 +88,14 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				maxAge: data.session.expires_in * 1000, // Convert to milliseconds
+				sameSite: 'none',
 			});
 
 			res.cookie('sb-refresh-token', data.session.refresh_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+				sameSite: 'none',
 			});
 
 			res.status(200).send({
