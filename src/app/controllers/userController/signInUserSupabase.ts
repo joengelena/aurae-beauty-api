@@ -65,19 +65,34 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				expiresAt: data.session.expires_at,
 			});
 		} else {
+			// Check if origin is allowed for cookie-based auth
+			const allowedOrigins =
+				process.env.ALLOWED_COOKIE_ORIGINS?.split(',').map((o) =>
+					o.trim()
+				) || [];
+			const requestOrigin = req.headers.origin;
+			const isOriginAllowed =
+				!requestOrigin || allowedOrigins.includes(requestOrigin);
+
+			if (!isOriginAllowed) {
+				logger.warn(
+					`Cookie authentication blocked for origin: ${requestOrigin}`
+				);
+				throw new AppError(
+					403,
+					'Cookie authentication not allowed from this origin'
+				);
+			}
+
 			res.cookie('sb-access-token', data.session.access_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
-				domain: 'localhost',
 				maxAge: data.session.expires_in * 1000, // Convert to milliseconds
 			});
 
 			res.cookie('sb-refresh-token', data.session.refresh_token, {
 				httpOnly: true,
 				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
-				domain: 'localhost',
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 			});
 

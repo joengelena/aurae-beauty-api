@@ -13,10 +13,13 @@ export default () => {
 	const app = express();
 
 	// Middleware
+	// Get allowed origins from environment variable
+	const allowedOrigins = process.env.ALLOWED_COOKIE_ORIGINS?.split(',').map(o => o.trim()) || [];
+
 	app.use(
 		cors({
-			// Allow any origin, should set to website domain in prod
-			origin: true,
+			// Allow specific origins from env, or all origins if not configured
+			origin: allowedOrigins.length > 0 ? allowedOrigins : true,
 			credentials: true,
 		})
 	);

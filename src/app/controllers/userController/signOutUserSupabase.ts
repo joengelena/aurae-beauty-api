@@ -39,17 +39,26 @@ async function signOutUserSupabase(req: Request, res: Response): Promise<void> {
 		logger.info(`User ${userId} signed out successfully`);
 
 		if (!isFlutterClient) {
-			res.clearCookie('sb-access-token', {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
-			});
+			// Check if origin is allowed for cookie-based auth
+			const allowedOrigins =
+				process.env.ALLOWED_COOKIE_ORIGINS?.split(',').map((o) =>
+					o.trim()
+				) || [];
+			const requestOrigin = req.headers.origin;
+			const isOriginAllowed =
+				!requestOrigin || allowedOrigins.includes(requestOrigin);
 
-			res.clearCookie('sb-refresh-token', {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-				sameSite: 'lax',
-			});
+			if (isOriginAllowed) {
+				res.clearCookie('sb-access-token', {
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+				});
+
+				res.clearCookie('sb-refresh-token', {
+					httpOnly: true,
+					secure: process.env.NODE_ENV === 'production',
+				});
+			}
 		}
 
 		res.status(200).send({
