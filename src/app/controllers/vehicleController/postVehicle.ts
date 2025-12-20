@@ -36,7 +36,9 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	let vehiclePhotoUrl: string | null = null;
 	if (file) {
 		validateFile(file);
-		logger.info(`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`);
+		logger.info(
+			`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`
+		);
 		const uploadResult = await uploadSingleImage(file);
 		vehiclePhotoUrl = uploadResult.url;
 		logger.info(`Successfully uploaded vehicle image: ${uploadResult.key}`);
@@ -45,13 +47,15 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	// Validate dates BEFORE acquiring connection to avoid holding resources
 	validateExpiryDate(regoExpiryDate, 'Registration expiry date');
 	validateExpiryDate(wofExpiryDate, 'WOF expiry date');
+	validateExpiryDate(insuranceExpiryDate, 'Insurance expiry date');
 
 	const connection = await getPool().connect();
 
 	try {
 		await connection.query('BEGIN');
 
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> = {
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> =
+			{
 				userIdFk: userId,
 				make,
 				model,
@@ -64,8 +68,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				odometerUnit: odometerUnit ?? 'km',
 				regoExpiryDate,
 				wofExpiryDate,
-				insuranceExpiryDate: insuranceExpiryDate ?? null,
-				insuranceProvider: insuranceProvider ?? null,
+				insuranceExpiryDate: insuranceExpiryDate,
+				insuranceProvider: insuranceProvider,
 				vehiclePhotoUrl,
 				notes: notes ?? null,
 			};

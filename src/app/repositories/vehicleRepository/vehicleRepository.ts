@@ -35,7 +35,9 @@ async function getAllVehiclesByUserId(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`SELECT * FROM "user_vehicles" WHERE user_id_fk = ? ORDER BY created_at DESC`);
+	const query = convertQueryPlaceholders(
+		`SELECT * FROM "user_vehicles" WHERE user_id_fk = ? ORDER BY created_at DESC`
+	);
 	const result = await conn.query(query, [userId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
@@ -53,7 +55,9 @@ async function getVehicleById(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders('SELECT * FROM "user_vehicles" WHERE id = ?');
+	const query = convertQueryPlaceholders(
+		'SELECT * FROM "user_vehicles" WHERE id = ?'
+	);
 	const result = await conn.query(query, [vehicleId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
@@ -78,11 +82,10 @@ async function getVehicleByIdAndUserId(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders('SELECT * FROM "user_vehicles" WHERE id = ? AND user_id_fk = ?');
-	const result = await conn.query(query, [
-		vehicleId,
-		userId,
-	]);
+	const query = convertQueryPlaceholders(
+		'SELECT * FROM "user_vehicles" WHERE id = ? AND user_id_fk = ?'
+	);
+	const result = await conn.query(query, [vehicleId, userId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
 		(conn as PoolClient).release();
@@ -113,7 +116,10 @@ async function postVehicle(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`INSERT INTO "user_vehicles" (${fields.join(', ')})
+	const query =
+		convertQueryPlaceholders(`INSERT INTO "user_vehicles" (${fields.join(
+			', '
+		)})
                    VALUES (${fields.map(() => '?').join(', ')}) RETURNING id`);
 	const result = await conn.query(query, values);
 
@@ -148,7 +154,9 @@ async function updateVehicleById(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`UPDATE "user_vehicles" SET ${fields.join(', ')} WHERE id = ?`);
+	const query = convertQueryPlaceholders(
+		`UPDATE "user_vehicles" SET ${fields.join(', ')} WHERE id = ?`
+	);
 
 	values.push(vehicleId);
 
@@ -169,7 +177,9 @@ async function deleteVehicleById(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders('DELETE FROM "user_vehicles" WHERE id = ?');
+	const query = convertQueryPlaceholders(
+		'DELETE FROM "user_vehicles" WHERE id = ?'
+	);
 	const result = await conn.query(query, [vehicleId]);
 
 	if (!useProvidedConnection && 'release' in conn) {

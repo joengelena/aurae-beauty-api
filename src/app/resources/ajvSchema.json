@@ -397,14 +397,20 @@
 				"minLength": 1,
 				"maxLength": 255
 			},
+			"regoExpiryDate": { "type": "string", "format": "date" },
+			"wofExpiryDate": { "type": "string", "format": "date" },
+			"insuranceExpiryDate": { "type": "string", "format": "date" },
+			"insuranceProvider": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
 			"odometerReading": {
 				"type": "integer",
 				"minimum": 0,
 				"maximum": 9999999
 			},
 			"odometerUnit": { "type": "string", "enum": ["km", "mi"] },
-			"regoExpiryDate": { "type": "string", "format": "date" },
-			"wofExpiryDate": { "type": "string", "format": "date" },
 			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 }
 		},
 		"required": [
@@ -413,7 +419,9 @@
 			"model",
 			"year",
 			"regoExpiryDate",
-			"wofExpiryDate"
+			"wofExpiryDate",
+			"insuranceExpiryDate",
+			"insuranceProvider"
 		],
 		"additionalProperties": false
 	},
