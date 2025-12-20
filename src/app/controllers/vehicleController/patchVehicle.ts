@@ -22,6 +22,10 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 		validateExpiryDate(newVehicleData.wofExpiryDate, 'WOF expiry date');
 	}
 
+	if (newVehicleData.insuranceExpiryDate) {
+		validateExpiryDate(newVehicleData.insuranceExpiryDate, 'Insurance expiry date');
+	}
+
 	// Handle image upload if provided
 	const file = req.file as Express.Multer.File | undefined;
 	if (file) {
@@ -33,7 +37,11 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 	}
 
 	if (Object.keys(newVehicleData).length === 0) {
-		throw new AppError(400, 'No changes to update.');
+		// No changes to update, but return success anyway
+		res.status(200).send({
+			message: 'Vehicle updated successfully',
+		});
+		return;
 	}
 
 	await withTransaction(async (connection) => {

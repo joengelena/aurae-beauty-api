@@ -19,6 +19,8 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	odometerUnit: 'odometer_unit',
 	regoExpiryDate: 'rego_expiry_date',
 	wofExpiryDate: 'wof_expiry_date',
+	insuranceExpiryDate: 'insurance_expiry_date',
+	insuranceProvider: 'insurance_provider',
 	vehiclePhotoUrl: 'vehicle_photo_url',
 	notes: 'notes',
 	createdAt: 'created_at',

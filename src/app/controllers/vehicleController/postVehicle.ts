@@ -22,6 +22,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		odometerUnit,
 		regoExpiryDate,
 		wofExpiryDate,
+		insuranceExpiryDate,
+		insuranceProvider,
 		notes,
 	} = req.body;
 
@@ -62,6 +64,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				odometerUnit: odometerUnit ?? 'km',
 				regoExpiryDate,
 				wofExpiryDate,
+				insuranceExpiryDate: insuranceExpiryDate ?? null,
+				insuranceProvider: insuranceProvider ?? null,
 				vehiclePhotoUrl,
 				notes: notes ?? null,
 			};

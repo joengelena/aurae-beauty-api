@@ -118,6 +118,8 @@ type UserVehicle = {
 	odometerUnit: string;
 	regoExpiryDate: string;
 	wofExpiryDate: string;
+	insuranceExpiryDate: string | null;
+	insuranceProvider: string | null;
 	vehiclePhotoUrl: string | null;
 	notes: string | null;
 	createdAt: Date;
