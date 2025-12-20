@@ -457,6 +457,12 @@
 			"odometerUnit": { "type": "string", "enum": ["km", "mi"] },
 			"regoExpiryDate": { "type": "string", "format": "date" },
 			"wofExpiryDate": { "type": "string", "format": "date" },
+			"insuranceExpiryDate": { "type": "string", "format": "date" },
+			"insuranceProvider": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
+			},
 			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 }
 		},
 		"required": ["currentUserId"],
