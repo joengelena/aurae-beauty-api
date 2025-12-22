@@ -7,6 +7,7 @@ import {
 	patchVehicle,
 	deleteVehicle,
 } from '../controllers/vehicleController';
+import { postService, getServicesByVehicleId } from '../controllers/vehicleServiceController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -54,6 +55,26 @@ const vehicleRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
 			asyncHandler(deleteVehicle)
+		);
+
+	// Get services for a specific vehicle
+	app.route(rootUrl + '/user/vehicles/:id/services')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getServicesByVehicleId)
+		);
+
+	// Vehicle service routes
+	app.route(rootUrl + '/user/vehicle-services')
+		.post(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.postVehicleService);
+			},
+			asyncHandler(postService)
 		);
 };
 

@@ -20,7 +20,7 @@ function mapVehicleServiceDbToObject(
 			typeOfService: service.type_of_service,
 			serviceDate: formatDateToString(service.service_date),
 			serviceProviderName: service.service_provider_name,
-			cost: service.cost,
+			cost: service.cost ? parseFloat(service.cost) : null,
 			notes: service.notes,
 			createdAt: service.created_at,
 			updatedAt: service.updated_at,

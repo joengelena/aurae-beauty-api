@@ -467,5 +467,45 @@
 		},
 		"required": ["currentUserId"],
 		"additionalProperties": false
+	},
+	"postVehicleService": {
+		"type": "object",
+		"properties": {
+			"currentUserId": {
+				"type": "string",
+				"format": "uuid",
+				"minLength": 36,
+				"maxLength": 36
+			},
+			"vehicleIdFk": {
+				"type": "integer",
+				"minimum": 1
+			},
+			"typeOfService": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 150
+			},
+			"serviceDate": {
+				"type": "string",
+				"format": "date"
+			},
+			"serviceProviderName": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 150
+			},
+			"cost": {
+				"type": "number",
+				"minimum": 0
+			},
+			"notes": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 10000
+			}
+		},
+		"required": ["currentUserId", "vehicleIdFk", "typeOfService", "serviceDate"],
+		"additionalProperties": false
 	}
 }
