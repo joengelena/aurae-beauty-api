@@ -54,8 +54,7 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> =
-			{
+		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> ={
 				userIdFk: userId,
 				make,
 				model,
@@ -68,8 +67,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				odometerUnit: odometerUnit ?? 'km',
 				regoExpiryDate,
 				wofExpiryDate,
-				insuranceExpiryDate: insuranceExpiryDate,
-				insuranceProvider: insuranceProvider,
+				insuranceExpiryDate,
+				insuranceProvider,
 				vehiclePhotoUrl,
 				notes: notes ?? null,
 			};
