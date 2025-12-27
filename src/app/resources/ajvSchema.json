@@ -385,6 +385,7 @@
 			"make": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
+			"nickname": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"licensePlate": {
 				"type": "string",
 				"minLength": 1,
@@ -437,6 +438,7 @@
 			"make": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
+			"nickname": { "type": "string", "minLength": 1, "maxLength": 100 },
 			"licensePlate": {
 				"type": "string",
 				"minLength": 1,

@@ -110,6 +110,7 @@ type UserVehicle = {
 	make: string;
 	model: string;
 	year: number;
+	nickname: string | null;
 	licensePlate: string | null;
 	color: string | null;
 	fuelType: string | null;
