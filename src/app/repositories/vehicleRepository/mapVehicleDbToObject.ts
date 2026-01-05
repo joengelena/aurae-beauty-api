@@ -18,6 +18,7 @@ function mapVehicleDbToObject(vehiclesDb: any[]): UserVehicle[] {
 			make: vehicle.make,
 			model: vehicle.model,
 			year: vehicle.year,
+			nickname: vehicle.nickname,
 			licensePlate: vehicle.license_plate,
 			color: vehicle.color,
 			fuelType: vehicle.fuel_type,
