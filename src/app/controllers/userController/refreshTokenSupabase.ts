@@ -79,18 +79,21 @@ async function refreshTokenSupabase(
 				);
 			}
 
+			// Use secure cookies in production, allow HTTP in development
+			const isProduction = process.env.NODE_ENV === 'production';
+
 			res.cookie('sb-access-token', data.session.access_token, {
 				httpOnly: true,
-				secure: true,
+				secure: isProduction,
 				maxAge: data.session.expires_in * 1000,
-				sameSite: 'none',
+				sameSite: isProduction ? 'none' : 'lax',
 			});
 
 			res.cookie('sb-refresh-token', data.session.refresh_token, {
 				httpOnly: true,
-				secure: true,
+				secure: isProduction,
 				maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-				sameSite: 'none',
+				sameSite: isProduction ? 'none' : 'lax',
 			});
 
 			res.status(200).send({

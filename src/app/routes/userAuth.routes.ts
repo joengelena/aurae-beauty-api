@@ -10,23 +10,37 @@ import {
 	signOutUserSupabase,
 	refreshTokenSupabase,
 } from '../controllers/userController';
+import { CACHE_PRESETS } from '../middlewares/cacheControl';
 
 const userAuthRoutes = (app: Express) => {
-	// Public routes
-	app.route(rootUrl + '/user/signup').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.signUpUser);
-	}, asyncHandler(signUpUserSupabase));
+	// Public routes - no caching for auth endpoints
+	app.route(rootUrl + '/user/signup').post(
+		CACHE_PRESETS.noCache,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.signUpUser);
+		},
+		asyncHandler(signUpUserSupabase)
+	);
 
-	app.route(rootUrl + '/user/signin').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.signInUser);
-	}, asyncHandler(signInUserSupabase));
+	app.route(rootUrl + '/user/signin').post(
+		CACHE_PRESETS.noCache,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.signInUser);
+		},
+		asyncHandler(signInUserSupabase)
+	);
 
-	app.route(rootUrl + '/user/refresh-token').post((req, res, next) => {
-		validateRequestBody(req, res, next, ajvSchema.refreshToken);
-	}, asyncHandler(refreshTokenSupabase));
+	app.route(rootUrl + '/user/refresh-token').post(
+		CACHE_PRESETS.noCache,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.refreshToken);
+		},
+		asyncHandler(refreshTokenSupabase)
+	);
 
-	// Private routes
+	// Private routes - no caching
 	app.route(rootUrl + '/user/signout').post(
+		CACHE_PRESETS.noCache,
 		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
