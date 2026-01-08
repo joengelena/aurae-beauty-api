@@ -15,22 +15,17 @@ import uploadMulter from '../utils/multerStorage';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
 import optionalSupabaseAuth from '../middlewares/optionalSupabaseAuth';
-import { CACHE_PRESETS } from '../middlewares/cacheControl';
 
 const listingRoutes = (app: Express) => {
-	// Static data - cache for 24 hours
 	app.route(rootUrl + '/listings/attributes').get(
-		CACHE_PRESETS.staticCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		},
 		asyncHandler(getListingAttributes)
 	);
 
-	// Listings list - cache for 5 minutes (frequently updated)
 	app.route(rootUrl + '/listings')
 		.get(
-			CACHE_PRESETS.shortCache,
 			optionalSupabaseAuth,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOptional);
@@ -47,10 +42,8 @@ const listingRoutes = (app: Express) => {
 			asyncHandler(postListing)
 		);
 
-	// Individual listing - cache for 5 minutes
 	app.route(rootUrl + '/listings/:id')
 		.get(
-			CACHE_PRESETS.shortCache,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.emptyBody);
 			},

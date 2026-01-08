@@ -10,12 +10,9 @@ import {
 	signOutUserSupabase,
 	refreshTokenSupabase,
 } from '../controllers/userController';
-import { CACHE_PRESETS } from '../middlewares/cacheControl';
 
 const userAuthRoutes = (app: Express) => {
-	// Public routes - no caching for auth endpoints
 	app.route(rootUrl + '/user/signup').post(
-		CACHE_PRESETS.noCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.signUpUser);
 		},
@@ -23,7 +20,6 @@ const userAuthRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/signin').post(
-		CACHE_PRESETS.noCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.signInUser);
 		},
@@ -31,16 +27,13 @@ const userAuthRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/refresh-token').post(
-		CACHE_PRESETS.noCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.refreshToken);
 		},
 		asyncHandler(refreshTokenSupabase)
 	);
 
-	// Private routes - no caching
 	app.route(rootUrl + '/user/signout').post(
-		CACHE_PRESETS.noCache,
 		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);

@@ -17,12 +17,9 @@ import {
 } from '../controllers/watchlistController';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
-import { CACHE_PRESETS } from '../middlewares/cacheControl';
 
 const usersRoutes = (app: Express) => {
-	// Public routes - no caching for password operations
 	app.route(rootUrl + '/user/forgot-password').post(
-		CACHE_PRESETS.noCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.forgotPassword);
 		},
@@ -30,7 +27,6 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/reset-password').post(
-		CACHE_PRESETS.noCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.resetPassword);
 		},
@@ -38,7 +34,6 @@ const usersRoutes = (app: Express) => {
 	);
 
 	app.route(rootUrl + '/user/change-password').post(
-		CACHE_PRESETS.noCache,
 		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.ChangePassword);
@@ -46,9 +41,7 @@ const usersRoutes = (app: Express) => {
 		asyncHandler(changePasswordSupabase)
 	);
 
-	// Public user profile - cache for 5 minutes
 	app.route(rootUrl + '/users/:userId').get(
-		CACHE_PRESETS.shortCache,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.emptyBody);
 		},
@@ -72,9 +65,7 @@ const usersRoutes = (app: Express) => {
 			asyncHandler(updateUser)
 		);
 
-	// Watchlist - no caching for user-specific data
 	app.route(rootUrl + '/user/watchlist').get(
-		CACHE_PRESETS.noCache,
 		supabaseAuthenticateReq,
 		(req, res, next) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
