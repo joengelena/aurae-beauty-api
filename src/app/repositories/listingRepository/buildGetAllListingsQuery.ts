@@ -102,12 +102,8 @@ function buildSearchQuery(
 		allQueries.searchString !== ''
 	) {
 		return {
-			query: 'make LIKE ? OR model LIKE ? OR location LIKE ? OR body_type LIKE ? OR color LIKE ? OR transmission LIKE ? OR drive_type LIKE ?',
+			query: 'make ILIKE ? OR model ILIKE ? OR transmission ILIKE ?',
 			values: [
-				`%${allQueries.searchString}%`,
-				`%${allQueries.searchString}%`,
-				`%${allQueries.searchString}%`,
-				`%${allQueries.searchString}%`,
 				`%${allQueries.searchString}%`,
 				`%${allQueries.searchString}%`,
 				`%${allQueries.searchString}%`,
