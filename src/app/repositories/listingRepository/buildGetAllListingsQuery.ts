@@ -175,6 +175,7 @@ function buildEqualFilterQuery(
 		{ key: 'driveType', column: 'drive_type' },
 		{ key: 'color', column: 'color' },
 		{ key: 'transmission', column: 'transmission' },
+		{ key: 'cylinders', column: 'cylinders' },
 	];
 
 	const subQueryParts: string[] = [];

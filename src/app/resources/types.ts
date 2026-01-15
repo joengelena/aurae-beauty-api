@@ -94,6 +94,7 @@ type ListingQueryParams = {
 	driveType: string;
 	color: string;
 	transmission: string;
+	cylinders: string;
 	currentUserId?: string;
 };
 
