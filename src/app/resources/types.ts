@@ -20,7 +20,7 @@ type Listing = {
 	status: 'active' | 'sold' | 'expired';
 	viewCount: number;
 	previewImgUrl: string;
-	imageUrls: string;
+	imageUrls: string[];
 	location: string;
 	vehicleCondition: string;
 	originalPrice: number;

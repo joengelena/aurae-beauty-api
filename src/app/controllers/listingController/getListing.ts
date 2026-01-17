@@ -22,7 +22,10 @@ async function getListing(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during get listing: ${error.message}`);
-		throw new AppError(500, 'Unable to load this listing. Please try again.');
+		throw new AppError(
+			500,
+			'Unable to load this listing. Please try again.'
+		);
 	}
 }
 
