@@ -68,6 +68,32 @@ export function buildPublicUrl(key: string): string {
 }
 
 /**
+ * Extracts R2 object key from a public URL
+ *
+ * @param url - Public URL of the R2 object
+ * @returns Object key or null if URL is invalid
+ *
+ * @example
+ * extractKeyFromUrl('https://cdn.example.com/motorix/12345-abc-image.jpg')
+ * // Returns: 'motorix/12345-abc-image.jpg'
+ */
+export function extractKeyFromUrl(url: string): string | null {
+	if (!url) return null;
+
+	const publicUrlBase = r2Config.publicUrl;
+
+	// Check if URL starts with the public URL base
+	if (!url.startsWith(publicUrlBase)) {
+		return null;
+	}
+
+	// Extract everything after the base URL and leading slash
+	const key = url.substring(publicUrlBase.length + 1);
+
+	return key || null;
+}
+
+/**
  * Uploads a single file buffer to R2
  *
  * @param buffer - File data as Buffer
