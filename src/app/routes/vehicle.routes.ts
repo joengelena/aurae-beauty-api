@@ -7,7 +7,7 @@ import {
 	patchVehicle,
 	deleteVehicle,
 } from '../controllers/vehicleController';
-import { postService, getServicesByVehicleId } from '../controllers/vehicleServiceController';
+import { postService, getServicesByVehicleId, deleteService } from '../controllers/vehicleServiceController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -74,6 +74,15 @@ const vehicleRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.postVehicleService);
 			},
 			asyncHandler(postService)
+		);
+
+	app.route(rootUrl + '/user/vehicle-services/:id')
+		.delete(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(deleteService)
 		);
 };
 
