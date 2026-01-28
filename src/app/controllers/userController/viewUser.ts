@@ -20,6 +20,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 			lastName: users[0].lastName,
 			phoneNumber: users[0].phoneNumber,
 			email: users[0].email,
+			location: users[0].location,
 		};
 
 		res.status(200).send(user);
@@ -29,7 +30,10 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(`Unexpected error during view user: ${error.message}`);
-		throw new AppError(500, 'Unable to load user profile. Please try again.');
+		throw new AppError(
+			500,
+			'Unable to load user profile. Please try again.',
+		);
 	}
 }
 
