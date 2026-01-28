@@ -6,6 +6,7 @@ type User = {
 	phoneNumber: string;
 	isEmailVerified: 0 | 1;
 	isPhoneNumberVerified: 0 | 1;
+	location: string;
 };
 
 type ListingPhoto = {

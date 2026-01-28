@@ -10,6 +10,7 @@ function mapUserDbToObject(usersDb: any[]): User[] {
 			phoneNumber: user.phone_number,
 			isEmailVerified: user.is_email_verified,
 			isPhoneNumberVerified: user.is_phone_number_verified,
+			location: user.location,
 		};
 	});
 }

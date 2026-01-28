@@ -7,7 +7,7 @@ import AppError from '../../utils/errors/appError';
 import { FALSE } from '../../resources/constants';
 
 async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
-	const { firstName, lastName, email, password, phoneNumber } =
+	const { firstName, lastName, email, password, phoneNumber, location } =
 		req.body;
 
 	logger.info(`Signing up new user with email: ${email} (Supabase)`);
@@ -22,6 +22,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					firstName,
 					lastName,
 					phoneNumber,
+					location,
 				},
 			});
 
@@ -70,6 +71,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					phoneNumber,
 					isEmailVerified: FALSE,
 					isPhoneNumberVerified: FALSE,
+					location,
 				},
 				connection
 			);

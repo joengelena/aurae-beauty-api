@@ -45,14 +45,16 @@
 				"type": "string",
 				"format": "email"
 			},
-			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
+			"password": { "type": "string", "minLength": 1, "maxLength": 255 },
+			"location": { "type": "string", "minLength": 1, "maxLength": 255 }
 		},
 		"required": [
 			"firstName",
 			"lastName",
 			"email",
 			"password",
-			"phoneNumber"
+			"phoneNumber",
+			"location"
 		],
 		"additionalProperties": false
 	},
@@ -85,6 +87,11 @@
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 12
+			},
+			"location": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 255
 			}
 		},
 		"required": ["currentUserId"],
