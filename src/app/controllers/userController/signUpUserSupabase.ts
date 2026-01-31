@@ -69,9 +69,10 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					lastName,
 					email,
 					phoneNumber,
+					location,
+					profilePhotoUrl: null,
 					isEmailVerified: FALSE,
 					isPhoneNumberVerified: FALSE,
-					location,
 				},
 				connection
 			);

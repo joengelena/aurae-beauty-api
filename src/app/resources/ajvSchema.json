@@ -92,7 +92,8 @@
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 255
-			}
+			},
+			"profilePhotoUrl": { "type": "string", "minLength": 1, "maxLength": 500 }
 		},
 		"required": ["currentUserId"],
 		"additionalProperties": false
