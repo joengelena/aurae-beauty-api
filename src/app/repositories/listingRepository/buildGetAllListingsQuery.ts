@@ -95,7 +95,7 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 }
 
 function buildSearchQuery(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	if (
 		allQueries.searchString !== undefined &&
@@ -118,7 +118,7 @@ function buildSearchQuery(
 }
 
 function buildBetweenFilterQuery(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	const betweenFilterConditions: BetweenFilterCondition[] = [
 		{ key: 'priceFrom', column: 'original_price', operator: '>=' },
@@ -156,7 +156,7 @@ function buildBetweenFilterQuery(
 }
 
 function buildEqualFilterQuery(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	const equalFilterConditions: EqualFilterCondition[] = [
 		{ key: 'userIdFk', column: 'user_id_fk' },
@@ -195,7 +195,7 @@ function buildEqualFilterQuery(
 }
 
 function buildSortByQuery(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	const sortByConditions = [
 		{ key: 'priceDesc', column: 'original_price', order: 'DESC' },
@@ -206,13 +206,11 @@ function buildSortByQuery(
 		{ key: 'kilometersAsc', column: 'kilometers', order: 'ASC' },
 		{ key: 'yearDesc', column: 'year', order: 'DESC' },
 		{ key: 'yearAsc', column: 'year', order: 'ASC' },
-		{ key: 'endDateDesc', column: 'end_date', order: 'DESC' },
-		{ key: 'endDateAsc', column: 'end_date', order: 'ASC' },
 	];
 
 	if (allQueries.sortBy !== undefined) {
 		const sortBy = sortByConditions.find(
-			(condition) => condition.key === allQueries.sortBy
+			(condition) => condition.key === allQueries.sortBy,
 		);
 
 		if (sortBy) {
@@ -227,7 +225,7 @@ function buildSortByQuery(
 }
 
 function buildPaginationQuery(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	let limit = Number(allQueries.limit);
 	let pageNumber = Number(allQueries.pageNumber) - 1;

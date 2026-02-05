@@ -28,7 +28,6 @@ type Listing = {
 	discountedPrice: number | null;
 	uploadDate: Date;
 	description: string;
-	endDate: string;
 	make: string;
 	model: string;
 	year: string;

@@ -217,12 +217,6 @@
 				"minLength": 1,
 				"maxLength": 10000
 			},
-			"endDate": {
-				"type": "string",
-				"format": "date",
-				"minLength": 1,
-				"maxLength": 20
-			},
 			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
@@ -278,7 +272,6 @@
 			"vehicleCondition",
 			"originalPrice",
 			"description",
-			"endDate",
 			"make",
 			"model",
 			"year",
@@ -323,12 +316,6 @@
 				"type": "string",
 				"minLength": 1,
 				"maxLength": 10000
-			},
-			"endDate": {
-				"type": "string",
-				"format": "date",
-				"minLength": 1,
-				"maxLength": 20
 			},
 			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
 			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
@@ -514,7 +501,12 @@
 				"maxLength": 10000
 			}
 		},
-		"required": ["currentUserId", "vehicleIdFk", "typeOfService", "serviceDate"],
+		"required": [
+			"currentUserId",
+			"vehicleIdFk",
+			"typeOfService",
+			"serviceDate"
+		],
 		"additionalProperties": false
 	}
 }

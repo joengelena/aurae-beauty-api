@@ -25,7 +25,6 @@ const listingDbFields: Partial<Record<keyof Listing, string>> = {
 	discountedPrice: 'discounted_price',
 	uploadDate: 'upload_date',
 	description: 'description',
-	endDate: 'end_date',
 	make: 'make',
 	model: 'model',
 	year: 'year',
@@ -57,7 +56,7 @@ async function getListingAttributes(): Promise<ListingAttribute[]> {
 }
 
 async function getAllListings(
-	allQueries: Partial<ListingQueryParams>
+	allQueries: Partial<ListingQueryParams>,
 ): Promise<{
 	data: Listing[];
 	pageNumber: number;
@@ -69,7 +68,7 @@ async function getAllListings(
 
 	const result = await connection.query(
 		convertQueryPlaceholders(query),
-		values
+		values,
 	);
 
 	const totalRows = result.rows[0]?.total_rows ?? 0;
@@ -90,7 +89,7 @@ async function getAllListings(
 
 async function getListingById(
 	id: string,
-	connection?: Pool | PoolClient
+	connection?: Pool | PoolClient,
 ): Promise<Listing[]> {
 	logger.info(`Getting listing with id '${id}' from the database`);
 
@@ -120,13 +119,13 @@ async function getListingById(
 
 async function postListing(
 	listingData: Omit<Listing, 'id'>,
-	connection?: Pool | PoolClient
+	connection?: Pool | PoolClient,
 ): Promise<QueryResult> {
 	logger.info('Adding new listing');
 
 	const today = new Date();
 	const uploadDate = `${today.getFullYear()}-${String(
-		today.getMonth() + 1
+		today.getMonth() + 1,
 	).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
 	const fields = ['upload_date'];
@@ -152,15 +151,15 @@ async function postListing(
 }
 
 async function postListingPhotoPath(
-	listingPhotoData: ListingPhoto
+	listingPhotoData: ListingPhoto,
 ): Promise<QueryResult> {
 	logger.info(
-		`Adding new listing photo path for listing id: ${listingPhotoData.listingIdFk} photo order: ${listingPhotoData.photoOrder}`
+		`Adding new listing photo path for listing id: ${listingPhotoData.listingIdFk} photo order: ${listingPhotoData.photoOrder}`,
 	);
 
 	const connection = getPool();
 	const query = convertQueryPlaceholders(
-		'INSERT INTO "listing_photo" values (?, ?, ?)'
+		'INSERT INTO "listing_photo" values (?, ?, ?)',
 	);
 	const result = await connection.query(query, [
 		listingPhotoData.listingIdFk,
@@ -174,10 +173,10 @@ async function postListingPhotoPath(
 async function postListingPhotoPaths(
 	listingId: number,
 	photoPaths: string[],
-	connection: Pool | PoolClient
+	connection: Pool | PoolClient,
 ): Promise<QueryResult> {
 	logger.info(
-		`Batch adding ${photoPaths.length} photo paths for listing id: ${listingId}`
+		`Batch adding ${photoPaths.length} photo paths for listing id: ${listingId}`,
 	);
 
 	if (photoPaths.length === 0) {
@@ -203,14 +202,14 @@ async function postListingPhotoPaths(
 
 async function deleteListingWithId(
 	id: string,
-	connection?: Pool | PoolClient
+	connection?: Pool | PoolClient,
 ): Promise<QueryResult> {
 	logger.info(`Deleting listing with id '${id}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(
-		'DELETE FROM "listing" WHERE id = ?'
+		'DELETE FROM "listing" WHERE id = ?',
 	);
 	const result = await conn.query(query, [id]);
 
@@ -224,7 +223,7 @@ async function deleteListingWithId(
 async function updateListingWithId(
 	id: string,
 	updateValues: Omit<Partial<Listing>, 'id' | 'userIdFk'>,
-	connection?: Pool | PoolClient
+	connection?: Pool | PoolClient,
 ): Promise<QueryResult> {
 	logger.info(`Updating listing with id '${id}' in the database`);
 
@@ -244,7 +243,7 @@ async function updateListingWithId(
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(
-		`UPDATE "listing" SET ${fields.join(', ')} WHERE id = ?`
+		`UPDATE "listing" SET ${fields.join(', ')} WHERE id = ?`,
 	);
 
 	values.push(id);
@@ -263,7 +262,7 @@ async function incrementViewCount(id: string): Promise<QueryResult> {
 
 	const connection = getPool();
 	const query = convertQueryPlaceholders(
-		'UPDATE "listing" SET view_count = view_count + 1 WHERE id = ?'
+		'UPDATE "listing" SET view_count = view_count + 1 WHERE id = ?',
 	);
 	const result = await connection.query(query, [id]);
 
@@ -272,12 +271,12 @@ async function incrementViewCount(id: string): Promise<QueryResult> {
 
 async function deleteListingPhotos(
 	listingId: number,
-	connection: Pool | PoolClient
+	connection: Pool | PoolClient,
 ): Promise<QueryResult> {
 	logger.info(`Deleting all photo paths for listing id: ${listingId}`);
 
 	const query = convertQueryPlaceholders(
-		'DELETE FROM "listing_photo" WHERE listing_id_fk = ?'
+		'DELETE FROM "listing_photo" WHERE listing_id_fk = ?',
 	);
 	const result = await connection.query(query, [listingId]);
 

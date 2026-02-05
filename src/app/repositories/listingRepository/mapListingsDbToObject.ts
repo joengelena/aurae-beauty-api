@@ -15,7 +15,6 @@ function mapListingsDbToObject(listingsDb: any[]): Listing[] {
 			discountedPrice: listing.discounted_price,
 			uploadDate: listing.upload_date,
 			description: listing.description,
-			endDate: listing.end_date,
 			make: listing.make,
 			model: listing.model,
 			year: listing.year,
