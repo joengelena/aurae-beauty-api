@@ -21,6 +21,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 			phoneNumber: users[0].phoneNumber,
 			email: users[0].email,
 			location: users[0].location,
+			profilePhotoUrl: users[0].profilePhotoUrl,
 		};
 
 		res.status(200).send(user);

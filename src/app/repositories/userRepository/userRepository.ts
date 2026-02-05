@@ -15,9 +15,9 @@ async function signUpUser(
 		lastName,
 		email,
 		phoneNumber,
+		location,
 		isEmailVerified,
 		isPhoneNumberVerified,
-		location,
 	} = params;
 
 	logger.info(`Signing up new user with email '${email}' to the database`);
@@ -25,7 +25,7 @@ async function signUpUser(
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(`INSERT into "user"
-        (id, first_name, last_name, phone_number, email, is_email_verified, is_phone_number_verified, location) values
+        (id, first_name, last_name, phone_number, email, location, is_email_verified, is_phone_number_verified) values
         (?, ?, ?, ?, ?, ?, ?, ?)`);
 	const result = await conn.query(query, [
 		id,
@@ -33,9 +33,9 @@ async function signUpUser(
 		lastName,
 		phoneNumber,
 		email,
+		location,
 		isEmailVerified,
 		isPhoneNumberVerified,
-		location,
 	]);
 
 	if (!useProvidedConnection && 'release' in conn) {
@@ -75,6 +75,7 @@ async function updateUser(
 		lastName: 'last_name',
 		phoneNumber: 'phone_number',
 		location: 'location',
+		profilePhotoUrl: 'profile_photo_url',
 	};
 
 	if (!id) {

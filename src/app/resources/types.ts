@@ -4,9 +4,10 @@ type User = {
 	lastName: string;
 	email: string;
 	phoneNumber: string;
+	location: string;
+	profilePhotoUrl: string | null;
 	isEmailVerified: 0 | 1;
 	isPhoneNumberVerified: 0 | 1;
-	location: string;
 };
 
 type ListingPhoto = {
