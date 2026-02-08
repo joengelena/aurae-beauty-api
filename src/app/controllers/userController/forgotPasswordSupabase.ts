@@ -5,12 +5,12 @@ import AppError from '../../utils/errors/appError';
 
 async function forgotPasswordSupabase(
 	req: Request,
-	res: Response
+	res: Response,
 ): Promise<void> {
 	const { email } = req.body;
 
 	logger.info(
-		`Processing forgot password request for user with email: ${email}`
+		`Processing forgot password request for user with email: ${email}`,
 	);
 
 	try {
@@ -22,14 +22,12 @@ async function forgotPasswordSupabase(
 		// This will send a reset password email if the user exists
 		// If the user doesn't exist, it will fail silently for security reasons
 		const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
-			redirectTo:
-				process.env.PASSWORD_RESET_REDIRECT_URL ||
-				`${process.env.FRONTEND_URL}/profile/reset-password`,
+			redirectTo: process.env.PASSWORD_RESET_REDIRECT_URL,
 		});
 
 		if (error) {
 			logger.error(
-				`Error sending password reset email: ${error.message}`
+				`Error sending password reset email: ${error.message}`,
 			);
 			// Don't expose whether the user exists or not for security reasons
 			// Return success message regardless
@@ -45,9 +43,7 @@ async function forgotPasswordSupabase(
 			throw error;
 		}
 
-		logger.error(
-			`Unexpected error during forgot password: ${error.message}`
-		);
+		logger.error(`Unexpected error during forgot password: ${error}`);
 		throw new AppError(500, 'Something went wrong. Please try again.');
 	}
 }
