@@ -111,7 +111,7 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				email: data.user.email,
 			});
 		}
-	} catch (error) {
+	} catch (error: any) {
 		if (error instanceof AppError) {
 			throw error;
 		}

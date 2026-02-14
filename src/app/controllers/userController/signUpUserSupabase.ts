@@ -86,7 +86,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 			logger.info(
 				`User ${supabaseUserId} successfully synced to database`,
 			);
-		} catch (dbError) {
+		} catch (dbError: any) {
 			await connection.query('ROLLBACK');
 			connection.release();
 
@@ -126,7 +126,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 			userId: supabaseUserId,
 			emailSent: true,
 		});
-	} catch (error) {
+	} catch (error: any) {
 		if (error instanceof AppError) {
 			throw error;
 		}
