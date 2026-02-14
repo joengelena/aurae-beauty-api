@@ -123,8 +123,6 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 		res.status(201).send({
 			message:
 				'Account created successfully. Please check your email to verify your account before signing in.',
-			userId: supabaseUserId,
-			emailSent: true,
 		});
 	} catch (error: any) {
 		if (error instanceof AppError) {
