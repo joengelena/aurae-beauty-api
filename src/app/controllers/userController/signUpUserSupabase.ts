@@ -91,7 +91,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 			connection.release();
 
 			logger.error(
-				`Failed to sync user to MySQL: ${dbError.message}, rolling back Supabase user`,
+				`Failed to sync user to database: ${dbError.message}, rolling back Supabase user`,
 			);
 
 			await supabaseAdmin.auth.admin.deleteUser(supabaseUserId);
