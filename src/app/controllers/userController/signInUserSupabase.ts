@@ -33,10 +33,14 @@ async function signInUserSupabase(req: Request, res: Response): Promise<void> {
 				}`
 			);
 
-			if (
-				error?.message.includes('Invalid login credentials') ||
-				error?.message.includes('Email not confirmed')
-			) {
+			if (error?.message.includes('Email not confirmed')) {
+				throw new AppError(
+					403,
+					'Please verify your email before signing in. Check your inbox for the verification link.'
+				);
+			}
+
+			if (error?.message.includes('Invalid login credentials')) {
 				throw new AppError(
 					401,
 					'Incorrect email or password. Please try again.'
