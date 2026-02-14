@@ -13,48 +13,51 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 	logger.info(`Signing up new user with email: ${email} (Supabase)`);
 
 	try {
+		// Use signUp instead of admin.createUser to trigger email confirmation
 		const { data: authData, error: authError } =
-			await supabaseAdmin.auth.admin.createUser({
+			await supabaseAdmin.auth.signUp({
 				email,
 				password,
-				email_confirm: true, // Auto-confirm email (set to false if you want to require email verification)
-				user_metadata: {
-					firstName,
-					lastName,
-					phoneNumber,
-					location,
+				options: {
+					data: {
+						firstName,
+						lastName,
+						phoneNumber,
+						location,
+					},
+					emailRedirectTo: undefined, // Let Supabase use default redirect URL
 				},
 			});
 
 		if (authError || !authData.user) {
 			logger.error(
-				`Failed to create user in Supabase: ${authError?.message}`
+				`Failed to create user in Supabase: ${authError?.message}`,
 			);
 			logger.error(`Full Supabase error: ${JSON.stringify(authError)}`);
 
 			if (authError?.message.includes('already registered')) {
 				throw new AppError(
 					409,
-					'This email is already registered. Please sign in or use a different email.'
+					'This email is already registered. Please sign in or use a different email.',
 				);
 			}
 
 			if (authError?.message.includes('not allowed')) {
 				throw new AppError(
 					503,
-					'Account registration is temporarily unavailable. Please try again later.'
+					'Account registration is temporarily unavailable. Please try again later.',
 				);
 			}
 
 			throw new AppError(
 				500,
-				'Unable to create your account. Please try again later.'
+				'Unable to create your account. Please try again later.',
 			);
 		}
 
 		const supabaseUserId = authData.user.id;
 		logger.info(
-			`User created in Supabase with ID: ${supabaseUserId}, syncing to MySQL`
+			`User created in Supabase with ID: ${supabaseUserId}, syncing to database...`,
 		);
 
 		const connection = await getPool().connect();
@@ -74,21 +77,21 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					isEmailVerified: FALSE,
 					isPhoneNumberVerified: FALSE,
 				},
-				connection
+				connection,
 			);
 
 			await connection.query('COMMIT');
 			connection.release();
 
 			logger.info(
-				`User ${supabaseUserId} successfully synced to MySQL database`
+				`User ${supabaseUserId} successfully synced to database`,
 			);
 		} catch (dbError) {
 			await connection.query('ROLLBACK');
 			connection.release();
 
 			logger.error(
-				`Failed to sync user to MySQL: ${dbError.message}, rolling back Supabase user`
+				`Failed to sync user to MySQL: ${dbError.message}, rolling back Supabase user`,
 			);
 
 			await supabaseAdmin.auth.admin.deleteUser(supabaseUserId);
@@ -101,25 +104,27 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 				if (lastWordInErrorMessage.includes('phone_number')) {
 					throw new AppError(
 						409,
-						'This phone number is already registered. Please use a different one.'
+						'This phone number is already registered. Please use a different one.',
 					);
 				}
 
 				throw new AppError(
 					409,
-					'An account with these details already exists.'
+					'An account with these details already exists.',
 				);
 			}
 
 			throw new AppError(
 				500,
-				'Unable to complete your registration. Please try again.'
+				'Unable to complete your registration. Please try again.',
 			);
 		}
 
 		res.status(201).send({
-			message: 'User created successfully',
+			message:
+				'Account created successfully. Please check your email to verify your account before signing in.',
 			userId: supabaseUserId,
+			emailSent: true,
 		});
 	} catch (error) {
 		if (error instanceof AppError) {
