@@ -25,7 +25,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 						phoneNumber,
 						location,
 					},
-					emailRedirectTo: undefined, // Let Supabase use default redirect URL
+					emailRedirectTo: process.env.EMAIL_VERIFICATION_REDIRECT_URL,
 				},
 			});
 
