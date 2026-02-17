@@ -8,6 +8,7 @@ import forgotPasswordSupabase from './forgotPasswordSupabase';
 import changePasswordSupabase from './changePasswordSupabase';
 import resetPasswordSupabase from './resetPasswordSupabase';
 import refreshTokenSupabase from './refreshTokenSupabase';
+import resendVerificationEmailSupabase from './resendVerificationEmailSupabase';
 
 export {
 	signUpUserSupabase,
@@ -16,6 +17,7 @@ export {
 	forgotPasswordSupabase,
 	changePasswordSupabase,
 	resetPasswordSupabase,
+	resendVerificationEmailSupabase,
 	viewUser,
 	updateUser,
 	deleteUserSupabase,

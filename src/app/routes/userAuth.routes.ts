@@ -9,6 +9,7 @@ import {
 	signUpUserSupabase,
 	signOutUserSupabase,
 	refreshTokenSupabase,
+	resendVerificationEmailSupabase,
 } from '../controllers/userController';
 
 const userAuthRoutes = (app: Express) => {
@@ -39,6 +40,13 @@ const userAuthRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
 		asyncHandler(signOutUserSupabase)
+	);
+
+	app.route(rootUrl + '/user/resend-verification-email').post(
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.resendVerificationEmail);
+		},
+		asyncHandler(resendVerificationEmailSupabase)
 	);
 };
 
