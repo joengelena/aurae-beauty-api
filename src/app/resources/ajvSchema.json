@@ -134,19 +134,6 @@
 		"required": ["email"],
 		"additionalProperties": false
 	},
-	"resendVerificationEmail": {
-		"type": "object",
-		"properties": {
-			"email": {
-				"type": "string",
-				"format": "email",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["email"],
-		"additionalProperties": false
-	},
 	"resetPassword": {
 		"type": "object",
 		"properties": {
