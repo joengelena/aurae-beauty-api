@@ -21,7 +21,10 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
-		const user = await userRepository.getUserById(currentUserId, connection);
+		const user = await userRepository.getUserById(
+			currentUserId,
+			connection,
+		);
 
 		if (user.length === 0) {
 			throw new AppError(404, 'Account not found.');
@@ -35,7 +38,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 		if (signInError) {
 			logger.warn(
-				`Password verification failed for user ${currentUserId}: ${signInError.message}`
+				`Password verification failed for user ${currentUserId}: ${signInError.message}`,
 			);
 			throw new AppError(403, 'Incorrect password. Please try again.');
 		}
@@ -45,7 +48,7 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 		try {
 			const deleteUserResult = await userRepository.deleteUserWithId(
 				currentUserId,
-				connection
+				connection,
 			);
 
 			if (deleteUserResult.rowCount !== 1) {
@@ -56,16 +59,19 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			connection.release();
 
 			logger.info(
-				`User ${currentUserId} deleted from MySQL database successfully`
+				`User ${currentUserId} deleted from MySQL database successfully`,
 			);
-		} catch (dbError) {
+		} catch (dbError: any) {
 			await connection.query('ROLLBACK');
 			connection.release();
 
 			logger.error(
-				`Failed to delete user from MySQL: ${dbError.message}`
+				`Failed to delete user from MySQL: ${dbError.message}`,
 			);
-			throw new AppError(500, 'Unable to delete your account. Please try again.');
+			throw new AppError(
+				500,
+				'Unable to delete your account. Please try again.',
+			);
 		}
 
 		const { error: deleteError } =
@@ -73,11 +79,11 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 
 		if (deleteError) {
 			logger.error(
-				`Failed to delete user from Supabase: ${deleteError.message}`
+				`Failed to delete user from Supabase: ${deleteError.message}`,
 			);
 			throw new AppError(
 				500,
-				'Your account data was partially deleted. Please contact support for assistance.'
+				'Your account data was partially deleted. Please contact support for assistance.',
 			);
 		}
 
@@ -86,13 +92,16 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 		res.status(200).send({
 			message: 'User deleted successfully',
 		});
-	} catch (error) {
+	} catch (error: any) {
 		if (error instanceof AppError) {
 			throw error;
 		}
 
 		logger.error(`Unexpected error during user deletion: ${error.message}`);
-		throw new AppError(500, 'Unable to delete your account. Please try again later.');
+		throw new AppError(
+			500,
+			'Unable to delete your account. Please try again later.',
+		);
 	}
 }
 
