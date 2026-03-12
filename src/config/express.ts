@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import logger from './logger';
+import { getPool } from './db';
+import { rootUrl } from '../app/routes/base.routes';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import listingRoutes from '../app/routes/listing.routes';
@@ -14,14 +16,16 @@ export default () => {
 
 	// Middleware
 	// Get allowed origins from environment variable
-	const allowedOrigins = process.env.ALLOWED_COOKIE_ORIGINS?.split(',').map(o => o.trim()) || [];
+	const allowedOrigins =
+		process.env.ALLOWED_COOKIE_ORIGINS?.split(',').map((o) => o.trim()) ||
+		[];
 
 	app.use(
 		cors({
 			// Allow specific origins from env, or all origins if not configured
 			origin: allowedOrigins.length > 0 ? allowedOrigins : true,
 			credentials: true,
-		})
+		}),
 	);
 	app.use(bodyParser.json());
 	app.use(bodyParser.raw({ type: 'text/plain' }));
@@ -36,8 +40,27 @@ export default () => {
 		next();
 	});
 
-	app.get('/heartbeat', (req, res) => {
-		res.send({ message: "I'm alive!" });
+	app.get(rootUrl + '/health', async (req, res) => {
+		try {
+			const pool = getPool();
+			await pool.query('SELECT 1');
+
+			res.status(200).send({
+				status: 'healthy',
+				api: 'running',
+				database: 'connected',
+				timestamp: new Date().toISOString(),
+			});
+		} catch (error: any) {
+			logger.error(`Health check failed: ${error.message}`);
+			res.status(503).send({
+				status: 'unhealthy',
+				api: 'running',
+				database: 'disconnected',
+				error: 'Database connection failed',
+				timestamp: new Date().toISOString(),
+			});
+		}
 	});
 
 	// Routes
