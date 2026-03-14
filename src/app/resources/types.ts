@@ -101,7 +101,7 @@ type ListingQueryParams = {
 
 type ListingAttribute = {
 	name: string;
-	attributeValues: string[];
+	attributeValues: string[] | number[];
 };
 
 // ===== Vehicle Management Types =====
