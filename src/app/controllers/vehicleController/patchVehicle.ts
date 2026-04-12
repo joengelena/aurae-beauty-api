@@ -16,7 +16,7 @@ import {
 } from '../../utils/cloudflare/r2Client';
 
 async function patchVehicle(req: Request, res: Response): Promise<void> {
-	const vehicleId = parseVehicleId(req.params.id);
+	const vehicleId = parseVehicleId(req.params.id as string);
 	const { currentUserId, ...newVehicleData } = req.body;
 
 	logger.info(`Updating vehicle with id '${vehicleId}'`);

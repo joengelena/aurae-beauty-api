@@ -13,7 +13,7 @@ import {
 } from '../../utils/cloudflare/r2Client';
 
 async function deleteVehicle(req: Request, res: Response): Promise<void> {
-	const vehicleId = parseVehicleId(req.params.id);
+	const vehicleId = parseVehicleId(req.params.id as string);
 	const currentUserId = req.body.currentUserId;
 
 	logger.info(`Deleting vehicle with id '${vehicleId}'`);

@@ -9,7 +9,7 @@ import {
 } from '../../utils/cloudflare/r2Client';
 
 async function deleteListing(req: Request, res: Response): Promise<void> {
-	const listingId = req.params.id;
+	const listingId = req.params.id as string;
 	const currentUserId = req.body.currentUserId;
 
 	logger.info(`Deleting listing with id '${listingId}'`);

@@ -5,7 +5,7 @@ import AppError from '../../utils/errors/appError';
 
 async function getVehicleById(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const vehicleId = parseInt(req.params.id, 10);
+	const vehicleId = parseInt(req.params.id as string, 10);
 
 	// Validate vehicleId BEFORE logging to avoid logging invalid data
 	if (isNaN(vehicleId)) {

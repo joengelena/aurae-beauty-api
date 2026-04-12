@@ -7,7 +7,7 @@ import { getPool } from '../../../config/db';
 
 async function deleteService(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const serviceId = parseInt(req.params.id, 10);
+	const serviceId = parseInt(req.params.id as string, 10);
 
 	if (isNaN(serviceId)) {
 		throw new AppError(400, 'Invalid service ID');

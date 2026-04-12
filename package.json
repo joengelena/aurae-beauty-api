@@ -1,7 +1,7 @@
 {
-	"name": "motorix-api",
+	"name": "shine-api",
 	"version": "1.0.0",
-	"description": "Motorix API",
+	"description": "Shine Dress Rental API",
 	"main": "dist/server.js",
 	"scripts": {
 		"prebuild": "tslint -c tslint.json -p tsconfig.json --fix",

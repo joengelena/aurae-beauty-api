@@ -6,7 +6,7 @@ import AppError from '../../utils/errors/appError';
 
 async function watchlistRemove(req: Request, res: Response): Promise<void> {
 	const { currentUserId } = req.body;
-	const listingId = req.params.listingId;
+	const listingId = req.params.listingId as string;
 
 	logger.info(`Removing listing ${listingId} from watchlist for user ${currentUserId}`);
 

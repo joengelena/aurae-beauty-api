@@ -4,7 +4,7 @@ import * as listingRepository from '../../repositories/listingRepository/listing
 import AppError from '../../utils/errors/appError';
 
 async function incrementViewCount(req: Request, res: Response): Promise<void> {
-	const listingId = req.params.id;
+	const listingId = req.params.id as string;
 
 	logger.info(`Incrementing view count for listing id '${listingId}'`);
 

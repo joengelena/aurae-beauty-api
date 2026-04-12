@@ -6,7 +6,7 @@ import AppError from '../../utils/errors/appError';
 
 async function watchlistAdd(req: Request, res: Response): Promise<void> {
 	const { currentUserId } = req.body;
-	const listingId = req.params.listingId;
+	const listingId = req.params.listingId as string;
 
 	logger.info(`Adding listing ${listingId} to watchlist for user ${currentUserId}`);
 

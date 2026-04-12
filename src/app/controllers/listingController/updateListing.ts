@@ -11,7 +11,7 @@ import {
 } from '../../utils/cloudflare/r2Client';
 
 async function updateLising(req: Request, res: Response): Promise<void> {
-	const listingId = req.params.id;
+	const listingId = req.params.id as string;
 	const { currentUserId, ...newListingData } = req.body;
 
 	logger.info(`Updating listing with id '${listingId}'`);

@@ -4,7 +4,7 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 
 async function viewUser(req: Request, res: Response): Promise<void> {
-	const userId = req.params.userId;
+	const userId = req.params.userId as string as string;
 
 	logger.info(`Viewing user with id '${userId}'`);
 
