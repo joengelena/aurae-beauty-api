@@ -1,51 +1,51 @@
 import { Request, Response } from 'express';
-import * as vehicleServiceRepository from '../../repositories/vehicleServiceRepository/vehicleServiceRepository';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
 
-async function deleteService(req: Request, res: Response): Promise<void> {
+async function deleteBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 	const serviceId = parseInt(req.params.id as string, 10);
 
 	if (isNaN(serviceId)) {
-		throw new AppError(400, 'Invalid service ID');
+		throw new AppError(400, 'Invalid booking ID');
 	}
 
-	logger.info(`Deleting service record '${serviceId}' by user '${userId}'`);
+	logger.info(`Deleting booking record '${serviceId}' by user '${userId}'`);
 
 	const connection = await getPool().connect();
 
 	try {
 		await connection.query('BEGIN');
 
-		// Get the service record
-		const service = await vehicleServiceRepository.getServiceById(
+		// Get the booking record
+		const booking = await rentalBookingRepository.getServiceById(
 			serviceId,
 			connection
 		);
 
-		if (!service) {
+		if (!booking) {
 			throw new AppError(404, 'Service record not found');
 		}
 
 		// Verify user owns the vehicle that this service belongs to
-		const vehicle = await vehicleRepository.getVehicleByIdAndUserId(
-			service.vehicleIdFk,
+		const dress = await dressRepository.getDressByIdAndUserId(
+			booking.dressIdFk,
 			userId,
 			connection
 		);
 
-		if (!vehicle) {
+		if (!dress) {
 			throw new AppError(
 				403,
-				'You do not have permission to delete this service record'
+				'You do not have permission to delete this booking record'
 			);
 		}
 
-		// Delete the service record
-		await vehicleServiceRepository.deleteServiceById(serviceId, connection);
+		// Delete the booking record
+		await rentalBookingRepository.deleteBookingById(serviceId, connection);
 
 		await connection.query('COMMIT');
 		connection.release();
@@ -65,12 +65,12 @@ async function deleteService(req: Request, res: Response): Promise<void> {
 			throw error;
 		}
 
-		logger.error(`Unexpected error during delete service: ${error.message}`);
+		logger.error(`Unexpected error during delete booking: ${error.message}`);
 		throw new AppError(
 			500,
-			'Unable to delete service record. Please try again.'
+			'Unable to delete booking record. Please try again.'
 		);
 	}
 }
 
-export default deleteService;
+export default deleteBooking;

@@ -368,7 +368,7 @@
 		"required": ["currentUserId"],
 		"additionalProperties": false
 	},
-	"postVehicle": {
+	"postDress": {
 		"type": "object",
 		"properties": {
 			"currentUserId": {
@@ -421,7 +421,7 @@
 		],
 		"additionalProperties": false
 	},
-	"patchVehicle": {
+	"patchDress": {
 		"type": "object",
 		"properties": {
 			"currentUserId": {
@@ -465,7 +465,7 @@
 		"required": ["currentUserId"],
 		"additionalProperties": false
 	},
-	"postVehicleService": {
+	"postBooking": {
 		"type": "object",
 		"properties": {
 			"currentUserId": {
@@ -474,7 +474,7 @@
 				"minLength": 36,
 				"maxLength": 36
 			},
-			"vehicleIdFk": {
+			"dressIdFk": {
 				"type": "integer",
 				"minimum": 1
 			},
@@ -504,7 +504,7 @@
 		},
 		"required": [
 			"currentUserId",
-			"vehicleIdFk",
+			"dressIdFk",
 			"typeOfService",
 			"serviceDate"
 		],

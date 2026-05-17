@@ -4,7 +4,7 @@ import { supabaseAdmin, supabaseAuth } from '../../../config/supabase';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
 import * as listingRepository from '../../repositories/listingRepository/listingRepository';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import {
 	extractKeyFromUrl,
 	deleteMultipleFilesFromR2,
@@ -81,14 +81,14 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			}
 
 			// Get all user's vehicles and their images
-			const userVehicles = await vehicleRepository.getAllVehiclesByUserId(
+			const userVehicles = await dressRepository.getAllDressesByUserId(
 				currentUserId,
 				connection,
 			);
 
 			for (const vehicle of userVehicles) {
-				if (vehicle.vehiclePhotoUrl) {
-					imageUrlsToDelete.push(vehicle.vehiclePhotoUrl);
+				if (vehicle.dressPhotoUrl) {
+					imageUrlsToDelete.push(vehicle.dressPhotoUrl);
 				}
 			}
 

@@ -2,14 +2,14 @@ import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { VehicleService } from '../../resources/types';
-import mapVehicleServiceDbToObject from './mapVehicleServiceDbToObject';
+import mapDressBookingDbToObject from './mapDressBookingDbToObject';
 import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const vehicleServiceDbFields: Record<
 	keyof Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
 	string
 > = {
-	vehicleIdFk: 'vehicle_id_fk',
+	dressIdFk: 'vehicle_id_fk',
 	typeOfService: 'type_of_service',
 	serviceDate: 'service_date',
 	serviceProviderName: 'service_provider_name',
@@ -22,7 +22,7 @@ async function getAllServicesByVehicleId(
 	connection?: Pool | PoolClient
 ): Promise<VehicleService[]> {
 	logger.info(
-		`Getting all services for vehicle '${vehicleId}' from the database`
+		`Getting all services for dress '${vehicleId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
@@ -38,14 +38,14 @@ async function getAllServicesByVehicleId(
 		(conn as PoolClient).release();
 	}
 
-	return mapVehicleServiceDbToObject(result.rows);
+	return mapDressBookingDbToObject(result.rows);
 }
 
 async function getServiceById(
 	serviceId: number,
 	connection?: Pool | PoolClient
 ): Promise<VehicleService | null> {
-	logger.info(`Getting service with id '${serviceId}' from the database`);
+	logger.info(`Getting booking with id '${serviceId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
@@ -60,14 +60,14 @@ async function getServiceById(
 		return null;
 	}
 
-	return mapVehicleServiceDbToObject(result.rows)[0];
+	return mapDressBookingDbToObject(result.rows)[0];
 }
 
-async function postService(
+async function postBooking(
 	serviceData: Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
-	logger.info('Adding new vehicle service to the database');
+	logger.info('Adding new dress service to the database');
 
 	const fields: string[] = [];
 	const values: any[] = [];
@@ -102,12 +102,12 @@ async function postService(
 async function updateServiceById(
 	serviceId: number,
 	updateValues: Partial<
-		Omit<VehicleService, 'id' | 'vehicleIdFk' | 'createdAt' | 'updatedAt'>
+		Omit<VehicleService, 'id' | 'dressIdFk' | 'createdAt' | 'updatedAt'>
 	>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
 	logger.info(
-		`Updating vehicle service with id '${serviceId}' in the database`
+		`Updating dress booking with id '${serviceId}' in the database`
 	);
 
 	if (Object.keys(updateValues).length === 0) {
@@ -147,12 +147,12 @@ async function updateServiceById(
 	return result;
 }
 
-async function deleteServiceById(
+async function deleteBookingById(
 	serviceId: number,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
 	logger.info(
-		`Deleting vehicle service with id '${serviceId}' from the database`
+		`Deleting dress booking with id '${serviceId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
@@ -170,7 +170,7 @@ async function deleteServiceById(
 export {
 	getAllServicesByVehicleId,
 	getServiceById,
-	postService,
+	postBooking,
 	updateServiceById,
-	deleteServiceById,
+	deleteBookingById,
 };

@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { UserVehicle } from '../../resources/types';
 import { getPool } from '../../../config/db';
 import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
 import { validateFile } from '../../utils/cloudflare/validation';
-import { validateExpiryDate } from '../../utils/validation/vehicleValidation';
+import { validateExpiryDate } from '../../utils/validation/dressValidation';
 
-async function postVehicle(req: Request, res: Response): Promise<void> {
+async function postDress(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 	const {
 		make,
@@ -28,21 +28,21 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		notes,
 	} = req.body;
 
-	logger.info(`Creating new vehicle for user '${userId}'`);
+	logger.info(`Creating new dress for user '${userId}'`);
 
 	// Get uploaded file
 	const file = req.file as Express.Multer.File | undefined;
 
 	// Validate file if provided (optional)
-	let vehiclePhotoUrl: string | null = null;
+	let dressPhotoUrl: string | null = null;
 	if (file) {
 		validateFile(file);
 		logger.info(
-			`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`
+			`Uploading dress image: ${file.originalname} (${file.size} bytes)`
 		);
 		const uploadResult = await uploadSingleImage(file);
-		vehiclePhotoUrl = uploadResult.url;
-		logger.info(`Successfully uploaded vehicle image: ${uploadResult.key}`);
+		dressPhotoUrl = uploadResult.url;
+		logger.info(`Successfully uploaded dress image: ${uploadResult.key}`);
 	}
 
 	// Validate dates BEFORE acquiring connection to avoid holding resources
@@ -55,7 +55,7 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
-		const vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> ={
+		const dressData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'> ={
 				userIdFk: userId,
 				make,
 				model,
@@ -71,22 +71,22 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 				wofExpiryDate,
 				insuranceExpiryDate,
 				insuranceProvider,
-				vehiclePhotoUrl,
+				dressPhotoUrl,
 				notes: notes ?? null,
 			};
 
-		const result = await vehicleRepository.postVehicle(
-			vehicleData,
+		const result = await dressRepository.postDress(
+			dressData,
 			connection
 		);
 
 		const vehicleId = result.rows[0].id;
 
 		logger.info(
-			`Vehicle created with id '${vehicleId}' for user '${userId}'`
+			`Dress created with id '${vehicleId}' for user '${userId}'`
 		);
 
-		const createdVehicle = await vehicleRepository.getVehicleById(
+		const createdVehicle = await dressRepository.getDressById(
 			vehicleId,
 			connection
 		);
@@ -95,8 +95,8 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		connection.release();
 
 		res.status(201).send({
-			message: 'Vehicle created successfully',
-			vehicle: createdVehicle,
+			message: 'Dress created successfully',
+			dress: createdVehicle,
 		});
 	} catch (error: any) {
 		await connection.query('ROLLBACK');
@@ -107,10 +107,10 @@ async function postVehicle(req: Request, res: Response): Promise<void> {
 		}
 
 		logger.error(
-			`Unexpected error during vehicle creation: ${error.message}`
+			`Unexpected error during dress creation: ${error.message}`
 		);
-		throw new AppError(500, 'Unable to create vehicle. Please try again.');
+		throw new AppError(500, 'Unable to create dress. Please try again.');
 	}
 }
 
-export default postVehicle;
+export default postDress;

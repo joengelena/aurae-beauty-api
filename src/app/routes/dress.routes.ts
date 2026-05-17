@@ -1,89 +1,89 @@
 import { Express } from 'express';
 import { rootUrl } from './base.routes';
 import {
-	getAllVehicles,
-	getVehicleById,
-	postVehicle,
-	patchVehicle,
-	deleteVehicle,
-} from '../controllers/vehicleController';
-import { postService, getServicesByVehicleId, deleteService } from '../controllers/vehicleServiceController';
+	getAllDresses,
+	getDressById,
+	postDress,
+	patchDress,
+	deleteDress,
+} from '../controllers/dressController';
+import { postBooking, getBookingsByDressId, deleteBooking } from '../controllers/rentalBookingController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
 import uploadMulter from '../utils/multerStorage';
 
-const vehicleRoutes = (app: Express) => {
-	app.route(rootUrl + '/user/vehicles')
+const dressRoutes = (app: Express) => {
+	app.route(rootUrl + '/user/dresses')
 		.get(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			asyncHandler(getAllVehicles)
+			asyncHandler(getAllDresses)
 		)
 		.post(
 			uploadMulter.single('image'),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.postVehicle);
+				validateRequestBody(req, res, next, ajvSchema.postDress);
 			},
-			asyncHandler(postVehicle)
+			asyncHandler(postDress)
 		);
 
-	app.route(rootUrl + '/user/vehicles/:id')
+	app.route(rootUrl + '/user/dresses/:id')
 		.get(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			asyncHandler(getVehicleById)
+			asyncHandler(getDressById)
 		)
 		.patch(
 			uploadMulter.single('image'),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.patchVehicle);
+				validateRequestBody(req, res, next, ajvSchema.patchDress);
 			},
-			asyncHandler(patchVehicle)
+			asyncHandler(patchDress)
 		)
 		.delete(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			asyncHandler(deleteVehicle)
+			asyncHandler(deleteDress)
 		);
 
-	// Get services for a specific vehicle
-	app.route(rootUrl + '/user/vehicles/:id/services')
+	// Get bookings for a specific dress
+	app.route(rootUrl + '/user/dresses/:id/bookings')
 		.get(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			asyncHandler(getServicesByVehicleId)
+			asyncHandler(getBookingsByDressId)
 		);
 
-	// Vehicle service routes
-	app.route(rootUrl + '/user/vehicle-services')
+	// Dress booking routes
+	app.route(rootUrl + '/user/dress-bookings')
 		.post(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
-				validateRequestBody(req, res, next, ajvSchema.postVehicleService);
+				validateRequestBody(req, res, next, ajvSchema.postBooking);
 			},
-			asyncHandler(postService)
+			asyncHandler(postBooking)
 		);
 
-	app.route(rootUrl + '/user/vehicle-services/:id')
+	app.route(rootUrl + '/user/dress-bookings/:id')
 		.delete(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
-			asyncHandler(deleteService)
+			asyncHandler(deleteBooking)
 		);
 };
 
-export default vehicleRoutes;
+export default dressRoutes;

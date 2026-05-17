@@ -123,7 +123,7 @@ type UserVehicle = {
 	wofExpiryDate: string;
 	insuranceExpiryDate: string;
 	insuranceProvider: string;
-	vehiclePhotoUrl: string | null;
+	dressPhotoUrl: string | null;
 	notes: string | null;
 	createdAt: Date;
 	updatedAt: Date;
@@ -131,7 +131,7 @@ type UserVehicle = {
 
 type VehicleService = {
 	id: number;
-	vehicleIdFk: number;
+	dressIdFk: number;
 	typeOfService: string;
 	serviceDate: string;
 	serviceProviderName: string | null;

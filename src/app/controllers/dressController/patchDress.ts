@@ -1,25 +1,25 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import AppError from '../../utils/errors/appError';
 import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
 import { validateFile } from '../../utils/cloudflare/validation';
 import {
-	parseVehicleId,
+	parseDressId,
 	validateExpiryDate,
-	verifyVehicleOwnership,
-} from '../../utils/validation/vehicleValidation';
+	verifyDressOwnership,
+} from '../../utils/validation/dressValidation';
 import { withTransaction } from '../../utils/database/transactionHandler';
 import {
 	extractKeyFromUrl,
 	deleteFileFromR2,
 } from '../../utils/cloudflare/r2Client';
 
-async function patchVehicle(req: Request, res: Response): Promise<void> {
-	const vehicleId = parseVehicleId(req.params.id as string);
+async function patchDress(req: Request, res: Response): Promise<void> {
+	const vehicleId = parseDressId(req.params.id as string);
 	const { currentUserId, ...newVehicleData } = req.body;
 
-	logger.info(`Updating vehicle with id '${vehicleId}'`);
+	logger.info(`Updating dress with id '${vehicleId}'`);
 
 	// Validate dates BEFORE acquiring connection to avoid holding resources
 	if (newVehicleData.regoExpiryDate) {
@@ -45,17 +45,17 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 	if (file) {
 		validateFile(file);
 		logger.info(
-			`Uploading vehicle image: ${file.originalname} (${file.size} bytes)`
+			`Uploading dress image: ${file.originalname} (${file.size} bytes)`
 		);
 		const uploadResult = await uploadSingleImage(file);
-		newVehicleData.vehiclePhotoUrl = uploadResult.url;
-		logger.info(`Successfully uploaded vehicle image: ${uploadResult.key}`);
+		newVehicleData.dressPhotoUrl = uploadResult.url;
+		logger.info(`Successfully uploaded dress image: ${uploadResult.key}`);
 	}
 
 	if (Object.keys(newVehicleData).length === 0) {
 		// No changes to update, but return success anyway
 		res.status(200).send({
-			message: 'Vehicle updated successfully',
+			message: 'Dress updated successfully',
 		});
 		return;
 	}
@@ -64,28 +64,28 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 
 	await withTransaction(
 		async (connection) => {
-			await verifyVehicleOwnership(vehicleId, currentUserId, connection);
+			await verifyDressOwnership(vehicleId, currentUserId, connection);
 
-			// Fetch old vehicle photo URL if a new image is being uploaded
+			// Fetch old dress photo URL if a new image is being uploaded
 			if (file) {
-				const vehicle = await vehicleRepository.getVehicleById(
+				const dress = await dressRepository.getDressById(
 					vehicleId,
 					connection
 				);
 
-				if (!vehicle) {
-					throw new AppError(404, 'Vehicle not found');
+				if (!dress) {
+					throw new AppError(404, 'Dress not found');
 				}
 
-				oldVehiclePhotoUrl = vehicle.vehiclePhotoUrl;
+				oldVehiclePhotoUrl = dress.dressPhotoUrl;
 				logger.info(
-					`Old vehicle image URL: ${
+					`Old dress image URL: ${
 						oldVehiclePhotoUrl ? 'exists' : 'none'
 					}`
 				);
 			}
 
-			const result = await vehicleRepository.updateVehicleById(
+			const result = await dressRepository.updateVehicleById(
 				vehicleId,
 				newVehicleData,
 				connection
@@ -94,16 +94,16 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 			if (result.rowCount !== 1) {
 				throw new AppError(
 					500,
-					'Unable to update vehicle. Please try again.'
+					'Unable to update dress. Please try again.'
 				);
 			}
 
 			res.status(200).send({
-				message: 'Vehicle updated successfully',
+				message: 'Dress updated successfully',
 			});
 		},
 		res,
-		'update vehicle'
+		'update dress'
 	);
 
 	// Delete old image from R2 after successful database update
@@ -113,11 +113,11 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 
 			if (key) {
 				logger.info(
-					`Deleting old vehicle image from R2 storage: ${key}`
+					`Deleting old dress image from R2 storage: ${key}`
 				);
 				await deleteFileFromR2(key);
 				logger.info(
-					'Successfully deleted old vehicle image from R2 storage'
+					'Successfully deleted old dress image from R2 storage'
 				);
 			}
 		} catch (r2Error) {
@@ -125,13 +125,13 @@ async function patchVehicle(req: Request, res: Response): Promise<void> {
 			const errorMessage =
 				r2Error instanceof Error ? r2Error.message : 'Unknown error';
 			logger.error(
-				`Failed to delete old vehicle image from R2: ${errorMessage}`
+				`Failed to delete old dress image from R2: ${errorMessage}`
 			);
 			logger.warn(
-				'Vehicle updated in database but old image remains in R2 storage'
+				'Dress updated in database but old image remains in R2 storage'
 			);
 		}
 	}
 }
 
-export default patchVehicle;
+export default patchDress;

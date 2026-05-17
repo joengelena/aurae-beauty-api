@@ -1,5 +1,5 @@
 import AppError from '../errors/appError';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import { Pool, PoolClient } from 'pg';
 
 /**
@@ -22,38 +22,38 @@ export function validateExpiryDate(date: string, fieldName: string): void {
 }
 
 /**
- * Parses and validates vehicle ID from request params
+ * Parses and validates dress ID from request params
  * @param idParam - The ID parameter from request params
- * @returns The parsed vehicle ID
+ * @returns The parsed dress ID
  * @throws AppError if the ID is not a valid number
  */
-export function parseVehicleId(idParam: string): number {
-	const vehicleId = parseInt(idParam, 10);
-	if (isNaN(vehicleId)) {
-		throw new AppError(400, 'Invalid vehicle ID');
+export function parseDressId(idParam: string): number {
+	const dressId = parseInt(idParam, 10);
+	if (isNaN(dressId)) {
+		throw new AppError(400, 'Invalid dress ID');
 	}
-	return vehicleId;
+	return dressId;
 }
 
 /**
- * Verifies that a vehicle exists and belongs to the specified user
- * @param vehicleId - The vehicle ID to verify
+ * Verifies that a dress exists and belongs to the specified user
+ * @param dressId - The dress ID to verify
  * @param userId - The user ID to verify ownership
  * @param connection - Database connection (optional)
- * @throws AppError if vehicle not found or doesn't belong to user
+ * @throws AppError if dress not found or doesn't belong to user
  */
-export async function verifyVehicleOwnership(
-	vehicleId: number,
+export async function verifyDressOwnership(
+	dressId: number,
 	userId: string,
 	connection?: Pool | PoolClient
 ): Promise<void> {
-	const vehicle = await vehicleRepository.getVehicleByIdAndUserId(
-		vehicleId,
+	const dress = await dressRepository.getDressByIdAndUserId(
+		dressId,
 		userId,
 		connection
 	);
 
-	if (!vehicle) {
-		throw new AppError(404, 'Vehicle not found or does not belong to you');
+	if (!dress) {
+		throw new AppError(404, 'Dress not found or does not belong to you');
 	}
 }

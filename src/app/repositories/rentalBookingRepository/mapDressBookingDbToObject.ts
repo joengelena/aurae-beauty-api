@@ -10,13 +10,13 @@ function formatDateToString(date: Date | null): string {
 	return `${year}-${month}-${day}`;
 }
 
-function mapVehicleServiceDbToObject(
+function mapDressBookingDbToObject(
 	servicesDb: any[]
 ): VehicleService[] {
 	return servicesDb.map((service) => {
 		return {
 			id: service.id,
-			vehicleIdFk: service.vehicle_id_fk,
+			dressIdFk: service.vehicle_id_fk,
 			typeOfService: service.type_of_service,
 			serviceDate: formatDateToString(service.service_date),
 			serviceProviderName: service.service_provider_name,
@@ -28,4 +28,4 @@ function mapVehicleServiceDbToObject(
 	});
 }
 
-export default mapVehicleServiceDbToObject;
+export default mapDressBookingDbToObject;

@@ -2,7 +2,7 @@ import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { UserVehicle } from '../../resources/types';
-import mapVehicleDbToObject from './mapVehicleDbToObject';
+import mapDressDbToObject from './mapDressDbToObject';
 import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const vehicleDbFields: Record<keyof UserVehicle, string> = {
@@ -22,13 +22,13 @@ const vehicleDbFields: Record<keyof UserVehicle, string> = {
 	wofExpiryDate: 'wof_expiry_date',
 	insuranceExpiryDate: 'insurance_expiry_date',
 	insuranceProvider: 'insurance_provider',
-	vehiclePhotoUrl: 'vehicle_photo_url',
+	dressPhotoUrl: 'vehicle_photo_url',
 	notes: 'notes',
 	createdAt: 'created_at',
 	updatedAt: 'updated_at',
 };
 
-async function getAllVehiclesByUserId(
+async function getAllDressesByUserId(
 	userId: string,
 	connection?: Pool | PoolClient
 ): Promise<UserVehicle[]> {
@@ -45,14 +45,14 @@ async function getAllVehiclesByUserId(
 		(conn as PoolClient).release();
 	}
 
-	return mapVehicleDbToObject(result.rows);
+	return mapDressDbToObject(result.rows);
 }
 
-async function getVehicleById(
+async function getDressById(
 	vehicleId: number,
 	connection?: Pool | PoolClient
 ): Promise<UserVehicle | null> {
-	logger.info(`Getting vehicle with id '${vehicleId}' from the database`);
+	logger.info(`Getting dress with id '${vehicleId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
@@ -69,16 +69,16 @@ async function getVehicleById(
 		return null;
 	}
 
-	return mapVehicleDbToObject(result.rows)[0];
+	return mapDressDbToObject(result.rows)[0];
 }
 
-async function getVehicleByIdAndUserId(
+async function getDressByIdAndUserId(
 	vehicleId: number,
 	userId: string,
 	connection?: Pool | PoolClient
 ): Promise<UserVehicle | null> {
 	logger.info(
-		`Getting vehicle with id '${vehicleId}' for user '${userId}' from the database`
+		`Getting dress with id '${vehicleId}' for user '${userId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
@@ -96,14 +96,14 @@ async function getVehicleByIdAndUserId(
 		return null;
 	}
 
-	return mapVehicleDbToObject(result.rows)[0];
+	return mapDressDbToObject(result.rows)[0];
 }
 
-async function postVehicle(
+async function postDress(
 	vehicleData: Omit<UserVehicle, 'id' | 'createdAt' | 'updatedAt'>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
-	logger.info('Adding new vehicle to the database');
+	logger.info('Adding new dress to the database');
 
 	const fields: string[] = [];
 	const values: any[] = [];
@@ -138,11 +138,11 @@ async function updateVehicleById(
 	>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
-	logger.info(`Updating vehicle with id '${vehicleId}' in the database`);
+	logger.info(`Updating dress with id '${vehicleId}' in the database`);
 
 	if (Object.keys(updateValues).length === 0) {
-		logger.error('Trying to update vehicle with no update values');
-		throw new Error('Empty vehicle update fields');
+		logger.error('Trying to update dress with no update values');
+		throw new Error('Empty dress update fields');
 	}
 
 	const fields = [];
@@ -170,11 +170,11 @@ async function updateVehicleById(
 	return result;
 }
 
-async function deleteVehicleById(
+async function deleteDressById(
 	vehicleId: number,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
-	logger.info(`Deleting vehicle with id '${vehicleId}' from the database`);
+	logger.info(`Deleting dress with id '${vehicleId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
@@ -191,10 +191,10 @@ async function deleteVehicleById(
 }
 
 export {
-	getAllVehiclesByUserId,
-	getVehicleById,
-	getVehicleByIdAndUserId,
-	postVehicle,
+	getAllDressesByUserId,
+	getDressById,
+	getDressByIdAndUserId,
+	postDress,
 	updateVehicleById,
-	deleteVehicleById,
+	deleteDressById,
 };

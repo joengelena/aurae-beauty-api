@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import * as vehicleServiceRepository from '../../repositories/vehicleServiceRepository/vehicleServiceRepository';
-import * as vehicleRepository from '../../repositories/vehicleRepository/vehicleRepository';
+import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
+import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { VehicleService } from '../../resources/types';
 import { getPool } from '../../../config/db';
 
-async function postService(req: Request, res: Response): Promise<void> {
+async function postBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 	const {
-		vehicleIdFk,
+		dressIdFk,
 		typeOfService,
 		serviceDate,
 		serviceProviderName,
@@ -17,7 +17,7 @@ async function postService(req: Request, res: Response): Promise<void> {
 		notes,
 	} = req.body;
 
-	logger.info(`Adding service record for vehicle '${vehicleIdFk}'`);
+	logger.info(`Adding booking record for dress '${dressIdFk}'`);
 
 	const connection = await getPool().connect();
 
@@ -25,14 +25,14 @@ async function postService(req: Request, res: Response): Promise<void> {
 		await connection.query('BEGIN');
 
 		// Verify user owns the vehicle
-		const vehicle = await vehicleRepository.getVehicleByIdAndUserId(
-			vehicleIdFk,
+		const dress = await dressRepository.getDressByIdAndUserId(
+			dressIdFk,
 			userId,
 			connection
 		);
 
-		if (!vehicle) {
-			throw new AppError(404, 'Vehicle not found');
+		if (!dress) {
+			throw new AppError(404, 'Dress not found');
 		}
 
 		// Prepare service data
@@ -40,7 +40,7 @@ async function postService(req: Request, res: Response): Promise<void> {
 			VehicleService,
 			'id' | 'createdAt' | 'updatedAt'
 		> = {
-			vehicleIdFk,
+			dressIdFk,
 			typeOfService,
 			serviceDate,
 			serviceProviderName: serviceProviderName || null,
@@ -48,7 +48,7 @@ async function postService(req: Request, res: Response): Promise<void> {
 			notes: notes || null,
 		};
 
-		const result = await vehicleServiceRepository.postService(
+		const result = await rentalBookingRepository.postBooking(
 			serviceData,
 			connection
 		);
@@ -57,7 +57,7 @@ async function postService(req: Request, res: Response): Promise<void> {
 		connection.release();
 
 		logger.info(
-			`Service record created for vehicle '${vehicleIdFk}' by user '${userId}'`
+			`Service record created for dress '${dressIdFk}' by user '${userId}'`
 		);
 
 		res.status(201).send({
@@ -80,4 +80,4 @@ async function postService(req: Request, res: Response): Promise<void> {
 	}
 }
 
-export default postService;
+export default postBooking;
