@@ -1,9 +1,13 @@
-# Motorix API
+# AURAE API
+
+## 🔄 TRANSFORMATION IN PROGRESS
+
+**IMPORTANT**: This API is being transformed from a vehicle marketplace to a dress rental platform (AURAE).
 
 ## Project Overview
 
-- RESTful backend for vehicle marketplace (buy/sell listings) with personal vehicle fleet management
-- Dual-purpose: public marketplace + authenticated user vehicle tracking with maintenance records
+- RESTful backend for dress rental marketplace with business owner inventory management
+- Dual-purpose: public marketplace + authenticated business owner dress wardrobe tracking with rental bookings
 - Tech: Node.js/TypeScript, Express, PostgreSQL, Supabase Auth, Cloudflare R2 (images)
 - Multi-client support: Web (httpOnly cookies) + Flutter (tokens in response body)
 - Migrated from MySQL to PostgreSQL (legacy `?` placeholders converted to `$1` style)
@@ -54,7 +58,8 @@ Routes → Middleware (auth, validation, upload) → Controllers → Repositorie
 - **PostgreSQL with explicit transactions** for multi-step operations (BEGIN/COMMIT/ROLLBACK pattern)
 - **Connection pooling** (max 100 connections) with optional connection parameter for transaction support
 - **No ORM** - raw SQL queries with placeholder conversion (`convertQueryPlaceholders`)
-- **CASCADE deletions** configured at DB level (e.g., user deletion cascades to vehicles/services)
+- **CASCADE deletions** configured at DB level (e.g., user deletion cascades to dresses/bookings)
+- **⚠️ DB NEEDS MIGRATION**: Current tables still use vehicle terminology (user_vehicles, vehicle_service)
 
 ### Image Storage Pattern
 - **Cloudflare R2** for scalability (not local filesystem)
@@ -160,8 +165,8 @@ try {
 ### Route Definitions
 - `src/app/routes/userAuth.routes.ts` - Signup, signin, signout, refresh token
 - `src/app/routes/user.routes.ts` - Profile, password, watchlist management
-- `src/app/routes/listing.routes.ts` - Marketplace listings (CRUD + search)
-- `src/app/routes/vehicle.routes.ts` - Personal vehicles + service records
+- `src/app/routes/listing.routes.ts` - Marketplace dress listings (CRUD + search)
+- `src/app/routes/dress.routes.ts` - ✅ Business owner dress wardrobe + rental bookings (RENAMED from vehicle.routes.ts)
 
 ### Core Middleware
 - `src/app/middlewares/supabaseAuthenticateReq.ts` - JWT verification, userId injection (required auth)
@@ -206,8 +211,10 @@ npm run prebuild
 
 ### Database Schema
 - **No migration files** - schema managed outside this codebase
-- Tables: `user`, `listing`, `listing_photo`, `user_vehicles`, `vehicle_service`, `watchlist`
-- See @docs/database-schema.md for full schema reference (when created)
+- **⚠️ NEEDS UPDATE**: Tables still use vehicle terminology: `user_vehicles`, `vehicle_service`
+- **Target tables**: `user_dresses`, `dress_bookings` (or `rental_bookings`)
+- Other tables: `user`, `listing`, `listing_photo`, `watchlist`
+- See @docs/database-schema.md for full schema reference
 
 ### Cloudflare R2 Setup
 - See `CLOUDFLARE_R2_SETUP.md` in repo root for bucket configuration
@@ -219,6 +226,129 @@ npm run prebuild
 
 ---
 
-**Last Updated**: Based on codebase as of commit 72ddd0e
+## 📋 TRANSFORMATION PROGRESS (2026-04-12)
+
+### ✅ COMPLETED TODAY
+
+**API Code Transformation:**
+1. ✅ **Folders & Files Renamed**
+   - `vehicleController/` → `dressController/`
+   - `vehicleServiceController/` → `rentalBookingController/`
+   - `vehicleRepository/` → `dressRepository/`
+   - `vehicleServiceRepository/` → `rentalBookingRepository/`
+   - `vehicle.routes.ts` → `dress.routes.ts`
+   - `vehicleValidation.ts` → `dressValidation.ts`
+
+2. ✅ **Functions Renamed**
+   - All CRUD operations: `getAllVehicles` → `getAllDresses`, etc.
+   - Service operations: `postService` → `postBooking`, etc.
+   - Validation: `parseVehicleId` → `parseDressId`, `verifyVehicleOwnership` → `verifyDressOwnership`
+
+3. ✅ **API Routes Updated**
+   - `/user/vehicles` → `/user/dresses`
+   - `/user/vehicles/:id` → `/user/dresses/:id`
+   - `/user/vehicles/:id/services` → `/user/dresses/:id/bookings`
+   - `/user/vehicle-services` → `/user/dress-bookings`
+
+4. ✅ **Code Internals**
+   - All variable names updated (vehicleId → dressId, serviceData → bookingData, etc.)
+   - Error messages updated ("Vehicle not found" → "Dress not found")
+   - Logger messages updated throughout
+   - Import statements updated in express.ts
+
+### ⚠️ CRITICAL: NOT YET COMMITTED TO GIT
+**Status**: All changes staged but NOT committed. Need to review and commit.
+
+---
+
+### 🚧 TODO: REMAINING WORK
+
+**HIGH PRIORITY (Must do before API is functional):**
+
+1. **Update TypeScript Types** (`src/app/resources/types.ts`)
+   - [ ] Rename `UserVehicle` → `UserDress` (or `BusinessDress`)
+   - [ ] Rename `VehicleService` → `DressBooking` (or `RentalBooking`)
+   - [ ] Update all type references across codebase
+
+2. **Update AJV Schemas** (`src/app/resources/ajvSchema.json`)
+   - [ ] Rename schema: `postVehicle` → `postDress`
+   - [ ] Rename schema: `patchVehicle` → `patchDress`
+   - [ ] Rename schema: `postService` → `postBooking`
+   - [ ] Update field names to match dress domain (if needed)
+
+3. **Database Migration** (CRITICAL - API will fail without this)
+   - [ ] Create migration script or SQL to rename tables:
+     - `user_vehicles` → `user_dresses`
+     - `vehicle_service` → `dress_bookings` (or `rental_bookings`)
+   - [ ] Update column names:
+     - `vehicle_id_fk` → `dress_id_fk`
+     - `vehicle_photo_url` → `dress_photo_url`
+     - Fields like `make`, `model`, `year`, `licensePlate` need domain-appropriate names
+   - [ ] Update database queries in repositories to match new table/column names
+
+4. **Update SQL Queries**
+   - [ ] Review all SQL in `dressRepository.ts` for table/column name mismatches
+   - [ ] Review all SQL in `rentalBookingRepository.ts`
+   - [ ] Update any hardcoded table names
+
+5. **Update R2 Image Keys**
+   - [ ] Change R2 key prefix from `motorix/` to `aurae/`
+   - [ ] Update in `uploadImages.ts`
+
+**MEDIUM PRIORITY:**
+
+6. **Review & Update Listing Routes** (marketplace)
+   - [ ] Check if listing-related types need dress terminology
+   - [ ] Update listing field mappings if needed (make/model → brand/style?)
+
+7. **Update Documentation**
+   - [ ] Update `docs/database-schema.md` with new table names
+   - [ ] Update API endpoint documentation
+   - [ ] Update README.md
+
+8. **Update Environment Variables**
+   - [ ] Check if any env vars reference "motorix" or "vehicle"
+   - [ ] Update R2 bucket name if needed
+
+9. **Test the API**
+   - [ ] Build and run: `npm run build && npm start`
+   - [ ] Test each endpoint with sample data
+   - [ ] Verify database operations work
+   - [ ] Check image uploads to R2
+
+**LOW PRIORITY:**
+
+10. **Rename Project Files**
+    - [ ] `motorix-api.yaml` → `aurae-api.yaml`
+    - [ ] Any other config files with old naming
+
+---
+
+## 🎯 CONCEPT MAPPING (Vehicle → Dress)
+
+| OLD (Vehicle Domain) | NEW (Dress Domain) |
+|---------------------|-------------------|
+| Vehicle | Dress |
+| UserVehicle | UserDress / BusinessDress |
+| VehicleService | DressBooking / RentalBooking |
+| Garage | Wardrobe |
+| vehicleId | dressId |
+| make/model | brand/style |
+| year | purchaseYear |
+| licensePlate | internalName |
+| odometerReading | rentalCount |
+| fuelType | fabricType |
+| bodyType | dressType |
+| transmission | fitType |
+| regoExpiryDate | (not applicable) |
+| wofExpiryDate | (not applicable) |
+| insuranceExpiryDate | insuranceExpiryDate (keep) |
+| serviceDate | bookingDate / rentalStartDate |
+| serviceProvider | renter |
+
+---
+
+**Last Updated**: 2026-04-12 (Transformation in progress)
 **Base URL**: `/api/v1`
 **Port**: 4941 (configurable via `PORT` env var)
+**Git Status**: Changes ready to commit in shine_api
