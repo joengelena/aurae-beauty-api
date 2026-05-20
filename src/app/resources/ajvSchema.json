@@ -407,7 +407,8 @@
 				"maximum": 9999999
 			},
 			"odometerUnit": { "type": "string", "enum": ["km", "mi"] },
-			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 }
+			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 },
+			"damageDescription": { "type": "string", "minLength": 1, "maxLength": 10000 }
 		},
 		"required": [
 			"currentUserId",
@@ -460,7 +461,8 @@
 				"minLength": 1,
 				"maxLength": 255
 			},
-			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 }
+			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 },
+			"damageDescription": { "type": "string", "minLength": 1, "maxLength": 10000 }
 		},
 		"required": ["currentUserId"],
 		"additionalProperties": false

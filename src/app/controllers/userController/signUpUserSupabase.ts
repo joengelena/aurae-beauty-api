@@ -96,12 +96,10 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 
 			await supabaseAdmin.auth.admin.deleteUser(supabaseUserId);
 
-			if (dbError.code === 'ER_DUP_ENTRY') {
-				const splitErrorMessage = dbError.sqlMessage.split(' ');
-				const lastWordInErrorMessage =
-					splitErrorMessage[splitErrorMessage.length - 1];
+			if (dbError.code === '23505') {
+				const constraint = (dbError.constraint as string) ?? '';
 
-				if (lastWordInErrorMessage.includes('phone_number')) {
+				if (constraint.includes('phone_number')) {
 					throw new AppError(
 						409,
 						'This phone number is already registered. Please use a different one.',
@@ -110,7 +108,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 
 				throw new AppError(
 					409,
-					'An account with these details already exists.',
+					'This email is already registered. Please sign in or use a different email.',
 				);
 			}
 
