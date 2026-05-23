@@ -104,32 +104,31 @@ type ListingAttribute = {
 	attributeValues: string[] | number[];
 };
 
-// ===== Vehicle Management Types =====
+// ===== Dress Management Types =====
 
-type UserVehicle = {
+type UserDress = {
 	id: number;
 	userIdFk: string;
-	make: string;
-	model: string;
-	year: number;
-	nickname: string | null;
-	licensePlate: string | null;
+	brand: string;
+	style: string;
+	purchaseYear: number | null;
+	internalName: string | null;
 	color: string | null;
-	fuelType: string | null;
-	transmission: string | null;
-	odometerReading: number | null;
-	odometerUnit: string;
-	regoExpiryDate: string;
-	wofExpiryDate: string;
+	rentalCount: number | null;
+	size: string | null;
+	purchasePrice: number | null;
+	condition: string | null;
 	insuranceExpiryDate: string;
 	insuranceProvider: string;
 	dressPhotoUrl: string | null;
 	notes: string | null;
+	damageDescription: string | null;
+	damagePhotoUrls: string[] | null;
 	createdAt: Date;
 	updatedAt: Date;
 };
 
-type VehicleService = {
+type DressBooking = {
 	id: number;
 	dressIdFk: number;
 	typeOfService: string;
@@ -219,8 +218,8 @@ export {
 	Listing,
 	ListingQueryParams,
 	ListingAttribute,
-	UserVehicle,
-	VehicleService,
+	UserDress,
+	DressBooking,
 	ServiceHistory,
 	ServiceReminder,
 	NotificationPreferences,

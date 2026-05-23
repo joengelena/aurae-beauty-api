@@ -21,18 +21,6 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Updating dress with id '${vehicleId}'`);
 
-	// Validate dates BEFORE acquiring connection to avoid holding resources
-	if (newVehicleData.regoExpiryDate) {
-		validateExpiryDate(
-			newVehicleData.regoExpiryDate,
-			'Registration expiry date'
-		);
-	}
-
-	if (newVehicleData.wofExpiryDate) {
-		validateExpiryDate(newVehicleData.wofExpiryDate, 'WOF expiry date');
-	}
-
 	if (newVehicleData.insuranceExpiryDate) {
 		validateExpiryDate(
 			newVehicleData.insuranceExpiryDate,
@@ -85,7 +73,7 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 				);
 			}
 
-			const result = await dressRepository.updateVehicleById(
+			const result = await dressRepository.updateDressById(
 				vehicleId,
 				newVehicleData,
 				connection

@@ -6,7 +6,7 @@ import AppError from '../../utils/errors/appError';
 async function getAllDresses(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 
-	logger.info(`Getting all vehicles for user '${userId}'`);
+	logger.info(`Getting all dresses for user '${userId}'`);
 
 	try {
 		const vehicles = await dressRepository.getAllDressesByUserId(userId);
@@ -17,7 +17,7 @@ async function getAllDresses(req: Request, res: Response): Promise<void> {
 			throw error;
 		}
 
-		logger.error(`Unexpected error during get all vehicles: ${error.message}`);
+		logger.error(`Unexpected error during get all dresses: ${error.message}`);
 		throw new AppError(500, 'Unable to load dresss. Please try again.');
 	}
 }

@@ -42,14 +42,14 @@ function sanitizeFilename(filename: string): string {
 
 /**
  * Generates a unique object key for storage
- * Format: motorix/{timestamp}-{random}-{filename}
+ * Format: aurae/{timestamp}-{random}-{filename}
  */
 export function generateObjectKey(originalFilename: string): string {
 	const timestamp = Date.now();
 	const randomString = Math.random().toString(36).substring(2, 15);
 	const sanitizedFilename = sanitizeFilename(originalFilename);
 
-	return `motorix/${timestamp}-${randomString}-${sanitizedFilename}`;
+	return `aurae/${timestamp}-${randomString}-${sanitizedFilename}`;
 }
 
 /**
@@ -74,8 +74,8 @@ export function buildPublicUrl(key: string): string {
  * @returns Object key or null if URL is invalid
  *
  * @example
- * extractKeyFromUrl('https://cdn.example.com/motorix/12345-abc-image.jpg')
- * // Returns: 'motorix/12345-abc-image.jpg'
+ * extractKeyFromUrl('https://cdn.example.com/aurae/12345-abc-image.jpg')
+ * // Returns: 'aurae/12345-abc-image.jpg'
  */
 export function extractKeyFromUrl(url: string): string | null {
 	if (!url) return null;

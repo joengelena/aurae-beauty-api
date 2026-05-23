@@ -1,6 +1,5 @@
-import { UserVehicle } from '../../resources/types';
+import { UserDress } from '../../resources/types';
 
-// Helper function to format Date to YYYY-MM-DD string
 function formatDateToString(date: Date | null): string | null {
 	if (!date) return null;
 	const d = new Date(date);
@@ -10,27 +9,26 @@ function formatDateToString(date: Date | null): string | null {
 	return `${year}-${month}-${day}`;
 }
 
-function mapDressDbToObject(dressesDb: any[]): UserVehicle[] {
+function mapDressDbToObject(dressesDb: any[]): UserDress[] {
 	return dressesDb.map((dress) => {
 		return {
 			id: dress.id,
 			userIdFk: dress.user_id_fk,
-			make: dress.make,
-			model: dress.model,
-			year: dress.year,
-			nickname: dress.nickname,
-			licensePlate: dress.license_plate,
+			brand: dress.brand,
+			style: dress.style,
+			purchaseYear: dress.purchase_year,
+			internalName: dress.internal_name,
 			color: dress.color,
-			fuelType: dress.fuel_type,
-			transmission: dress.transmission,
-			odometerReading: dress.odometer_reading,
-			odometerUnit: dress.odometer_unit,
-			regoExpiryDate: formatDateToString(dress.rego_expiry_date) || '',
-			wofExpiryDate: formatDateToString(dress.wof_expiry_date) || '',
-			insuranceExpiryDate: formatDateToString(dress.insurance_expiry_date),
+			rentalCount: dress.rental_count,
+			size: dress.size,
+			purchasePrice: dress.purchase_price,
+			condition: dress.condition,
+			insuranceExpiryDate: formatDateToString(dress.insurance_expiry_date) || '',
 			insuranceProvider: dress.insurance_provider,
-			dressPhotoUrl: dress.vehicle_photo_url,
+			dressPhotoUrl: dress.dress_photo_url,
 			notes: dress.notes,
+			damageDescription: dress.damage_description,
+			damagePhotoUrls: dress.damage_photo_urls ?? [],
 			createdAt: dress.created_at,
 			updatedAt: dress.updated_at,
 		};

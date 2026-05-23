@@ -1,15 +1,15 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
-import { VehicleService } from '../../resources/types';
+import { DressBooking } from '../../resources/types';
 import mapDressBookingDbToObject from './mapDressBookingDbToObject';
 import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
-const vehicleServiceDbFields: Record<
-	keyof Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
+const dressBookingDbFields: Record<
+	keyof Omit<DressBooking, 'id' | 'createdAt' | 'updatedAt'>,
 	string
 > = {
-	dressIdFk: 'vehicle_id_fk',
+	dressIdFk: 'dress_id_fk',
 	typeOfService: 'type_of_service',
 	serviceDate: 'service_date',
 	serviceProviderName: 'service_provider_name',
@@ -18,21 +18,21 @@ const vehicleServiceDbFields: Record<
 };
 
 async function getAllServicesByVehicleId(
-	vehicleId: number,
+	dressId: number,
 	connection?: Pool | PoolClient
-): Promise<VehicleService[]> {
+): Promise<DressBooking[]> {
 	logger.info(
-		`Getting all services for dress '${vehicleId}' from the database`
+		`Getting all bookings for dress '${dressId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(`
-		SELECT * FROM "vehicle_service"
-		WHERE vehicle_id_fk = ?
+		SELECT * FROM "dress_bookings"
+		WHERE dress_id_fk = ?
 		ORDER BY service_date DESC
 	`);
-	const result = await conn.query(query, [vehicleId]);
+	const result = await conn.query(query, [dressId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
 		(conn as PoolClient).release();
@@ -42,15 +42,15 @@ async function getAllServicesByVehicleId(
 }
 
 async function getServiceById(
-	serviceId: number,
+	bookingId: number,
 	connection?: Pool | PoolClient
-): Promise<VehicleService | null> {
-	logger.info(`Getting booking with id '${serviceId}' from the database`);
+): Promise<DressBooking | null> {
+	logger.info(`Getting booking with id '${bookingId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders('SELECT * FROM "vehicle_service" WHERE id = ?');
-	const result = await conn.query(query, [serviceId]);
+	const query = convertQueryPlaceholders('SELECT * FROM "dress_bookings" WHERE id = ?');
+	const result = await conn.query(query, [bookingId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
 		(conn as PoolClient).release();
@@ -64,20 +64,20 @@ async function getServiceById(
 }
 
 async function postBooking(
-	serviceData: Omit<VehicleService, 'id' | 'createdAt' | 'updatedAt'>,
+	bookingData: Omit<DressBooking, 'id' | 'createdAt' | 'updatedAt'>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
-	logger.info('Adding new dress service to the database');
+	logger.info('Adding new booking to the database');
 
 	const fields: string[] = [];
 	const values: any[] = [];
 
-	for (const [key, value] of Object.entries(serviceData)) {
+	for (const [key, value] of Object.entries(bookingData)) {
 		if (value !== undefined) {
 			fields.push(
-				vehicleServiceDbFields[
+				dressBookingDbFields[
 					key as keyof Omit<
-						VehicleService,
+						DressBooking,
 						'id' | 'createdAt' | 'updatedAt'
 					>
 				]
@@ -88,8 +88,8 @@ async function postBooking(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`INSERT INTO "vehicle_service" (${fields.join(', ')})
-                   VALUES (${fields.map(() => '?').join(', ')})`);
+	const query = convertQueryPlaceholders(`INSERT INTO "dress_bookings" (${fields.join(', ')})
+                   VALUES (${fields.map(() => '?').join(', ')}) RETURNING id`);
 	const result = await conn.query(query, values);
 
 	if (!useProvidedConnection && 'release' in conn) {
@@ -100,19 +100,19 @@ async function postBooking(
 }
 
 async function updateServiceById(
-	serviceId: number,
+	bookingId: number,
 	updateValues: Partial<
-		Omit<VehicleService, 'id' | 'dressIdFk' | 'createdAt' | 'updatedAt'>
+		Omit<DressBooking, 'id' | 'dressIdFk' | 'createdAt' | 'updatedAt'>
 	>,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
 	logger.info(
-		`Updating dress booking with id '${serviceId}' in the database`
+		`Updating booking with id '${bookingId}' in the database`
 	);
 
 	if (Object.keys(updateValues).length === 0) {
-		logger.error('Trying to update vehicle service with no update values');
-		throw new Error('Empty vehicle service update fields');
+		logger.error('Trying to update booking with no update values');
+		throw new Error('Empty booking update fields');
 	}
 
 	const fields = [];
@@ -121,9 +121,9 @@ async function updateServiceById(
 	for (const [key, value] of Object.entries(updateValues)) {
 		fields.push(
 			`${
-				vehicleServiceDbFields[
+				dressBookingDbFields[
 					key as keyof Omit<
-						VehicleService,
+						DressBooking,
 						'id' | 'createdAt' | 'updatedAt'
 					>
 				]
@@ -134,9 +134,9 @@ async function updateServiceById(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`UPDATE "vehicle_service" SET ${fields.join(', ')} WHERE id = ?`);
+	const query = convertQueryPlaceholders(`UPDATE "dress_bookings" SET ${fields.join(', ')} WHERE id = ?`);
 
-	values.push(serviceId);
+	values.push(bookingId);
 
 	const result = await conn.query(query, values);
 
@@ -148,17 +148,17 @@ async function updateServiceById(
 }
 
 async function deleteBookingById(
-	serviceId: number,
+	bookingId: number,
 	connection?: Pool | PoolClient
 ): Promise<QueryResult> {
 	logger.info(
-		`Deleting dress booking with id '${serviceId}' from the database`
+		`Deleting booking with id '${bookingId}' from the database`
 	);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders('DELETE FROM "vehicle_service" WHERE id = ?');
-	const result = await conn.query(query, [serviceId]);
+	const query = convertQueryPlaceholders('DELETE FROM "dress_bookings" WHERE id = ?');
+	const result = await conn.query(query, [bookingId]);
 
 	if (!useProvidedConnection && 'release' in conn) {
 		(conn as PoolClient).release();

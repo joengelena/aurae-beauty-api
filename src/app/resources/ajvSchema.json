@@ -1,515 +1,733 @@
 {
-	"emptyBody": {
-		"type": "object",
-		"properties": {},
-		"required": [],
-		"additionalProperties": false
-	},
-	"userIdOnly": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			}
-		},
-		"required": ["currentUserId"],
-		"additionalProperties": false
-	},
-	"userIdOptional": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			}
-		},
-		"required": [],
-		"additionalProperties": false
-	},
-	"signUpUser": {
-		"type": "object",
-		"properties": {
-			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"phoneNumber": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 12
-			},
-			"email": {
-				"type": "string",
-				"format": "email"
-			},
-			"password": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"location": { "type": "string", "minLength": 1, "maxLength": 255 }
-		},
-		"required": [
-			"firstName",
-			"lastName",
-			"email",
-			"password",
-			"phoneNumber",
-			"location"
-		],
-		"additionalProperties": false
-	},
-	"signInUser": {
-		"type": "object",
-		"properties": {
-			"email": {
-				"type": "string",
-				"format": "email",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"password": { "type": "string", "minLength": 1, "maxLength": 255 }
-		},
-		"required": ["email", "password"],
-		"additionalProperties": false
-	},
-	"updateUser": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"firstName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"lastName": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"phoneNumber": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 12
-			},
-			"location": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"profilePhotoUrl": { "type": "string", "minLength": 1, "maxLength": 500 }
-		},
-		"required": ["currentUserId"],
-		"additionalProperties": false
-	},
-	"updateUserPassword": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"currentPassword": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"newPassword": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["currentUserId", "currentPassword", "newPassword"],
-		"additionalProperties": false
-	},
-	"forgotPassword": {
-		"type": "object",
-		"properties": {
-			"email": {
-				"type": "string",
-				"format": "email",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["email"],
-		"additionalProperties": false
-	},
-	"resetPassword": {
-		"type": "object",
-		"properties": {
-			"newPassword": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["newPassword"],
-		"additionalProperties": false
-	},
-	"ChangePassword": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"newPassword": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["currentUserId", "newPassword"],
-		"additionalProperties": false
-	},
-	"refreshToken": {
-		"type": "object",
-		"properties": {
-			"refreshToken": {
-				"type": "string",
-				"minLength": 1
-			}
-		},
-		"required": [],
-		"additionalProperties": false
-	},
-	"deleteUser": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"currentPassword": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["currentUserId", "currentPassword"],
-		"additionalProperties": false
-	},
-	"postListing": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"vehicleCondition": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"originalPrice": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 99999999999
-			},
-			"description": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 10000
-			},
-			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
-			"kilometers": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 99999999999
-			},
-			"fuelType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"bodyType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"driveType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"orcIncluded": { "type": "integer", "minimum": 0, "maximum": 1 },
-			"numberPlate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"seats": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"doors": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"previousOwners": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 255
-			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"engineSize": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 100000
-			},
-			"transmission": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"cylinders": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"regoExpiryDate": {
-				"type": "string",
-				"format": "date",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"wofExpiryDate": {
-				"type": "string",
-				"format": "date",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": [
-			"currentUserId",
-			"location",
-			"vehicleCondition",
-			"originalPrice",
-			"description",
-			"make",
-			"model",
-			"year",
-			"kilometers",
-			"fuelType",
-			"bodyType",
-			"driveType"
-		],
-		"additionalProperties": false
-	},
-	"updateListing": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"status": {
-				"type": "string",
-				"enum": ["active", "sold", "expired"]
-			},
-			"location": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"vehicleCondition": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"originalPrice": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 99999999999
-			},
-			"discountedPrice": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 99999999999
-			},
-			"photoPaths": { "type": "object" },
-			"description": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 10000
-			},
-			"make": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"model": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"year": { "type": "integer", "minimum": 1, "maximum": 3000 },
-			"kilometers": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 99999999999
-			},
-			"fuelType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"bodyType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"driveType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"orcIncluded": { "type": "integer", "minimum": 0, "maximum": 1 },
-			"numberPlate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"seats": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"doors": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"previousOwners": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 255
-			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 50 },
-			"engineSize": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 100000
-			},
-			"transmission": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"cylinders": { "type": "integer", "minimum": 0, "maximum": 255 },
-			"regoExpiryDate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"wofExpiryDate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			}
-		},
-		"required": ["currentUserId"],
-		"additionalProperties": false
-	},
-	"postDress": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"make": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"model": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
-			"nickname": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"licensePlate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 20
-			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"fuelType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"transmission": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"regoExpiryDate": { "type": "string", "format": "date" },
-			"wofExpiryDate": { "type": "string", "format": "date" },
-			"insuranceExpiryDate": { "type": "string", "format": "date" },
-			"insuranceProvider": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"odometerReading": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 9999999
-			},
-			"odometerUnit": { "type": "string", "enum": ["km", "mi"] },
-			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 },
-			"damageDescription": { "type": "string", "minLength": 1, "maxLength": 10000 }
-		},
-		"required": [
-			"currentUserId",
-			"make",
-			"model",
-			"year",
-			"regoExpiryDate",
-			"wofExpiryDate",
-			"insuranceExpiryDate",
-			"insuranceProvider"
-		],
-		"additionalProperties": false
-	},
-	"patchDress": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"make": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"model": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
-			"nickname": { "type": "string", "minLength": 1, "maxLength": 100 },
-			"licensePlate": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 20
-			},
-			"color": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"fuelType": { "type": "string", "minLength": 1, "maxLength": 255 },
-			"transmission": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"odometerReading": {
-				"type": "integer",
-				"minimum": 0,
-				"maximum": 9999999
-			},
-			"odometerUnit": { "type": "string", "enum": ["km", "mi"] },
-			"regoExpiryDate": { "type": "string", "format": "date" },
-			"wofExpiryDate": { "type": "string", "format": "date" },
-			"insuranceExpiryDate": { "type": "string", "format": "date" },
-			"insuranceProvider": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 255
-			},
-			"notes": { "type": "string", "minLength": 1, "maxLength": 10000 },
-			"damageDescription": { "type": "string", "minLength": 1, "maxLength": 10000 }
-		},
-		"required": ["currentUserId"],
-		"additionalProperties": false
-	},
-	"postBooking": {
-		"type": "object",
-		"properties": {
-			"currentUserId": {
-				"type": "string",
-				"format": "uuid",
-				"minLength": 36,
-				"maxLength": 36
-			},
-			"dressIdFk": {
-				"type": "integer",
-				"minimum": 1
-			},
-			"typeOfService": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 150
-			},
-			"serviceDate": {
-				"type": "string",
-				"format": "date"
-			},
-			"serviceProviderName": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 150
-			},
-			"cost": {
-				"type": "number",
-				"minimum": 0
-			},
-			"notes": {
-				"type": "string",
-				"minLength": 1,
-				"maxLength": 10000
-			}
-		},
-		"required": [
-			"currentUserId",
-			"dressIdFk",
-			"typeOfService",
-			"serviceDate"
-		],
-		"additionalProperties": false
-	}
+  "emptyBody": {
+    "type": "object",
+    "properties": {},
+    "required": [],
+    "additionalProperties": false
+  },
+  "userIdOnly": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      }
+    },
+    "required": [
+      "currentUserId"
+    ],
+    "additionalProperties": false
+  },
+  "userIdOptional": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "signUpUser": {
+    "type": "object",
+    "properties": {
+      "firstName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "lastName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "phoneNumber": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 12
+      },
+      "email": {
+        "type": "string",
+        "format": "email"
+      },
+      "password": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "location": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "firstName",
+      "lastName",
+      "email",
+      "password",
+      "phoneNumber",
+      "location"
+    ],
+    "additionalProperties": false
+  },
+  "signInUser": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "password": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "email",
+      "password"
+    ],
+    "additionalProperties": false
+  },
+  "updateUser": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "firstName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "lastName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "phoneNumber": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 12
+      },
+      "location": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "profilePhotoUrl": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      }
+    },
+    "required": [
+      "currentUserId"
+    ],
+    "additionalProperties": false
+  },
+  "updateUserPassword": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "currentPassword": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "newPassword": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "currentUserId",
+      "currentPassword",
+      "newPassword"
+    ],
+    "additionalProperties": false
+  },
+  "forgotPassword": {
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "format": "email",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "email"
+    ],
+    "additionalProperties": false
+  },
+  "resetPassword": {
+    "type": "object",
+    "properties": {
+      "newPassword": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "newPassword"
+    ],
+    "additionalProperties": false
+  },
+  "ChangePassword": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "newPassword": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "currentUserId",
+      "newPassword"
+    ],
+    "additionalProperties": false
+  },
+  "refreshToken": {
+    "type": "object",
+    "properties": {
+      "refreshToken": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "required": [],
+    "additionalProperties": false
+  },
+  "deleteUser": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "currentPassword": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "currentUserId",
+      "currentPassword"
+    ],
+    "additionalProperties": false
+  },
+  "postListing": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "location": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "vehicleCondition": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "originalPrice": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99999999999
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "make": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "model": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "year": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 3000
+      },
+      "kilometers": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99999999999
+      },
+      "fuelType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "bodyType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "driveType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "orcIncluded": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "numberPlate": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "seats": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "doors": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "previousOwners": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "color": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "engineSize": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100000
+      },
+      "transmission": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "cylinders": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "regoExpiryDate": {
+        "type": "string",
+        "format": "date",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "wofExpiryDate": {
+        "type": "string",
+        "format": "date",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "currentUserId",
+      "location",
+      "vehicleCondition",
+      "originalPrice",
+      "description",
+      "make",
+      "model",
+      "year",
+      "kilometers",
+      "fuelType",
+      "bodyType",
+      "driveType"
+    ],
+    "additionalProperties": false
+  },
+  "updateListing": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "sold",
+          "expired"
+        ]
+      },
+      "location": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "vehicleCondition": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "originalPrice": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99999999999
+      },
+      "discountedPrice": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99999999999
+      },
+      "photoPaths": {
+        "type": "object"
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "make": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "model": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "year": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 3000
+      },
+      "kilometers": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99999999999
+      },
+      "fuelType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "bodyType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "driveType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "orcIncluded": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "numberPlate": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "seats": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "doors": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "previousOwners": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "color": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "engineSize": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100000
+      },
+      "transmission": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "cylinders": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "regoExpiryDate": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "wofExpiryDate": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "required": [
+      "currentUserId"
+    ],
+    "additionalProperties": false
+  },
+  "postDress": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "brand": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "style": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "size": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "condition": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "purchaseYear": {
+        "type": "integer",
+        "minimum": 1900,
+        "maximum": 2100
+      },
+      "internalName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "color": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "rentalCount": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "purchasePrice": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "insuranceExpiryDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "insuranceProvider": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "damageDescription": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      }
+    },
+    "required": [
+      "currentUserId",
+      "brand",
+      "style",
+      "size",
+      "condition",
+      "insuranceExpiryDate",
+      "insuranceProvider"
+    ],
+    "additionalProperties": false
+  },
+  "patchDress": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "brand": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "style": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "size": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "condition": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "purchaseYear": {
+        "type": "integer",
+        "minimum": 1900,
+        "maximum": 2100
+      },
+      "internalName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "color": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "rentalCount": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "purchasePrice": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "insuranceExpiryDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "insuranceProvider": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "damageDescription": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      }
+    },
+    "required": [
+      "currentUserId"
+    ],
+    "additionalProperties": false
+  },
+  "postBooking": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "dressIdFk": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "typeOfService": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "serviceDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "serviceProviderName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "cost": {
+        "type": "number",
+        "minimum": 0
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      }
+    },
+    "required": [
+      "currentUserId",
+      "dressIdFk",
+      "typeOfService",
+      "serviceDate"
+    ],
+    "additionalProperties": false
+  }
 }

@@ -3,7 +3,7 @@ import * as rentalBookingRepository from '../../repositories/rentalBookingReposi
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
-import { VehicleService } from '../../resources/types';
+import { DressBooking } from '../../resources/types';
 import { getPool } from '../../../config/db';
 
 async function postBooking(req: Request, res: Response): Promise<void> {
@@ -37,7 +37,7 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 
 		// Prepare service data
 		const serviceData: Omit<
-			VehicleService,
+			DressBooking,
 			'id' | 'createdAt' | 'updatedAt'
 		> = {
 			dressIdFk,
@@ -61,8 +61,8 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 		);
 
 		res.status(201).send({
-			message: 'Service record added successfully',
-			serviceId: result.rows[0]?.id,
+			message: 'Booking added successfully',
+			bookingId: result.rows[0]?.id,
 		});
 	} catch (error: any) {
 		await connection.query('ROLLBACK');
