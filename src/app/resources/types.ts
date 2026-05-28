@@ -11,7 +11,7 @@ type User = {
 };
 
 type ListingPhoto = {
-	listingIdFk: number;
+	dressIdFk: number;
 	photoOrder: number;
 	photoPath: string;
 };
@@ -19,34 +19,20 @@ type ListingPhoto = {
 type Listing = {
 	id: number;
 	userIdFk: string;
-	status: 'active' | 'sold' | 'expired';
+	status: 'active' | 'rented' | 'sold';
 	viewCount: number;
 	previewImgUrl: string;
 	imageUrls: string[];
 	location: string;
-	vehicleCondition: string;
-	originalPrice: number;
-	discountedPrice: number | null;
+	condition: string;
+	pricePerDay: number;
 	uploadDate: Date;
 	description: string;
-	make: string;
-	model: string;
-	year: string;
-	kilometers: number;
-	fuelType: string;
-	bodyType: string;
-	driveType: string;
-	orcIncluded: number;
-	numberPlate: string | null;
-	seats: number | null;
-	doors: number | null;
-	previousOwners: number | null;
+	brand: string;
+	style: string;
+	size: string;
 	color: string | null;
-	engineSize: number | null;
-	transmission: string | null;
-	cylinders: number | null;
-	regoExpiryDate: string | null;
-	wofExpiryDate: string | null;
+	dressType: string | null;
 	isInWatchlist?: number;
 };
 
@@ -62,40 +48,23 @@ type ListingQueryParams = {
 		| 'priceDesc'
 		| 'priceAsc'
 		| 'uploadDateDesc'
-		| 'uploadDateAsc'
-		| 'kilometersDesc'
-		| 'kilometersAsc'
-		| 'yearDesc'
-		| 'yearAsc';
+		| 'uploadDateAsc';
 	limit: string;
 	pageNumber: string;
 	// Between filters
 	priceFrom: string;
 	priceTo: string;
-	yearFrom: string;
-	yearTo: string;
-	kilometersFrom: string;
-	kilometersTo: string;
-	seatsFrom: string;
-	seatsTo: string;
-	doorsFrom: string;
-	doorsTo: string;
-	engineSizeFrom: string;
-	engineSizeTo: string;
 	// Equal filters
 	userIdFk: string;
 	location: string;
 	status: string;
-	vehicleCondition: string;
+	condition: string;
 	uploadDate: string;
-	make: string;
-	model: string;
-	fuelType: string;
-	bodyType: string;
-	driveType: string;
+	brand: string;
+	style: string;
+	size: string;
 	color: string;
-	transmission: string;
-	cylinders: string;
+	dressType: string;
 	currentUserId?: string;
 };
 
@@ -118,8 +87,6 @@ type UserDress = {
 	size: string | null;
 	purchasePrice: number | null;
 	condition: string | null;
-	insuranceExpiryDate: string;
-	insuranceProvider: string;
 	dressPhotoUrl: string | null;
 	notes: string | null;
 	damageDescription: string | null;

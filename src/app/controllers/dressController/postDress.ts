@@ -6,7 +6,6 @@ import { UserDress } from '../../resources/types';
 import { getPool } from '../../../config/db';
 import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
 import { validateFile } from '../../utils/cloudflare/validation';
-import { validateExpiryDate } from '../../utils/validation/dressValidation';
 
 async function postDress(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -20,8 +19,6 @@ async function postDress(req: Request, res: Response): Promise<void> {
 		color,
 		rentalCount,
 		purchasePrice,
-		insuranceExpiryDate,
-		insuranceProvider,
 		notes,
 		damageDescription,
 	} = req.body;
@@ -41,10 +38,6 @@ async function postDress(req: Request, res: Response): Promise<void> {
 		logger.info(`Successfully uploaded dress image: ${uploadResult.key}`);
 	}
 
-	if (insuranceExpiryDate) {
-		validateExpiryDate(insuranceExpiryDate, 'Insurance expiry date');
-	}
-
 	const connection = await getPool().connect();
 
 	try {
@@ -61,8 +54,6 @@ async function postDress(req: Request, res: Response): Promise<void> {
 			color: color ?? null,
 			rentalCount: rentalCount ?? null,
 			purchasePrice: purchasePrice ?? null,
-			insuranceExpiryDate,
-			insuranceProvider,
 			dressPhotoUrl,
 			notes: notes ?? null,
 			damageDescription: damageDescription ?? null,

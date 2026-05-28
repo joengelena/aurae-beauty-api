@@ -260,12 +260,12 @@
         "minLength": 1,
         "maxLength": 255
       },
-      "vehicleCondition": {
+      "condition": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "originalPrice": {
+      "pricePerDay": {
         "type": "integer",
         "minimum": 0,
         "maximum": 99999999999
@@ -275,95 +275,28 @@
         "minLength": 1,
         "maxLength": 10000
       },
-      "make": {
+      "brand": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "model": {
+      "style": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "year": {
-        "type": "integer",
-        "minimum": 1,
-        "maximum": 3000
-      },
-      "kilometers": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 99999999999
-      },
-      "fuelType": {
+      "size": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 255
-      },
-      "bodyType": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "driveType": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "orcIncluded": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 1
-      },
-      "numberPlate": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "seats": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "doors": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "previousOwners": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
+        "maxLength": 50
       },
       "color": {
         "type": "string",
         "minLength": 1,
         "maxLength": 50
       },
-      "engineSize": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 100000
-      },
-      "transmission": {
+      "dressType": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "cylinders": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "regoExpiryDate": {
-        "type": "string",
-        "format": "date",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "wofExpiryDate": {
-        "type": "string",
-        "format": "date",
         "minLength": 1,
         "maxLength": 255
       }
@@ -371,16 +304,12 @@
     "required": [
       "currentUserId",
       "location",
-      "vehicleCondition",
-      "originalPrice",
+      "condition",
+      "pricePerDay",
       "description",
-      "make",
-      "model",
-      "year",
-      "kilometers",
-      "fuelType",
-      "bodyType",
-      "driveType"
+      "brand",
+      "style",
+      "size"
     ],
     "additionalProperties": false
   },
@@ -397,8 +326,8 @@
         "type": "string",
         "enum": [
           "active",
-          "sold",
-          "expired"
+          "rented",
+          "sold"
         ]
       },
       "location": {
@@ -406,115 +335,42 @@
         "minLength": 1,
         "maxLength": 255
       },
-      "vehicleCondition": {
+      "condition": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "originalPrice": {
+      "pricePerDay": {
         "type": "integer",
         "minimum": 0,
         "maximum": 99999999999
-      },
-      "discountedPrice": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 99999999999
-      },
-      "photoPaths": {
-        "type": "object"
       },
       "description": {
         "type": "string",
         "minLength": 1,
         "maxLength": 10000
       },
-      "make": {
+      "brand": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "model": {
+      "style": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
       },
-      "year": {
-        "type": "integer",
-        "minimum": 1,
-        "maximum": 3000
-      },
-      "kilometers": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 99999999999
-      },
-      "fuelType": {
+      "size": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 255
-      },
-      "bodyType": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "driveType": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "orcIncluded": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 1
-      },
-      "numberPlate": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "seats": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "doors": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "previousOwners": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
+        "maxLength": 50
       },
       "color": {
         "type": "string",
         "minLength": 1,
         "maxLength": 50
       },
-      "engineSize": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 100000
-      },
-      "transmission": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "cylinders": {
-        "type": "integer",
-        "minimum": 0,
-        "maximum": 255
-      },
-      "regoExpiryDate": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
-      "wofExpiryDate": {
+      "dressType": {
         "type": "string",
         "minLength": 1,
         "maxLength": 255
@@ -577,15 +433,6 @@
         "type": "integer",
         "minimum": 0
       },
-      "insuranceExpiryDate": {
-        "type": "string",
-        "format": "date"
-      },
-      "insuranceProvider": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
-      },
       "notes": {
         "type": "string",
         "minLength": 1,
@@ -602,9 +449,7 @@
       "brand",
       "style",
       "size",
-      "condition",
-      "insuranceExpiryDate",
-      "insuranceProvider"
+      "condition"
     ],
     "additionalProperties": false
   },
@@ -659,15 +504,6 @@
       "purchasePrice": {
         "type": "integer",
         "minimum": 0
-      },
-      "insuranceExpiryDate": {
-        "type": "string",
-        "format": "date"
-      },
-      "insuranceProvider": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 255
       },
       "notes": {
         "type": "string",

@@ -6,7 +6,6 @@ import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
 import { validateFile } from '../../utils/cloudflare/validation';
 import {
 	parseDressId,
-	validateExpiryDate,
 	verifyDressOwnership,
 } from '../../utils/validation/dressValidation';
 import { withTransaction } from '../../utils/database/transactionHandler';
@@ -20,13 +19,6 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 	const { currentUserId, ...newVehicleData } = req.body;
 
 	logger.info(`Updating dress with id '${vehicleId}'`);
-
-	if (newVehicleData.insuranceExpiryDate) {
-		validateExpiryDate(
-			newVehicleData.insuranceExpiryDate,
-			'Insurance expiry date'
-		);
-	}
 
 	// Handle image upload if provided
 	const file = req.file as Express.Multer.File | undefined;

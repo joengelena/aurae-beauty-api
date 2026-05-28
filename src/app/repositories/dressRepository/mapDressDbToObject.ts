@@ -23,8 +23,6 @@ function mapDressDbToObject(dressesDb: any[]): UserDress[] {
 			size: dress.size,
 			purchasePrice: dress.purchase_price,
 			condition: dress.condition,
-			insuranceExpiryDate: formatDateToString(dress.insurance_expiry_date) || '',
-			insuranceProvider: dress.insurance_provider,
 			dressPhotoUrl: dress.dress_photo_url,
 			notes: dress.notes,
 			damageDescription: dress.damage_description,

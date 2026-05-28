@@ -17,8 +17,6 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	size: 'size',
 	purchasePrice: 'purchase_price',
 	condition: 'condition',
-	insuranceExpiryDate: 'insurance_expiry_date',
-	insuranceProvider: 'insurance_provider',
 	dressPhotoUrl: 'dress_photo_url',
 	notes: 'notes',
 	damageDescription: 'damage_description',
