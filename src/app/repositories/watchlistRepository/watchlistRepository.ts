@@ -16,7 +16,7 @@ async function addToWatchlist(
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(`INSERT INTO "watchlist"
-        (user_id_fk, listing_id_fk) VALUES
+        (user_id_fk, dress_id_fk) VALUES
         (?, ?)`);
 	const result = await conn.query(query, [
 		userId,
@@ -42,7 +42,7 @@ async function removeFromWatchlist(
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(
-		'DELETE FROM "watchlist" WHERE user_id_fk = ? AND listing_id_fk = ?');
+		'DELETE FROM "watchlist" WHERE user_id_fk = ? AND dress_id_fk = ?');
 	const result = await conn.query(query, [
 		userId,
 		listingId,
@@ -65,8 +65,8 @@ async function getUserWatchlist(userId: string): Promise<any[]> {
 			COALESCE(json_agg(lp.photo_path ORDER BY lp.photo_order), '[]'::json) AS image_urls,
 			MAX(w.added_at) as added_at
 		FROM "watchlist" w
-		INNER JOIN "listing" l ON w.listing_id_fk = l.id
-		LEFT JOIN "listing_photo" lp ON l.id = lp.listing_id_fk
+		INNER JOIN "dress" l ON w.dress_id_fk = l.id
+		LEFT JOIN "dress_photo" lp ON l.id = lp.dress_id_fk
 		WHERE w.user_id_fk = ?
 		GROUP BY l.id
 		ORDER BY MAX(w.added_at) DESC

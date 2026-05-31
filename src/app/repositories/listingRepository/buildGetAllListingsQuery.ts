@@ -28,8 +28,8 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 						SELECT
 						l.*,
 						COALESCE(json_agg(lp.photo_path ORDER BY lp.photo_order), '[]'::json) AS image_urls
-						FROM listing l
-						LEFT JOIN listing_photo lp ON l.id = lp.listing_id_fk
+						FROM dress l
+						LEFT JOIN dress_photo lp ON l.id = lp.dress_id_fk
 						GROUP BY l.id
 					) AS listingsWithImages`;
 	let query = null;
@@ -74,16 +74,16 @@ function buildGetAllListingsQuery(allQueries: Partial<ListingQueryParams>) {
 
 	if (allQueries.currentUserId) {
 		query = `
-				SELECT *, CASE WHEN watchlist.listing_id_fk IS NOT NULL THEN 1 ELSE 0 END AS is_in_watchlist
+				SELECT *, CASE WHEN watchlist.dress_id_fk IS NOT NULL THEN 1 ELSE 0 END AS is_in_watchlist
 				FROM (
 					${baseQuery}
 				) AS result
 				LEFT JOIN (
-					SELECT listing_id_fk
+					SELECT dress_id_fk
 					FROM watchlist
 					WHERE user_id_fk = ?
 				) as watchlist
-				on watchlist.listing_id_fk = result.id`;
+				on watchlist.dress_id_fk = result.id`;
 		queryValues.push(allQueries.currentUserId);
 	}
 
@@ -102,9 +102,8 @@ function buildSearchQuery(
 		allQueries.searchString !== ''
 	) {
 		return {
-			query: 'make ILIKE ? OR model ILIKE ? OR transmission ILIKE ?',
+			query: 'brand ILIKE ? OR style ILIKE ?',
 			values: [
-				`%${allQueries.searchString}%`,
 				`%${allQueries.searchString}%`,
 				`%${allQueries.searchString}%`,
 			],
@@ -121,18 +120,8 @@ function buildBetweenFilterQuery(
 	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	const betweenFilterConditions: BetweenFilterCondition[] = [
-		{ key: 'priceFrom', column: 'original_price', operator: '>=' },
-		{ key: 'priceTo', column: 'original_price', operator: '<=' },
-		{ key: 'yearFrom', column: 'year', operator: '>=' },
-		{ key: 'yearTo', column: 'year', operator: '<=' },
-		{ key: 'kilometersFrom', column: 'kilometers', operator: '>=' },
-		{ key: 'kilometersTo', column: 'kilometers', operator: '<=' },
-		{ key: 'seatsFrom', column: 'seats', operator: '>=' },
-		{ key: 'seatsTo', column: 'seats', operator: '<=' },
-		{ key: 'doorsFrom', column: 'doors', operator: '>=' },
-		{ key: 'doorsTo', column: 'doors', operator: '<=' },
-		{ key: 'engineSizeFrom', column: 'engine_size', operator: '>=' },
-		{ key: 'engineSizeTo', column: 'engine_size', operator: '<=' },
+		{ key: 'priceFrom', column: 'price_per_day', operator: '>=' },
+		{ key: 'priceTo', column: 'price_per_day', operator: '<=' },
 	];
 
 	const subQueryParts: string[] = [];
@@ -162,16 +151,13 @@ function buildEqualFilterQuery(
 		{ key: 'userIdFk', column: 'user_id_fk' },
 		{ key: 'status', column: 'status' },
 		{ key: 'location', column: 'location' },
-		{ key: 'vehicleCondition', column: 'vehicle_condition' },
+		{ key: 'condition', column: 'condition' },
 		{ key: 'uploadDate', column: 'upload_date' },
-		{ key: 'make', column: 'make' },
-		{ key: 'model', column: 'model' },
-		{ key: 'fuelType', column: 'fuel_type' },
-		{ key: 'bodyType', column: 'body_type' },
-		{ key: 'driveType', column: 'drive_type' },
+		{ key: 'brand', column: 'brand' },
+		{ key: 'style', column: 'style' },
+		{ key: 'size', column: 'size' },
 		{ key: 'color', column: 'color' },
-		{ key: 'transmission', column: 'transmission' },
-		{ key: 'cylinders', column: 'cylinders' },
+		{ key: 'dressType', column: 'dress_type' },
 	];
 
 	const subQueryParts: string[] = [];
@@ -198,14 +184,10 @@ function buildSortByQuery(
 	allQueries: Partial<ListingQueryParams>,
 ): QueryAndValue {
 	const sortByConditions = [
-		{ key: 'priceDesc', column: 'original_price', order: 'DESC' },
-		{ key: 'priceAsc', column: 'original_price', order: 'ASC' },
+		{ key: 'priceDesc', column: 'price_per_day', order: 'DESC' },
+		{ key: 'priceAsc', column: 'price_per_day', order: 'ASC' },
 		{ key: 'uploadDateDesc', column: 'upload_date', order: 'DESC' },
 		{ key: 'uploadDateAsc', column: 'upload_date', order: 'ASC' },
-		{ key: 'kilometersDesc', column: 'kilometers', order: 'DESC' },
-		{ key: 'kilometersAsc', column: 'kilometers', order: 'ASC' },
-		{ key: 'yearDesc', column: 'year', order: 'DESC' },
-		{ key: 'yearAsc', column: 'year', order: 'ASC' },
 	];
 
 	if (allQueries.sortBy !== undefined) {
