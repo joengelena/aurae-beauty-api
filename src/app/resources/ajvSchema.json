@@ -433,6 +433,10 @@
         "type": "integer",
         "minimum": 0
       },
+      "rentalPricePerDay": {
+        "type": "integer",
+        "minimum": 0
+      },
       "notes": {
         "type": "string",
         "minLength": 1,
@@ -449,7 +453,8 @@
       "brand",
       "style",
       "size",
-      "condition"
+      "condition",
+      "rentalPricePerDay"
     ],
     "additionalProperties": false
   },
@@ -502,6 +507,10 @@
         "minimum": 0
       },
       "purchasePrice": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "rentalPricePerDay": {
         "type": "integer",
         "minimum": 0
       },

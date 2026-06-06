@@ -16,6 +16,7 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	rentalCount: 'rental_count',
 	size: 'size',
 	purchasePrice: 'purchase_price',
+	rentalPricePerDay: 'rental_price_per_day',
 	condition: 'condition',
 	dressPhotoUrl: 'dress_photo_url',
 	notes: 'notes',
@@ -187,6 +188,43 @@ async function deleteDressById(
 	return result;
 }
 
+async function getPublicDresses(
+	limit: number,
+	offset: number,
+	connection?: Pool | PoolClient
+): Promise<{ dresses: Partial<UserDress>[]; totalRows: number }> {
+	logger.info('Getting public dresses from the database');
+
+	const conn = connection || getPool();
+
+	const countResult = await conn.query('SELECT COUNT(*) FROM "user_dresses"');
+	const totalRows = parseInt(countResult.rows[0].count, 10);
+
+	const query = convertQueryPlaceholders(
+		`SELECT id, user_id_fk, brand, style, size, color, condition,
+		        dress_photo_url, rental_price_per_day, created_at
+		 FROM "user_dresses"
+		 ORDER BY created_at DESC
+		 LIMIT ? OFFSET ?`
+	);
+	const result = await conn.query(query, [limit, offset]);
+
+	const dresses = result.rows.map((row: any) => ({
+		id: row.id,
+		userIdFk: row.user_id_fk,
+		brand: row.brand,
+		style: row.style,
+		size: row.size,
+		color: row.color,
+		condition: row.condition,
+		dressPhotoUrl: row.dress_photo_url,
+		rentalPricePerDay: row.rental_price_per_day,
+		createdAt: row.created_at,
+	}));
+
+	return { dresses, totalRows };
+}
+
 export {
 	getAllDressesByUserId,
 	getDressById,
@@ -194,4 +232,5 @@ export {
 	postDress,
 	updateDressById,
 	deleteDressById,
+	getPublicDresses,
 };

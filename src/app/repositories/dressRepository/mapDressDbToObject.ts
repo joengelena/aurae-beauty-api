@@ -22,6 +22,7 @@ function mapDressDbToObject(dressesDb: any[]): UserDress[] {
 			rentalCount: dress.rental_count,
 			size: dress.size,
 			purchasePrice: dress.purchase_price,
+			rentalPricePerDay: dress.rental_price_per_day,
 			condition: dress.condition,
 			dressPhotoUrl: dress.dress_photo_url,
 			notes: dress.notes,

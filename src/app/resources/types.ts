@@ -86,6 +86,7 @@ type UserDress = {
 	rentalCount: number | null;
 	size: string | null;
 	purchasePrice: number | null;
+	rentalPricePerDay: number | null;
 	condition: string | null;
 	dressPhotoUrl: string | null;
 	notes: string | null;

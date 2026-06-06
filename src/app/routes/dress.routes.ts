@@ -6,6 +6,7 @@ import {
 	postDress,
 	patchDress,
 	deleteDress,
+	getPublicDresses,
 } from '../controllers/dressController';
 import { postBooking, getBookingsByDressId, deleteBooking } from '../controllers/rentalBookingController';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -15,6 +16,10 @@ import { asyncHandler } from '../utils/asyncHandler';
 import uploadMulter from '../utils/multerStorage';
 
 const dressRoutes = (app: Express) => {
+	// Public browse endpoint — no auth required
+	app.route(rootUrl + '/dresses')
+		.get(asyncHandler(getPublicDresses));
+
 	app.route(rootUrl + '/user/dresses')
 		.get(
 			supabaseAuthenticateReq,
