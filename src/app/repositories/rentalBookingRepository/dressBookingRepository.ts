@@ -10,10 +10,16 @@ const dressBookingDbFields: Record<
 	string
 > = {
 	dressIdFk: 'dress_id_fk',
-	typeOfService: 'type_of_service',
-	serviceDate: 'service_date',
-	serviceProviderName: 'service_provider_name',
-	cost: 'cost',
+	bookingType: 'booking_type',
+	bookingDate: 'booking_date',
+	startDate: 'start_date',
+	endDate: 'end_date',
+	renterName: 'renter_name',
+	renterEmail: 'renter_email',
+	renterPhone: 'renter_phone',
+	totalCost: 'total_cost',
+	depositPaid: 'deposit_paid',
+	status: 'status',
 	notes: 'notes',
 };
 

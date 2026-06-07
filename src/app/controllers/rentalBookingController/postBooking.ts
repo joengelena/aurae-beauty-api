@@ -10,10 +10,16 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 	const {
 		dressIdFk,
-		typeOfService,
-		serviceDate,
-		serviceProviderName,
-		cost,
+		bookingType,
+		bookingDate,
+		startDate,
+		endDate,
+		renterName,
+		renterEmail,
+		renterPhone,
+		totalCost,
+		depositPaid,
+		status,
 		notes,
 	} = req.body;
 
@@ -35,16 +41,22 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'Dress not found');
 		}
 
-		// Prepare service data
+		// Prepare booking data
 		const serviceData: Omit<
 			DressBooking,
 			'id' | 'createdAt' | 'updatedAt'
 		> = {
 			dressIdFk,
-			typeOfService,
-			serviceDate,
-			serviceProviderName: serviceProviderName || null,
-			cost: cost || null,
+			bookingType: bookingType || 'rental',
+			bookingDate: bookingDate || startDate,
+			startDate,
+			endDate,
+			renterName: renterName || null,
+			renterEmail: renterEmail || null,
+			renterPhone: renterPhone || null,
+			totalCost: totalCost ?? 0,
+			depositPaid: depositPaid || null,
+			status: status || 'pending',
 			notes: notes || null,
 		};
 

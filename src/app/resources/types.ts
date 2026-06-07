@@ -99,10 +99,16 @@ type UserDress = {
 type DressBooking = {
 	id: number;
 	dressIdFk: number;
-	typeOfService: string;
-	serviceDate: string;
-	serviceProviderName: string | null;
-	cost: number | null;
+	bookingType: string;
+	bookingDate: string;
+	startDate: string;
+	endDate: string;
+	renterName: string | null;
+	renterEmail: string | null;
+	renterPhone: string | null;
+	totalCost: number;
+	depositPaid: number | null;
+	status: string;
 	notes: string | null;
 	createdAt: Date;
 	updatedAt: Date;

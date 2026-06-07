@@ -543,23 +543,49 @@
         "type": "integer",
         "minimum": 1
       },
-      "typeOfService": {
+      "bookingType": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 150
+        "maxLength": 50
       },
-      "serviceDate": {
+      "bookingDate": {
         "type": "string",
         "format": "date"
       },
-      "serviceProviderName": {
+      "startDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "renterName": {
         "type": "string",
         "minLength": 1,
         "maxLength": 150
       },
-      "cost": {
+      "renterEmail": {
+        "type": "string",
+        "format": "email"
+      },
+      "renterPhone": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "totalCost": {
         "type": "number",
         "minimum": 0
+      },
+      "depositPaid": {
+        "type": "number",
+        "minimum": 0
+      },
+      "status": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
       },
       "notes": {
         "type": "string",
@@ -570,8 +596,8 @@
     "required": [
       "currentUserId",
       "dressIdFk",
-      "typeOfService",
-      "serviceDate"
+      "startDate",
+      "endDate"
     ],
     "additionalProperties": false
   }
