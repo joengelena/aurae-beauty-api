@@ -5,6 +5,7 @@ type User = {
 	email: string;
 	phoneNumber: string;
 	location: string;
+	instagram: string | null;
 	profilePhotoUrl: string | null;
 	isEmailVerified: 0 | 1;
 	isPhoneNumberVerified: 0 | 1;

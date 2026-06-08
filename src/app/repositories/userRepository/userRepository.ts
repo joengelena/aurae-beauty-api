@@ -75,6 +75,7 @@ async function updateUser(
 		lastName: 'last_name',
 		phoneNumber: 'phone_number',
 		location: 'location',
+		instagram: 'instagram',
 		profilePhotoUrl: 'profile_photo_url',
 	};
 

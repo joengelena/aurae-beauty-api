@@ -9,6 +9,7 @@ function mapUserDbToObject(usersDb: any[]): User[] {
 			email: user.email,
 			phoneNumber: user.phone_number,
 			location: user.location,
+			instagram: user.instagram ?? null,
 			profilePhotoUrl: user.profile_photo_url,
 			isEmailVerified: user.is_email_verified,
 			isPhoneNumberVerified: user.is_phone_number_verified,

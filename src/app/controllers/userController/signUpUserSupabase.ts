@@ -73,6 +73,7 @@ async function signUpUserSupabase(req: Request, res: Response): Promise<void> {
 					email,
 					phoneNumber,
 					location,
+					instagram: null,
 					profilePhotoUrl: null,
 					isEmailVerified: FALSE,
 					isPhoneNumberVerified: FALSE,

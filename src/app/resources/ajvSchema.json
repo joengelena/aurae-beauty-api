@@ -126,6 +126,11 @@
         "minLength": 1,
         "maxLength": 255
       },
+      "instagram": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
       "profilePhotoUrl": {
         "type": "string",
         "minLength": 1,
