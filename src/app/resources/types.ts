@@ -80,6 +80,8 @@ type UserDress = {
 	userIdFk: string;
 	brand: string;
 	style: string;
+	listingType: 'rent' | 'sell';
+	isPublic: boolean;
 	purchaseYear: number | null;
 	internalName: string | null;
 	color: string | null;
@@ -103,9 +105,10 @@ type DressBooking = {
 	bookingDate: string;
 	startDate: string;
 	endDate: string;
-	renterName: string | null;
+	renterName: string;
 	renterEmail: string | null;
 	renterPhone: string | null;
+	renterInstagram: string | null;
 	totalCost: number;
 	depositPaid: number | null;
 	status: string;
