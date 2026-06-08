@@ -17,6 +17,7 @@ const dressBookingDbFields: Record<
 	renterName: 'renter_name',
 	renterEmail: 'renter_email',
 	renterPhone: 'renter_phone',
+	renterInstagram: 'renter_instagram',
 	totalCost: 'total_cost',
 	depositPaid: 'deposit_paid',
 	status: 'status',
@@ -36,7 +37,7 @@ async function getAllServicesByVehicleId(
 	const query = convertQueryPlaceholders(`
 		SELECT * FROM "dress_bookings"
 		WHERE dress_id_fk = ?
-		ORDER BY service_date DESC
+		ORDER BY booking_date DESC
 	`);
 	const result = await conn.query(query, [dressId]);
 
