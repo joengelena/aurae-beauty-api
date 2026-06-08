@@ -236,7 +236,7 @@ async function getPublicDresses(
 async function getPublicDressById(
 	dressId: number,
 	connection?: Pool | PoolClient
-): Promise<(UserDress & { location: string }) | null> {
+): Promise<(UserDress & { location: string; imageUrls: string[] }) | null> {
 	logger.info(`Getting public dress with id '${dressId}' from the database`);
 
 	const useProvidedConnection = !!connection;
@@ -258,7 +258,12 @@ async function getPublicDressById(
 	}
 
 	const mapped = mapDressDbToObject(result.rows)[0];
-	return { ...mapped, location: result.rows[0].location ?? '' };
+	const dressPhotoUrl = result.rows[0].dress_photo_url as string | null;
+	return {
+		...mapped,
+		location: result.rows[0].location ?? '',
+		imageUrls: dressPhotoUrl ? [dressPhotoUrl] : [],
+	};
 }
 
 export {
