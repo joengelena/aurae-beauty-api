@@ -12,6 +12,8 @@ async function postDress(req: Request, res: Response): Promise<void> {
 	const {
 		brand,
 		style,
+		listingType,
+		isPublic,
 		size,
 		condition,
 		purchaseYear,
@@ -48,6 +50,8 @@ async function postDress(req: Request, res: Response): Promise<void> {
 			userIdFk: userId,
 			brand,
 			style,
+			listingType: listingType ?? 'rent',
+			isPublic: isPublic ?? false,
 			size: size ?? null,
 			condition: condition ?? null,
 			purchaseYear: purchaseYear ?? null,

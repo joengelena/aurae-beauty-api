@@ -4,8 +4,8 @@ import AppError from '../../utils/errors/appError';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 
 const getPublicDresses = async (req: Request, res: Response): Promise<void> => {
-	const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
-	const pageNumber = Math.max(parseInt(req.query.pageNumber as string) || 1, 1);
+	const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 50);
+	const pageNumber = Math.max(parseInt(req.query.pageNumber as string, 10) || 1, 1);
 	const offset = (pageNumber - 1) * limit;
 
 	try {

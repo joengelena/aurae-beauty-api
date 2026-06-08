@@ -10,6 +10,8 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	userIdFk: 'user_id_fk',
 	brand: 'brand',
 	style: 'style',
+	listingType: 'listing_type',
+	isPublic: 'is_public',
 	purchaseYear: 'purchase_year',
 	internalName: 'internal_name',
 	color: 'color',
@@ -192,19 +194,22 @@ async function getPublicDresses(
 	limit: number,
 	offset: number,
 	connection?: Pool | PoolClient
-): Promise<{ dresses: Partial<UserDress>[]; totalRows: number }> {
+): Promise<{ dresses: Partial<UserDress & { location: string }>[]; totalRows: number }> {
 	logger.info('Getting public dresses from the database');
 
 	const conn = connection || getPool();
 
-	const countResult = await conn.query('SELECT COUNT(*) FROM "user_dresses"');
+	const countResult = await conn.query('SELECT COUNT(*) FROM "user_dresses" WHERE is_public = TRUE');
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
 	const query = convertQueryPlaceholders(
-		`SELECT id, user_id_fk, brand, style, size, color, condition,
-		        dress_photo_url, rental_price_per_day, created_at
-		 FROM "user_dresses"
-		 ORDER BY created_at DESC
+		`SELECT ud.id, ud.user_id_fk, ud.brand, ud.style, ud.size, ud.color, ud.condition,
+		        ud.listing_type, ud.is_public, ud.dress_photo_url, ud.rental_price_per_day, ud.created_at,
+		        u.location
+		 FROM "user_dresses" ud
+		 JOIN "user" u ON ud.user_id_fk = u.id
+		 WHERE ud.is_public = TRUE
+		 ORDER BY ud.created_at DESC
 		 LIMIT ? OFFSET ?`
 	);
 	const result = await conn.query(query, [limit, offset]);
@@ -217,12 +222,43 @@ async function getPublicDresses(
 		size: row.size,
 		color: row.color,
 		condition: row.condition,
+		listingType: row.listing_type ?? 'rent',
+		isPublic: row.is_public ?? false,
 		dressPhotoUrl: row.dress_photo_url,
 		rentalPricePerDay: row.rental_price_per_day,
 		createdAt: row.created_at,
+		location: row.location ?? '',
 	}));
 
 	return { dresses, totalRows };
+}
+
+async function getPublicDressById(
+	dressId: number,
+	connection?: Pool | PoolClient
+): Promise<(UserDress & { location: string }) | null> {
+	logger.info(`Getting public dress with id '${dressId}' from the database`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(
+		`SELECT ud.*, u.location
+		 FROM "user_dresses" ud
+		 JOIN "user" u ON ud.user_id_fk = u.id
+		 WHERE ud.id = ? AND ud.is_public = TRUE`
+	);
+	const result = await conn.query(query, [dressId]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	if (result.rows.length === 0) {
+		return null;
+	}
+
+	const mapped = mapDressDbToObject(result.rows)[0];
+	return { ...mapped, location: result.rows[0].location ?? '' };
 }
 
 export {
@@ -233,4 +269,5 @@ export {
 	updateDressById,
 	deleteDressById,
 	getPublicDresses,
+	getPublicDressById,
 };
