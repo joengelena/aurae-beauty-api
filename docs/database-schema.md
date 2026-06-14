@@ -1,217 +1,153 @@
 # Database Schema Reference
 
-**Database**: PostgreSQL
-**Schema Management**: Managed outside codebase (no migration files in repo)
+**Database**: PostgreSQL  
+**Schema source of truth**: `postgresql-db-tool/sql/shine/init/`  
+**Reset & reseed**: `cd postgresql-db-tool && npm run reset && npm run seed`
 
-## Core Tables
+---
+
+## Architecture
+
+One table (`user_dresses`) is the single source of truth for all dresses. The `is_public` flag controls visibility:
+
+| `is_public` | Visible in |
+|-------------|------------|
+| `FALSE` | Owner's Wardrobe only |
+| `TRUE` | Wardrobe + public Browse page |
+
+The Browse page (`GET /dresses`) queries `user_dresses WHERE is_public = TRUE`, joining `user` for location. There is no separate "listing" concept — a dress is a listing when public.
+
+---
+
+## Active Tables
+
+### `user_dresses`
+Owner's dress inventory. Drives both the Wardrobe and the Browse page.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | SERIAL PK | |
+| `user_id_fk` | CHAR(36) | FK → `user(id)`, CASCADE DELETE |
+| `brand` | VARCHAR(100) | NOT NULL |
+| `style` | VARCHAR(100) | NOT NULL |
+| `size` | VARCHAR(10) | NOT NULL |
+| `condition` | VARCHAR(50) | NOT NULL |
+| `listing_type` | VARCHAR(10) | `'rent'` or `'sell'`, DEFAULT `'rent'` |
+| `is_public` | BOOLEAN | DEFAULT FALSE — controls Browse visibility |
+| `purchase_year` | INTEGER | NULL, CHECK 1900–2100 |
+| `internal_name` | VARCHAR(100) | NULL — owner's private label |
+| `color` | VARCHAR(255) | NULL |
+| `rental_count` | INTEGER | DEFAULT 0 |
+| `rental_price_per_day` | INTEGER | NULL — shown when `listing_type = 'rent'` |
+| `purchase_price` | INTEGER | NULL — shown when `listing_type = 'sell'` |
+| `dress_photo_url` | VARCHAR(500) | NULL — Cloudflare R2 URL |
+| `damage_description` | TEXT | NULL |
+| `damage_photo_urls` | TEXT[] | NULL — array of R2 URLs |
+| `notes` | TEXT | NULL |
+| `created_at` | TIMESTAMP | DEFAULT NOW() |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() (trigger) |
+
+**API routes**: `GET/POST /user/dresses`, `GET/PATCH/DELETE /user/dresses/:id` (auth required)  
+**Public routes**: `GET /dresses`, `GET /dresses/:id` (no auth, `is_public = TRUE` only)
+
+---
+
+### `dress_bookings`
+Rental bookings attached to a dress. Owner-managed.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | SERIAL PK | |
+| `dress_id_fk` | INTEGER | FK → `user_dresses(id)`, CASCADE DELETE |
+| `booking_type` | VARCHAR(50) | e.g. `'rental'`, `'personal_use'` |
+| `start_date` | DATE | NOT NULL |
+| `end_date` | DATE | NOT NULL |
+| `renter_name` | VARCHAR(255) | |
+| `renter_email` | VARCHAR(255) | |
+| `renter_phone` | VARCHAR(50) | |
+| `total_cost` | DECIMAL(10,2) | |
+| `deposit_paid` | DECIMAL(10,2) | |
+| `status` | VARCHAR(50) | `pending` → `confirmed` → `active` → `returned` |
+| `notes` | TEXT | |
+| `created_at` | TIMESTAMP | DEFAULT NOW() |
+| `updated_at` | TIMESTAMP | DEFAULT NOW() (trigger) |
+
+**API routes**: `GET /user/dresses/:id/bookings`, `POST /user/dress-bookings`, `DELETE /user/dress-bookings/:id`
+
+---
 
 ### `user`
-Stores user profile data synced from Supabase Auth.
+User profiles, synced from Supabase Auth on signup.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PRIMARY KEY | Supabase Auth user ID |
-| `first_name` | VARCHAR(50) | NOT NULL | User's first name |
-| `last_name` | VARCHAR(50) | NOT NULL | User's last name |
-| `email` | VARCHAR(255) | NOT NULL, UNIQUE | Email address (managed by Supabase) |
-| `phone_number` | VARCHAR(12) | NOT NULL | Phone number |
-| `location` | VARCHAR(255) | NOT NULL | User location/city |
-| `profile_photo_url` | VARCHAR(500) | NULL | Cloudflare R2 URL |
-| `is_email_verified` | SMALLINT | DEFAULT 0 | 0 or 1 (boolean) |
-| `is_phone_number_verified` | SMALLINT | DEFAULT 0 | 0 or 1 (boolean) |
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | CHAR(36) PK | Supabase Auth UUID |
+| `first_name` | VARCHAR(50) | NOT NULL |
+| `last_name` | VARCHAR(50) | NOT NULL |
+| `email` | VARCHAR(255) | NOT NULL, UNIQUE |
+| `phone_number` | VARCHAR(12) | NOT NULL |
+| `location` | VARCHAR(255) | NOT NULL — used as dress location in Browse |
+| `profile_photo_url` | VARCHAR(500) | NULL — R2 URL |
+| `instagram` | VARCHAR(100) | NULL |
+| `is_email_verified` | SMALLINT | DEFAULT 0 |
 
-**Notes**:
-- Passwords stored in Supabase Auth, NOT in this table
-- `id` matches Supabase Auth UUID
-- DELETE CASCADE to `listing`, `user_vehicles`, `watchlist`
+**Notes**: Passwords are stored in Supabase Auth only, never here. CASCADE DELETE to `user_dresses` and `watchlist`.
 
 ---
 
-### `listing`
-Marketplace vehicle listings for sale.
+### `dress_attribute`
+Pre-computed filter attribute values for Browse dropdowns (e.g. available brands, sizes).
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Auto-increment listing ID |
-| `user_id_fk` | UUID | FOREIGN KEY → user(id) | Listing owner |
-| `status` | VARCHAR(20) | NOT NULL, CHECK | 'active', 'sold', 'expired' |
-| `view_count` | INTEGER | DEFAULT 0 | Number of views |
-| `preview_img_url` | VARCHAR(500) | NOT NULL | First image (R2 URL) |
-| `location` | VARCHAR(255) | NOT NULL | Vehicle location |
-| `vehicle_condition` | VARCHAR(255) | NOT NULL | Condition (e.g., 'Excellent', 'Good') |
-| `original_price` | BIGINT | NOT NULL | Price in cents/smallest unit |
-| `discounted_price` | BIGINT | NULL | Sale price (optional) |
-| `upload_date` | TIMESTAMP | DEFAULT NOW() | Created timestamp |
-| `description` | TEXT(10000) | NOT NULL | Listing description |
-| `make` | VARCHAR(255) | NOT NULL | Vehicle manufacturer |
-| `model` | VARCHAR(255) | NOT NULL | Vehicle model |
-| `year` | INTEGER | NOT NULL | Manufacturing year |
-| `kilometers` | BIGINT | NOT NULL | Odometer reading |
-| `fuel_type` | VARCHAR(255) | NOT NULL | Fuel type |
-| `body_type` | VARCHAR(255) | NOT NULL | Body style |
-| `drive_type` | VARCHAR(255) | NOT NULL | Drivetrain (FWD/RWD/AWD) |
-| `orc_included` | SMALLINT | NOT NULL | 0 or 1 |
-| `number_plate` | VARCHAR(255) | NULL | License plate |
-| `seats` | INTEGER | NULL | Number of seats |
-| `doors` | INTEGER | NULL | Number of doors |
-| `previous_owners` | INTEGER | NULL | Ownership history |
-| `color` | VARCHAR(50) | NULL | Exterior color |
-| `engine_size` | INTEGER | NULL | Engine displacement (cc) |
-| `transmission` | VARCHAR(255) | NULL | Transmission type |
-| `cylinders` | INTEGER | NULL | Number of cylinders |
-| `rego_expiry_date` | DATE | NULL | Registration expiry |
-| `wof_expiry_date` | DATE | NULL | WOF expiry (NZ specific) |
-
-**Indexes**:
-- `user_id_fk` (foreign key index)
-- `status` (for active listings queries)
-- `upload_date` (for sorting)
-- `make`, `model` (for filtering)
-
-**CASCADE**: ON DELETE CASCADE when user deleted
-
----
-
-### `listing_photo`
-Stores multiple photos per listing in order.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `listing_id_fk` | INTEGER | FOREIGN KEY → listing(id) | Parent listing |
-| `photo_order` | INTEGER | NOT NULL | Display order (0-indexed) |
-| `photo_path` | VARCHAR(500) | NOT NULL | Cloudflare R2 URL |
-
-**Primary Key**: `(listing_id_fk, photo_order)`
-**CASCADE**: ON DELETE CASCADE when listing deleted
-
----
-
-### `listing_attribute`
-Stores dynamic filter values for marketplace search.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `name` | VARCHAR(100) | PRIMARY KEY | Attribute name (e.g., 'make', 'bodyType') |
-| `attribute_values` | TEXT[] | NOT NULL | Array of distinct values |
-
-**Usage**: Pre-computed filter options for frontend dropdowns
+| Column | Type | Notes |
+|--------|------|-------|
+| `name` | VARCHAR(100) PK | Attribute key, e.g. `'brand'`, `'size'` |
+| `attribute_values` | TEXT[] | Array of distinct values |
 
 ---
 
 ### `watchlist`
-User's saved/favorite listings (join table).
+User's saved dresses.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `user_id_fk` | UUID | FOREIGN KEY → user(id) | User who saved |
-| `listing_id_fk` | INTEGER | FOREIGN KEY → listing(id) | Saved listing |
-| `added_date` | TIMESTAMP | DEFAULT NOW() | When saved |
+| Column | Type | Notes |
+|--------|------|-------|
+| `user_id_fk` | CHAR(36) | FK → `user(id)` |
+| `dress_id_fk` | INTEGER | FK → `user_dresses(id)` |
+| `added_date` | TIMESTAMP | DEFAULT NOW() |
 
-**Primary Key**: `(user_id_fk, listing_id_fk)`
-**CASCADE**: ON DELETE CASCADE for both foreign keys
-
----
-
-## Personal Vehicle Management
-
-### `user_vehicles`
-User's personal vehicles (not for sale).
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Vehicle ID |
-| `user_id_fk` | UUID | FOREIGN KEY → user(id) | Vehicle owner |
-| `make` | VARCHAR(100) | NOT NULL | Manufacturer |
-| `model` | VARCHAR(100) | NOT NULL | Model name |
-| `year` | INTEGER | NOT NULL | Year (1900-2100) |
-| `nickname` | VARCHAR(100) | NULL | Custom vehicle name |
-| `license_plate` | VARCHAR(20) | NULL | License plate number |
-| `color` | VARCHAR(255) | NULL | Exterior color |
-| `fuel_type` | VARCHAR(255) | NULL | Fuel type |
-| `transmission` | VARCHAR(255) | NULL | Transmission type |
-| `odometer_reading` | INTEGER | NULL | Current odometer (0-9,999,999) |
-| `odometer_unit` | VARCHAR(10) | DEFAULT 'km' | 'km' or 'mi' |
-| `rego_expiry_date` | DATE | NOT NULL | Registration expiry |
-| `wof_expiry_date` | DATE | NOT NULL | WOF expiry |
-| `insurance_expiry_date` | DATE | NOT NULL | Insurance expiry |
-| `insurance_provider` | VARCHAR(255) | NOT NULL | Insurance company |
-| `vehicle_photo_url` | VARCHAR(500) | NULL | Cloudflare R2 URL |
-| `notes` | TEXT(10000) | NULL | User notes |
-| `created_at` | TIMESTAMP | DEFAULT NOW() | Created timestamp |
-| `updated_at` | TIMESTAMP | DEFAULT NOW() | Last modified |
-
-**CASCADE**: ON DELETE CASCADE when user deleted
+**Primary key**: `(user_id_fk, dress_id_fk)`
 
 ---
 
-### `vehicle_service`
-Service/maintenance records for user vehicles.
+## Legacy Tables (being phased out — Phase 2)
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | SERIAL | PRIMARY KEY | Service record ID |
-| `vehicle_id_fk` | INTEGER | FOREIGN KEY → user_vehicles(id) | Parent vehicle |
-| `type_of_service` | VARCHAR(150) | NOT NULL | Service type (e.g., 'Oil Change') |
-| `service_date` | DATE | NOT NULL | Date of service |
-| `service_provider_name` | VARCHAR(150) | NULL | Service provider/mechanic |
-| `cost` | DECIMAL(10,2) | NULL | Service cost |
-| `notes` | TEXT(10000) | NULL | Service notes |
-| `created_at` | TIMESTAMP | DEFAULT NOW() | Created timestamp |
-| `updated_at` | TIMESTAMP | DEFAULT NOW() | Last modified |
+### `dress`
+Original public listing table from the Motorix pivot. Still used by the `PostListingProvider` / `/listings` API routes in Flutter. Not linked to `user_dresses`. **Do not add new features here.**
 
-**CASCADE**: ON DELETE CASCADE when vehicle deleted
+Key columns: `id`, `user_id_fk`, `status`, `view_count`, `preview_img_url`, `location`, `description`, `price_per_day`, `brand`, `style`, `size`, `color`, `condition`, `dress_type`
 
----
-
-## Future Tables (Defined but Not Yet Implemented)
-
-### `service_history`
-Extended service tracking (alternative to `vehicle_service`).
-
-### `service_reminder`
-Scheduled maintenance reminders for vehicles.
-
-### `notification_preferences`
-User notification settings for reminders.
-
-### `device_token`
-Push notification device tokens.
-
-### `notification_log`
-History of sent notifications.
+### `dress_photo`
+Multiple photos per `dress` listing. Will be retired with `dress`.
 
 ---
 
 ## Key Relationships
 
 ```
-user (1) ───< (N) listing
-user (1) ───< (N) user_vehicles
+user (1) ───< (N) user_dresses
 user (1) ───< (N) watchlist
 
-listing (1) ───< (N) listing_photo
-listing (1) ───< (N) watchlist
-
-user_vehicles (1) ───< (N) vehicle_service
+user_dresses (1) ───< (N) dress_bookings
+user_dresses (1) ───< (N) watchlist
 ```
 
-## Data Type Conventions
+---
 
-- **UUIDs**: User IDs (synced from Supabase Auth)
-- **SERIAL**: Auto-increment integer IDs
-- **SMALLINT**: Boolean values (0 or 1) - prefer this over BOOLEAN for consistency
-- **BIGINT**: Large numbers (prices, kilometers)
-- **TIMESTAMP**: Always use `DEFAULT NOW()` for created_at/updated_at
-- **TEXT[]**: PostgreSQL arrays for multi-value attributes
-- **VARCHAR lengths**:
-  - Names: 50-150
-  - URLs: 500
-  - Descriptions: Use TEXT with max length validation in code
+## Conventions
 
-## Important Notes
-
-1. **No password fields** - All authentication credentials stored in Supabase Auth
-2. **CASCADE deletions configured** - User deletion automatically cascades to all related data
-3. **Boolean values** - Use SMALLINT (0/1) not BOOLEAN for consistency with TypeScript mapping
-4. **Timestamps** - All timestamps in UTC, timezone conversion handled in application layer
-5. **Column naming** - snake_case in database, mapped to camelCase in TypeScript
+- **UUIDs**: User IDs (Supabase Auth)
+- **SERIAL**: Integer IDs for all other tables
+- **BOOLEAN**: Used for `is_public` (PostgreSQL native)
+- **SMALLINT**: Used for legacy boolean flags (0/1)
+- **TIMESTAMP**: Always `DEFAULT NOW()`, UTC
+- **TEXT[]**: PostgreSQL arrays for multi-value fields (damage photos, attribute values)
+- **snake_case** in DB, mapped to **camelCase** in TypeScript/Dart

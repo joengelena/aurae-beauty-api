@@ -1,107 +1,58 @@
-# Motorix API
+# AURAE API
 
-RESTful API for the Motorix vehicle marketplace application with dual authentication systems.
+RESTful backend for the AURAE dress rental marketplace.
 
-## 🔐 Authentication Systems
+## Authentication
 
-### Authentication
+- Routes: `/api/v1/user/*`
+- Supabase Auth for user management (passwords never stored in PostgreSQL)
+- HttpOnly cookies for web clients; tokens in response body for Flutter (`X-Client-Type: flutter`)
 
--   Routes: `/api/v1/user/*`
--   Supabase Auth for user management
--   Passwords managed by Supabase
--   HttpOnly cookies for secure token storage
--   Auto email confirmation for development (configurable for production)
-
-## 🗺️ Folder Structure & Responsibilities
+## Folder Structure
 
 ### Routes
-
--   Define the **API endpoints** for the application.
--   Specify the URL paths and HTTP methods (GET, POST, PUT, DELETE).
--   Delegate request handling to the appropriate **middlewares** and **controllers**.
+Define API endpoints, URL paths, HTTP methods, and middleware chains.
 
 ### Middleware
-
--   Handle request **validation** and **security checks** before reaching controllers.
--   Common tasks include:
-    -   Authentication (e.g., JWT verification)
-    -   CSRF token validation
-    -   Input validation & sanitization
-    -   Permission & role checks
+Request validation and security before controllers:
+- Auth (Supabase JWT verification)
+- Input validation (AJV schema)
+- File upload (Multer)
 
 ### Controllers
-
--   Act as the **business logic layer**.
--   Receive validated requests from routes.
--   Orchestrate processing logic and communicate with repositories.
--   Format and return appropriate API responses.
+Business logic layer — one file per operation. Orchestrate repositories, manage transactions, return responses.
 
 ### Repositories
-
--   Responsible for **database operations**.
--   Abstract away direct database queries.
--   Provide a clean interface for controllers to perform CRUD operations.
+Database CRUD operations. Abstract SQL queries, map snake_case ↔ camelCase.
 
 ### Utils
-
--   Utility functions and **wrappers for third-party libraries**.
--   Simplify integration with external services (e.g., S3 clients, payment gateways).
+Cloudflare R2 upload, error classes, async handler, query placeholder conversion.
 
 ### Config
+Database pool, Supabase clients (admin + auth), Winston logger, Express app setup.
 
--   Stores all the **configuration files** required by the API.
--   Examples:
-    -   Environment variables (dotenv)
-    -   Database connection settings
-    -   Third-party API keys & endpoints
-    -   Supabase client configuration (admin & auth clients)
+## Security Flow
 
-## 🛡️ Security Flow for Private Routes
+All private routes require Supabase JWT verification via `supabaseAuthenticateReq` middleware. The middleware extracts and injects `currentUserId` into `req.body` — controllers never trust a user ID provided by the client.
 
-### V1 Routes (Legacy)
-
--   Every **private API route** requires:
-
-    1. **Authentication Token** (Auth Token)
-    2. **CSRF Token** for cross-site request forgery protection
-    3. **Valid JWT Token** associated with the request
-
--   Once the JWT is verified:
-    -   The **user ID** extracted from the token is stored in the `request` object.
-    -   This allows all downstream middlewares, controllers, and repositories to **easily access the current user's ID** during the request lifecycle.
-
-### V2 Routes (Supabase)
-
--   Private routes use **Supabase JWT verification**
--   Tokens stored in httpOnly cookies (`sb-access-token`, `sb-refresh-token`)
--   `supabaseAuth` middleware validates JWT from cookies
--   User ID extracted from Supabase JWT and stored in request object
-
-## 🚀 Getting Started
-
-### Environment Setup
+## Getting Started
 
 1. Copy `.env.example` to `.env`
-2. Configure database credentials (MySQL)
-3. Add Supabase credentials:
-    - `SUPABASE_URL` - Your Supabase project URL
-    - `SUPABASE_SERVICE_ROLE_KEY` - Service role key (admin operations)
-    - `SUPABASE_ANON_KEY` - Anon key (authentication operations)
-4. Configure Cloudflare R2 for image storage (see `CLOUDFLARE_R2_SETUP.md`)
-
-### Installation
+2. Configure PostgreSQL credentials
+3. Add Supabase URL + keys (`SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`)
+4. Configure Cloudflare R2 (see `CLOUDFLARE_R2_SETUP.md`)
+5. Set `ALLOWED_COOKIE_ORIGINS` (comma-separated, must include Flutter app origin)
 
 ```bash
 npm install
-npm run dev
+npm run dev     # Development with hot reload (ts-node)
+npm run build   # Compile TypeScript to dist/
+npm start       # Build then run from dist/
 ```
 
-## ✅ Summary
+## Summary
 
-This structure ensures:
-
--   **Separation of concerns** (clean code organization)
--   **Security & validation layers** are handled early
--   Controllers stay focused on business logic
--   Database interactions remain decoupled and testable
--   Dual authentication systems for flexibility and migration path
+- Clean layered architecture (Routes → Middleware → Controllers → Repositories)
+- PostgreSQL with explicit transactions for multi-step operations
+- Cloudflare R2 for image storage (never local filesystem)
+- Dual Supabase clients: `supabaseAdmin` for backend operations, `supabaseAuth` for signin

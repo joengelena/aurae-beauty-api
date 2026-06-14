@@ -55,7 +55,7 @@ Routes → Middleware (auth, validation, upload) → Controllers → Repositorie
 - **Connection pooling** (max 100 connections) with optional connection parameter for transaction support
 - **No ORM** - raw SQL queries with placeholder conversion (`convertQueryPlaceholders`)
 - **CASCADE deletions** configured at DB level (e.g., user deletion cascades to dresses/bookings)
-- **⚠️ DB NEEDS MIGRATION**: Current tables still use vehicle terminology (user_vehicles, vehicle_service)
+- **Active tables**: `user_dresses`, `dress_bookings`, `dress`, `dress_attribute`, `user`, `watchlist`
 
 ### Image Storage Pattern
 - **Cloudflare R2** for scalability (not local filesystem)
@@ -161,8 +161,8 @@ try {
 ### Route Definitions
 - `src/app/routes/userAuth.routes.ts` - Signup, signin, signout, refresh token
 - `src/app/routes/user.routes.ts` - Profile, password, watchlist management
-- `src/app/routes/listing.routes.ts` - Marketplace dress listings (CRUD + search)
-- `src/app/routes/dress.routes.ts` - ✅ Business owner dress wardrobe + rental bookings (RENAMED from vehicle.routes.ts)
+- `src/app/routes/listing.routes.ts` - ⚠️ Legacy listing routes (still active, to be retired in Phase 2)
+- `src/app/routes/dress.routes.ts` - Dress routes: public browse (`/dresses`) + owner wardrobe (`/user/dresses`) + bookings
 
 ### Core Middleware
 - `src/app/middlewares/supabaseAuthenticateReq.ts` - JWT verification, userId injection (required auth)
@@ -206,11 +206,12 @@ npm run prebuild
 ## Additional Context
 
 ### Database Schema
-- **No migration files** - schema managed outside this codebase
-- **⚠️ NEEDS UPDATE**: Tables still use vehicle terminology: `user_vehicles`, `vehicle_service`
-- **Target tables**: `user_dresses`, `dress_bookings` (or `rental_bookings`)
-- Other tables: `user`, `listing`, `listing_photo`, `watchlist`
-- See @docs/database-schema.md for full schema reference
+- **No migration files** - schema managed by `postgresql-db-tool` (source of truth: `sql/shine/init/`)
+- **Primary table**: `user_dresses` — owner inventory, drives both Wardrobe and Browse (`is_public = TRUE`)
+- **Bookings**: `dress_bookings` — attached to `user_dresses` via `dress_id_fk`
+- **Legacy**: `dress` table + `/listings` routes — still active via `PostListingProvider`; being phased out in Phase 2
+- Other tables: `user`, `dress_attribute`, `watchlist`
+- See `docs/database-schema.md` for full schema reference
 
 ### Cloudflare R2 Setup
 - See `CLOUDFLARE_R2_SETUP.md` in repo root for bucket configuration
