@@ -10,6 +10,7 @@ import { validateFile } from '../../utils/cloudflare/validation';
 async function postDress(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
 	const {
+		name,
 		brand,
 		style,
 		listingType,
@@ -48,6 +49,7 @@ async function postDress(req: Request, res: Response): Promise<void> {
 
 		const dressData: Omit<UserDress, 'id' | 'createdAt' | 'updatedAt'> = {
 			userIdFk: userId,
+			name: name ?? null,
 			brand,
 			style,
 			listingType: listingType ?? 'rent',

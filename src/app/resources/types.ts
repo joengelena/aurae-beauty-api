@@ -79,6 +79,7 @@ type ListingAttribute = {
 type UserDress = {
 	id: number;
 	userIdFk: string;
+	name: string | null;
 	brand: string;
 	style: string;
 	listingType: 'rent' | 'sell';

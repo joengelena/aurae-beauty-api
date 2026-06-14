@@ -14,6 +14,7 @@ function mapDressDbToObject(dressesDb: any[]): UserDress[] {
 		return {
 			id: dress.id,
 			userIdFk: dress.user_id_fk,
+			name: dress.name ?? null,
 			brand: dress.brand,
 			style: dress.style,
 			listingType: dress.listing_type ?? 'rent',

@@ -8,6 +8,7 @@ import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 const dressDbFields: Record<keyof UserDress, string> = {
 	id: 'id',
 	userIdFk: 'user_id_fk',
+	name: 'name',
 	brand: 'brand',
 	style: 'style',
 	listingType: 'listing_type',
@@ -203,7 +204,7 @@ async function getPublicDresses(
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
 	const query = convertQueryPlaceholders(
-		`SELECT ud.id, ud.user_id_fk, ud.brand, ud.style, ud.size, ud.color, ud.condition,
+		`SELECT ud.id, ud.user_id_fk, ud.name, ud.brand, ud.style, ud.size, ud.color, ud.condition,
 		        ud.listing_type, ud.is_public, ud.dress_photo_url, ud.rental_price_per_day, ud.created_at,
 		        u.location
 		 FROM "user_dresses" ud
@@ -217,6 +218,7 @@ async function getPublicDresses(
 	const dresses = result.rows.map((row: any) => ({
 		id: row.id,
 		userIdFk: row.user_id_fk,
+		name: row.name ?? null,
 		brand: row.brand,
 		style: row.style,
 		size: row.size,
