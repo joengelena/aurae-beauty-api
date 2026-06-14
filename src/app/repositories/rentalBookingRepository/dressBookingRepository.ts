@@ -174,10 +174,34 @@ async function deleteBookingById(
 	return result;
 }
 
+async function getAllBookingsByUserId(
+	userId: string,
+	connection?: Pool | PoolClient
+): Promise<DressBooking[]> {
+	logger.info(`Getting all bookings for user '${userId}'`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`
+		SELECT db.* FROM "dress_bookings" db
+		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
+		WHERE ud.user_id_fk = ?
+		ORDER BY db.start_date ASC
+	`);
+	const result = await conn.query(query, [userId]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	return mapDressBookingDbToObject(result.rows);
+}
+
 export {
 	getAllServicesByVehicleId,
 	getServiceById,
 	postBooking,
 	updateServiceById,
 	deleteBookingById,
+	getAllBookingsByUserId,
 };

@@ -9,7 +9,7 @@ import {
 	getPublicDresses,
 	getPublicDressById,
 } from '../controllers/dressController';
-import { postBooking, getBookingsByDressId, deleteBooking } from '../controllers/rentalBookingController';
+import { postBooking, getBookingsByDressId, deleteBooking, getAllUserBookings } from '../controllers/rentalBookingController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -77,6 +77,13 @@ const dressRoutes = (app: Express) => {
 
 	// Dress booking routes
 	app.route(rootUrl + '/user/dress-bookings')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getAllUserBookings)
+		)
 		.post(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
