@@ -9,7 +9,7 @@ import {
 	getPublicDresses,
 	getPublicDressById,
 } from '../controllers/dressController';
-import { postBooking, getBookingsByDressId, deleteBooking, getAllUserBookings } from '../controllers/rentalBookingController';
+import { postBooking, postSelfBooking, getBookingsByDressId, deleteBooking, getAllUserBookings, getMyBookings, getPublicDressBookings } from '../controllers/rentalBookingController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -23,6 +23,18 @@ const dressRoutes = (app: Express) => {
 
 	app.route(rootUrl + '/dresses/:id')
 		.get(asyncHandler(getPublicDressById));
+
+	app.route(rootUrl + '/dresses/:id/bookings')
+		.get(asyncHandler(getPublicDressBookings));
+
+	app.route(rootUrl + '/dresses/:id/book')
+		.post(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.selfBook);
+			},
+			asyncHandler(postSelfBooking)
+		);
 
 	app.route(rootUrl + '/user/dresses')
 		.get(
@@ -73,6 +85,16 @@ const dressRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
 			asyncHandler(getBookingsByDressId)
+		);
+
+	// My bookings as a renter
+	app.route(rootUrl + '/user/my-bookings')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getMyBookings)
 		);
 
 	// Dress booking routes

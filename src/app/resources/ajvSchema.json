@@ -641,5 +641,30 @@
       "renterName"
     ],
     "additionalProperties": false
+  },
+  "selfBook": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "required": [
+      "currentUserId",
+      "startDate",
+      "endDate"
+    ],
+    "additionalProperties": false
   }
 }

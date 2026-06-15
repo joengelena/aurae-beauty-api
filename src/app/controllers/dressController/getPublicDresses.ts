@@ -7,9 +7,10 @@ const getPublicDresses = async (req: Request, res: Response): Promise<void> => {
 	const limit = Math.min(parseInt(req.query.limit as string, 10) || 10, 50);
 	const pageNumber = Math.max(parseInt(req.query.pageNumber as string, 10) || 1, 1);
 	const offset = (pageNumber - 1) * limit;
+	const userId = (req.query.userId as string) || undefined;
 
 	try {
-		const { dresses, totalRows } = await dressRepository.getPublicDresses(limit, offset);
+		const { dresses, totalRows } = await dressRepository.getPublicDresses(limit, offset, userId);
 		const totalPages = Math.ceil(totalRows / limit);
 
 		res.status(200).json({

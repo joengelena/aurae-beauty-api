@@ -197,6 +197,29 @@ async function getAllBookingsByUserId(
 	return mapDressBookingDbToObject(result.rows);
 }
 
+async function getPublicAvailabilityByDressId(
+	dressId: number,
+	connection?: Pool | PoolClient
+): Promise<{ startDate: string; endDate: string; status: string }[]> {
+	logger.info(`Getting public availability ranges for dress '${dressId}'`);
+
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`
+		SELECT start_date, end_date, status
+		FROM "dress_bookings"
+		WHERE dress_id_fk = ?
+		  AND status NOT IN ('cancelled', 'returned')
+		ORDER BY start_date ASC
+	`);
+	const result = await conn.query(query, [dressId]);
+
+	return result.rows.map((row: any) => ({
+		startDate: row.start_date,
+		endDate: row.end_date,
+		status: row.status,
+	}));
+}
+
 export {
 	getAllServicesByVehicleId,
 	getServiceById,
@@ -204,4 +227,5 @@ export {
 	updateServiceById,
 	deleteBookingById,
 	getAllBookingsByUserId,
+	getPublicAvailabilityByDressId,
 };

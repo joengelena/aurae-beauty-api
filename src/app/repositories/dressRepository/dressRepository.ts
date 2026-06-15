@@ -194,26 +194,33 @@ async function deleteDressById(
 async function getPublicDresses(
 	limit: number,
 	offset: number,
+	userId?: string,
 	connection?: Pool | PoolClient
 ): Promise<{ dresses: Partial<UserDress & { location: string }>[]; totalRows: number }> {
 	logger.info('Getting public dresses from the database');
 
 	const conn = connection || getPool();
 
-	const countResult = await conn.query('SELECT COUNT(*) FROM "user_dresses" WHERE is_public = TRUE');
+	const userClause = userId ? ' AND ud.user_id_fk = ?' : '';
+	const countQuery = convertQueryPlaceholders(
+		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}`
+	);
+	const countParams = userId ? [userId] : [];
+	const countResult = await conn.query(countQuery, countParams);
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
-	const query = convertQueryPlaceholders(
+	const mainQuery = convertQueryPlaceholders(
 		`SELECT ud.id, ud.user_id_fk, ud.name, ud.brand, ud.style, ud.size, ud.color, ud.condition,
 		        ud.listing_type, ud.is_public, ud.dress_photo_url, ud.rental_price_per_day, ud.created_at,
 		        u.location
 		 FROM "user_dresses" ud
 		 JOIN "user" u ON ud.user_id_fk = u.id
-		 WHERE ud.is_public = TRUE
+		 WHERE ud.is_public = TRUE${userClause}
 		 ORDER BY ud.created_at DESC
 		 LIMIT ? OFFSET ?`
 	);
-	const result = await conn.query(query, [limit, offset]);
+	const mainParams = userId ? [userId, limit, offset] : [limit, offset];
+	const result = await conn.query(mainQuery, mainParams);
 
 	const dresses = result.rows.map((row: any) => ({
 		id: row.id,
