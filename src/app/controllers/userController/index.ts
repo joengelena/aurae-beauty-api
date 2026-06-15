@@ -8,6 +8,8 @@ import forgotPasswordSupabase from './forgotPasswordSupabase';
 import changePasswordSupabase from './changePasswordSupabase';
 import resetPasswordSupabase from './resetPasswordSupabase';
 import refreshTokenSupabase from './refreshTokenSupabase';
+import getBusinessSettings from './getBusinessSettings';
+import updateBusinessSettings from './updateBusinessSettings';
 export {
 	signUpUserSupabase,
 	signInUserSupabase,
@@ -19,4 +21,6 @@ export {
 	updateUser,
 	deleteUserSupabase,
 	refreshTokenSupabase,
+	getBusinessSettings,
+	updateBusinessSettings,
 };

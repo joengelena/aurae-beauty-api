@@ -125,9 +125,58 @@ async function deleteUserWithId(
 	return result;
 }
 
+async function getBusinessSettings(
+	userId: string,
+	connection?: Pool | PoolClient
+): Promise<Record<string, unknown>> {
+	logger.info(`Getting business settings for user '${userId}'`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(
+		'SELECT business_settings FROM "user" WHERE id = ?'
+	);
+	const result = await conn.query(query, [userId]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	if (result.rows.length === 0) {
+		throw new Error('User not found');
+	}
+
+	return result.rows[0].business_settings ?? {};
+}
+
+async function updateBusinessSettings(
+	userId: string,
+	patch: Record<string, unknown>,
+	connection?: Pool | PoolClient
+): Promise<Record<string, unknown>> {
+	logger.info(`Updating business settings for user '${userId}'`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+
+	// Merge patch into existing JSONB rather than replacing it
+	const query = convertQueryPlaceholders(
+		'UPDATE "user" SET business_settings = business_settings || ?::jsonb WHERE id = ? RETURNING business_settings'
+	);
+	const result = await conn.query(query, [JSON.stringify(patch), userId]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	return result.rows[0].business_settings ?? {};
+}
+
 export {
 	signUpUser,
 	getUserById,
 	updateUser,
 	deleteUserWithId,
+	getBusinessSettings,
+	updateBusinessSettings,
 };

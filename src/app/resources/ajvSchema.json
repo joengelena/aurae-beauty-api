@@ -666,5 +666,22 @@
       "endDate"
     ],
     "additionalProperties": false
+  },
+  "updateBusinessSettings": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "deliveryOption": {
+        "type": "string",
+        "enum": ["pickup", "postal", "both"]
+      }
+    },
+    "required": ["currentUserId"],
+    "additionalProperties": false
   }
 }

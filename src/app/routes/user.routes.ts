@@ -7,6 +7,8 @@ import {
 	changePasswordSupabase,
 	resetPasswordSupabase,
 	forgotPasswordSupabase,
+	getBusinessSettings,
+	updateBusinessSettings,
 } from '../controllers/userController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
@@ -65,6 +67,22 @@ const usersRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.updateUser);
 			},
 			asyncHandler(updateUser)
+		);
+
+	app.route(rootUrl + '/user/settings')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getBusinessSettings)
+		)
+		.patch(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.updateBusinessSettings);
+			},
+			asyncHandler(updateBusinessSettings)
 		);
 
 	app.route(rootUrl + '/user/watchlist').get(
