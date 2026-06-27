@@ -92,7 +92,7 @@ type UserDress = {
 	purchasePrice: number | null;
 	rentalPricePerDay: number | null;
 	condition: string | null;
-	dressPhotoUrl: string | null;
+	dressPhotoUrls: string[];
 	notes: string | null;
 	damageDescription: string | null;
 	damagePhotoUrls: string[] | null;

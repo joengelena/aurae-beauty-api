@@ -21,7 +21,7 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	purchasePrice: 'purchase_price',
 	rentalPricePerDay: 'rental_price_per_day',
 	condition: 'condition',
-	dressPhotoUrl: 'dress_photo_url',
+	dressPhotoUrls: 'dress_photo_urls',
 	notes: 'notes',
 	damageDescription: 'damage_description',
 	damagePhotoUrls: 'damage_photo_urls',
@@ -211,7 +211,7 @@ async function getPublicDresses(
 
 	const mainQuery = convertQueryPlaceholders(
 		`SELECT ud.id, ud.user_id_fk, ud.name, ud.brand, ud.style, ud.size, ud.color, ud.condition,
-		        ud.listing_type, ud.is_public, ud.dress_photo_url, ud.rental_price_per_day, ud.created_at,
+		        ud.listing_type, ud.is_public, ud.dress_photo_urls[1] as dress_photo_url, ud.rental_price_per_day, ud.created_at,
 		        u.location
 		 FROM "user_dresses" ud
 		 JOIN "user" u ON ud.user_id_fk = u.id
@@ -267,11 +267,10 @@ async function getPublicDressById(
 	}
 
 	const mapped = mapDressDbToObject(result.rows)[0];
-	const dressPhotoUrl = result.rows[0].dress_photo_url as string | null;
 	return {
 		...mapped,
 		location: result.rows[0].location ?? '',
-		imageUrls: dressPhotoUrl ? [dressPhotoUrl] : [],
+		imageUrls: mapped.dressPhotoUrls ?? [],
 	};
 }
 

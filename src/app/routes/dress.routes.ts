@@ -45,7 +45,7 @@ const dressRoutes = (app: Express) => {
 			asyncHandler(getAllDresses)
 		)
 		.post(
-			uploadMulter.single('image'),
+			uploadMulter.array('images', 10),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postDress);
@@ -62,7 +62,7 @@ const dressRoutes = (app: Express) => {
 			asyncHandler(getDressById)
 		)
 		.patch(
-			uploadMulter.single('image'),
+			uploadMulter.array('images', 10),
 			supabaseAuthenticateReq,
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.patchDress);

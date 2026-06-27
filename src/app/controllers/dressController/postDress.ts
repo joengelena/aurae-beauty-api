@@ -4,8 +4,8 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { UserDress } from '../../resources/types';
 import { getPool } from '../../../config/db';
-import { uploadSingleImage } from '../../utils/cloudflare/uploadImages';
-import { validateFile } from '../../utils/cloudflare/validation';
+import uploadImages from '../../utils/cloudflare/uploadImages';
+import { validateFiles } from '../../utils/cloudflare/validation';
 
 async function postDress(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -29,17 +29,15 @@ async function postDress(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Creating new dress for user '${userId}'`);
 
-	const file = req.file as Express.Multer.File | undefined;
+	const files = (req.files || []) as Express.Multer.File[];
+	let dressPhotoUrls: string[] = [];
 
-	let dressPhotoUrl: string | null = null;
-	if (file) {
-		validateFile(file);
-		logger.info(
-			`Uploading dress image: ${file.originalname} (${file.size} bytes)`
-		);
-		const uploadResult = await uploadSingleImage(file);
-		dressPhotoUrl = uploadResult.url;
-		logger.info(`Successfully uploaded dress image: ${uploadResult.key}`);
+	if (files.length > 0) {
+		validateFiles(files);
+		logger.info(`Uploading ${files.length} dress photo(s)`);
+		const uploadResult = await uploadImages(files);
+		dressPhotoUrls = uploadResult.urls;
+		logger.info(`Successfully uploaded ${files.length} dress photo(s)`);
 	}
 
 	const connection = await getPool().connect();
@@ -62,7 +60,7 @@ async function postDress(req: Request, res: Response): Promise<void> {
 			rentalCount: rentalCount ?? null,
 			rentalPricePerDay: rentalPricePerDay ?? null,
 			purchasePrice: purchasePrice ?? null,
-			dressPhotoUrl,
+			dressPhotoUrls,
 			notes: notes ?? null,
 			damageDescription: damageDescription ?? null,
 			damagePhotoUrls: null,
