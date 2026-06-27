@@ -87,8 +87,8 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			);
 
 			for (const vehicle of userVehicles) {
-				if (vehicle.dressPhotoUrl) {
-					imageUrlsToDelete.push(vehicle.dressPhotoUrl);
+				if (vehicle.dressPhotoUrls?.length) {
+					imageUrlsToDelete.push(...vehicle.dressPhotoUrls);
 				}
 			}
 

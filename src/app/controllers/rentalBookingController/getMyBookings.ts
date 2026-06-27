@@ -38,7 +38,7 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			db.updated_at,
 			ud.brand AS dress_brand,
 			ud.style AS dress_style,
-			ud.dress_photo_url,
+			ud.dress_photo_urls[1] as dress_photo_url,
 			ud.internal_name AS dress_internal_name
 		FROM "dress_bookings" db
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
