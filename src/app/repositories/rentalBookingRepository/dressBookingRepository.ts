@@ -204,20 +204,33 @@ async function getPublicAvailabilityByDressId(
 	logger.info(`Getting public availability ranges for dress '${dressId}'`);
 
 	const conn = connection || getPool();
-	const query = convertQueryPlaceholders(`
+
+	const bookingsQuery = convertQueryPlaceholders(`
 		SELECT start_date, end_date, status
 		FROM "dress_bookings"
 		WHERE dress_id_fk = ?
 		  AND status NOT IN ('cancelled', 'returned')
 		ORDER BY start_date ASC
 	`);
-	const result = await conn.query(query, [dressId]);
-
-	return result.rows.map((row: any) => ({
+	const bookingsResult = await conn.query(bookingsQuery, [dressId]);
+	const bookingRanges = bookingsResult.rows.map((row: any) => ({
 		startDate: row.start_date,
 		endDate: row.end_date,
 		status: row.status,
 	}));
+
+	const blockedQuery = convertQueryPlaceholders(
+		`SELECT blocked_date_ranges FROM "user_dresses" WHERE id = ?`
+	);
+	const blockedResult = await conn.query(blockedQuery, [dressId]);
+	const blockedRanges: { startDate: string; endDate: string; status: string }[] =
+		(blockedResult.rows[0]?.blocked_date_ranges ?? []).map((r: any) => ({
+			startDate: r.startDate,
+			endDate: r.endDate,
+			status: 'blocked',
+		}));
+
+	return [...bookingRanges, ...blockedRanges];
 }
 
 export {
