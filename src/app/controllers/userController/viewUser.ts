@@ -23,6 +23,7 @@ async function viewUser(req: Request, res: Response): Promise<void> {
 			location: users[0].location,
 			instagram: users[0].instagram,
 			profilePhotoUrl: users[0].profilePhotoUrl,
+			deliveryOption: users[0].deliveryOption,
 		};
 
 		res.status(200).send(user);
