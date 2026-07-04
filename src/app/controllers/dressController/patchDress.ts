@@ -16,7 +16,7 @@ import {
 
 async function patchDress(req: Request, res: Response): Promise<void> {
 	const vehicleId = parseDressId(req.params.id as string);
-	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, ...newVehicleData } = req.body;
+	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, blockedDateRanges: blockedDateRangesStr, ...newVehicleData } = req.body;
 
 	logger.info(`Updating dress with id '${vehicleId}'`);
 
@@ -44,6 +44,10 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 	// Combine kept existing URLs + newly uploaded
 	if (hasPhotoChanges) {
 		newVehicleData.dressPhotoUrls = [...keepPhotoUrls, ...newlyUploadedUrls];
+	}
+
+	if (blockedDateRangesStr !== undefined) {
+		newVehicleData.blockedDateRanges = JSON.parse(blockedDateRangesStr as string);
 	}
 
 	if (Object.keys(newVehicleData).length === 0) {

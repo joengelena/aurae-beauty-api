@@ -561,6 +561,9 @@
       },
       "keepPhotoUrls": {
         "type": "string"
+      },
+      "blockedDateRanges": {
+        "type": "string"
       }
     },
     "required": [

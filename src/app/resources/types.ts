@@ -9,6 +9,7 @@ type User = {
 	profilePhotoUrl: string | null;
 	isEmailVerified: 0 | 1;
 	isPhoneNumberVerified: 0 | 1;
+	deliveryOption?: 'pickup' | 'postal' | 'both' | null;
 };
 
 type ListingPhoto = {
@@ -93,6 +94,7 @@ type UserDress = {
 	rentalPricePerDay: number | null;
 	condition: string | null;
 	dressPhotoUrls: string[];
+	blockedDateRanges?: { startDate: string; endDate: string }[];
 	notes: string | null;
 	damageDescription: string | null;
 	damagePhotoUrls: string[] | null;

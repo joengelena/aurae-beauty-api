@@ -22,6 +22,7 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	rentalPricePerDay: 'rental_price_per_day',
 	condition: 'condition',
 	dressPhotoUrls: 'dress_photo_urls',
+	blockedDateRanges: 'blocked_date_ranges',
 	notes: 'notes',
 	damageDescription: 'damage_description',
 	damagePhotoUrls: 'damage_photo_urls',
@@ -150,8 +151,13 @@ async function updateDressById(
 	const values = [];
 
 	for (const [key, value] of Object.entries(updateValues)) {
-		fields.push(`${dressDbFields[key as keyof UserDress]} = ?`);
-		values.push(value);
+		if (key === 'blockedDateRanges') {
+			fields.push(`${dressDbFields[key as keyof UserDress]} = ?::jsonb`);
+			values.push(JSON.stringify(value));
+		} else {
+			fields.push(`${dressDbFields[key as keyof UserDress]} = ?`);
+			values.push(value);
+		}
 	}
 
 	const useProvidedConnection = !!connection;
@@ -195,6 +201,8 @@ async function getPublicDresses(
 	limit: number,
 	offset: number,
 	userId?: string,
+	startDate?: string,
+	endDate?: string,
 	connection?: Pool | PoolClient
 ): Promise<{ dresses: Partial<UserDress & { location: string }>[]; totalRows: number }> {
 	logger.info('Getting public dresses from the database');
@@ -202,10 +210,25 @@ async function getPublicDresses(
 	const conn = connection || getPool();
 
 	const userClause = userId ? ' AND ud.user_id_fk = ?' : '';
+
+	// Exclude dresses with overlapping non-cancelled/returned bookings
+	const availabilityClause = (startDate && endDate)
+		? ` AND NOT EXISTS (
+			SELECT 1 FROM "dress_bookings" db
+			WHERE db.dress_id_fk = ud.id
+			AND db.status NOT IN ('cancelled', 'returned')
+			AND db.start_date <= ?
+			AND db.end_date >= ?
+		  )`
+		: '';
+	const dateParams = (startDate && endDate) ? [endDate, startDate] : [];
+
+	const baseParams = userId ? [userId] : [];
+
 	const countQuery = convertQueryPlaceholders(
-		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}`
+		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}${availabilityClause}`
 	);
-	const countParams = userId ? [userId] : [];
+	const countParams = [...baseParams, ...dateParams];
 	const countResult = await conn.query(countQuery, countParams);
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
@@ -215,11 +238,11 @@ async function getPublicDresses(
 		        u.location
 		 FROM "user_dresses" ud
 		 JOIN "user" u ON ud.user_id_fk = u.id
-		 WHERE ud.is_public = TRUE${userClause}
+		 WHERE ud.is_public = TRUE${userClause}${availabilityClause}
 		 ORDER BY ud.created_at DESC
 		 LIMIT ? OFFSET ?`
 	);
-	const mainParams = userId ? [userId, limit, offset] : [limit, offset];
+	const mainParams = [...baseParams, ...dateParams, limit, offset];
 	const result = await conn.query(mainQuery, mainParams);
 
 	const dresses = result.rows.map((row: any) => ({
