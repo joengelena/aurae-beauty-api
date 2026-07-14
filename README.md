@@ -11,24 +11,31 @@ RESTful backend for the AURAE dress rental marketplace.
 ## Folder Structure
 
 ### Routes
+
 Define API endpoints, URL paths, HTTP methods, and middleware chains.
 
 ### Middleware
+
 Request validation and security before controllers:
+
 - Auth (Supabase JWT verification)
 - Input validation (AJV schema)
 - File upload (Multer)
 
 ### Controllers
+
 Business logic layer — one file per operation. Orchestrate repositories, manage transactions, return responses.
 
 ### Repositories
+
 Database CRUD operations. Abstract SQL queries, map snake_case ↔ camelCase.
 
 ### Utils
+
 Cloudflare R2 upload, error classes, async handler, query placeholder conversion.
 
 ### Config
+
 Database pool, Supabase clients (admin + auth), Winston logger, Express app setup.
 
 ## Security Flow
