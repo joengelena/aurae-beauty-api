@@ -203,6 +203,7 @@ async function getPublicDresses(
 	userId?: string,
 	startDate?: string,
 	endDate?: string,
+	search?: string,
 	connection?: Pool | PoolClient
 ): Promise<{ dresses: Partial<UserDress & { location: string }>[]; totalRows: number }> {
 	logger.info('Getting public dresses from the database');
@@ -221,14 +222,16 @@ async function getPublicDresses(
 			AND db.end_date >= ?
 		  )`
 		: '';
-	const dateParams = (startDate && endDate) ? [endDate, startDate] : [];
+	const searchClause = search ? ' AND (ud.name ILIKE ? OR ud.brand ILIKE ?)' : '';
 
+	const dateParams = (startDate && endDate) ? [endDate, startDate] : [];
 	const baseParams = userId ? [userId] : [];
+	const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
 
 	const countQuery = convertQueryPlaceholders(
-		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}${availabilityClause}`
+		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}`
 	);
-	const countParams = [...baseParams, ...dateParams];
+	const countParams = [...baseParams, ...dateParams, ...searchParams];
 	const countResult = await conn.query(countQuery, countParams);
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
@@ -238,11 +241,11 @@ async function getPublicDresses(
 		        u.location
 		 FROM "user_dresses" ud
 		 JOIN "user" u ON ud.user_id_fk = u.id
-		 WHERE ud.is_public = TRUE${userClause}${availabilityClause}
+		 WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}
 		 ORDER BY ud.created_at DESC
 		 LIMIT ? OFFSET ?`
 	);
-	const mainParams = [...baseParams, ...dateParams, limit, offset];
+	const mainParams = [...baseParams, ...dateParams, ...searchParams, limit, offset];
 	const result = await conn.query(mainQuery, mainParams);
 
 	const dresses = result.rows.map((row: any) => ({
