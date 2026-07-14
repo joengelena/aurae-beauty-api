@@ -49,7 +49,7 @@
       "phoneNumber": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 12
+        "maxLength": 16
       },
       "email": {
         "type": "string",
@@ -119,7 +119,7 @@
       "phoneNumber": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 12
+        "maxLength": 16
       },
       "location": {
         "type": "string",
