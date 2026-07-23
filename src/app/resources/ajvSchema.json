@@ -405,10 +405,26 @@
         "minLength": 1,
         "maxLength": 100
       },
+      "dressType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
       "size": {
         "type": "string",
         "minLength": 1,
         "maxLength": 10
+      },
+      "fitNote": {
+        "type": "string",
+        "enum": [
+          "Runs small",
+          "True to size",
+          "Runs large"
+        ]
+      },
+      "recommendedSizes": {
+        "type": "string"
       },
       "condition": {
         "type": "string",
@@ -451,6 +467,10 @@
       "rentalPricePerDay": {
         "type": "integer",
         "minimum": 0
+      },
+      "availableFrom": {
+        "type": "string",
+        "format": "date"
       },
       "notes": {
         "type": "string",
@@ -497,10 +517,26 @@
         "minLength": 1,
         "maxLength": 100
       },
+      "dressType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
       "size": {
         "type": "string",
         "minLength": 1,
         "maxLength": 10
+      },
+      "fitNote": {
+        "type": "string",
+        "enum": [
+          "Runs small",
+          "True to size",
+          "Runs large"
+        ]
+      },
+      "recommendedSizes": {
+        "type": "string"
       },
       "condition": {
         "type": "string",
@@ -543,6 +579,10 @@
       "rentalPricePerDay": {
         "type": "integer",
         "minimum": 0
+      },
+      "availableFrom": {
+        "type": "string",
+        "format": "date"
       },
       "notes": {
         "type": "string",

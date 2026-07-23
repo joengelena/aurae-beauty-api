@@ -11,6 +11,7 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	name: 'name',
 	brand: 'brand',
 	style: 'style',
+	dressType: 'dress_type',
 	listingType: 'listing_type',
 	isPublic: 'is_public',
 	purchaseYear: 'purchase_year',
@@ -18,8 +19,11 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	color: 'color',
 	rentalCount: 'rental_count',
 	size: 'size',
+	fitNote: 'fit_note',
+	recommendedSizes: 'recommended_sizes',
 	purchasePrice: 'purchase_price',
 	rentalPricePerDay: 'rental_price_per_day',
+	availableFrom: 'available_from',
 	condition: 'condition',
 	dressPhotoUrls: 'dress_photo_urls',
 	blockedDateRanges: 'blocked_date_ranges',
@@ -197,18 +201,42 @@ async function deleteDressById(
 	return result;
 }
 
+// Sort values are never interpolated from user input directly — only these
+// whitelisted SQL fragments can end up in the ORDER BY clause.
+const publicDressSortOptions: Record<string, string> = {
+	priceDesc: 'ud.rental_price_per_day DESC NULLS LAST',
+	priceAsc: 'ud.rental_price_per_day ASC NULLS LAST',
+	uploadDateDesc: 'ud.created_at DESC',
+	uploadDateAsc: 'ud.created_at ASC',
+};
+
+type PublicDressFilters = {
+	userId?: string;
+	startDate?: string;
+	endDate?: string;
+	search?: string;
+	sortBy?: string;
+	brand?: string;
+	style?: string;
+	dressType?: string;
+	size?: string;
+	color?: string;
+	condition?: string;
+	location?: string;
+	priceFrom?: string;
+	priceTo?: string;
+};
+
 async function getPublicDresses(
 	limit: number,
 	offset: number,
-	userId?: string,
-	startDate?: string,
-	endDate?: string,
-	search?: string,
+	filters: PublicDressFilters = {},
 	connection?: Pool | PoolClient
 ): Promise<{ dresses: Partial<UserDress & { location: string }>[]; totalRows: number }> {
 	logger.info('Getting public dresses from the database');
 
 	const conn = connection || getPool();
+	const { userId, startDate, endDate, search, sortBy, brand, style, dressType, size, color, condition, location, priceFrom, priceTo } = filters;
 
 	const userClause = userId ? ' AND ud.user_id_fk = ?' : '';
 
@@ -223,29 +251,59 @@ async function getPublicDresses(
 		  )`
 		: '';
 	const searchClause = search ? ' AND (ud.name ILIKE ? OR ud.brand ILIKE ?)' : '';
+	const orderByClause = publicDressSortOptions[sortBy ?? ''] ?? publicDressSortOptions.uploadDateDesc;
+
+	// Equal-match filters: column is always one of these hardcoded strings,
+	// only the value (bound via ?) comes from the request.
+	const equalFilters: { column: string; value?: string }[] = [
+		{ column: 'ud.brand', value: brand },
+		{ column: 'ud.style', value: style },
+		{ column: 'ud.dress_type', value: dressType },
+		{ column: 'ud.size', value: size },
+		{ column: 'ud.color', value: color },
+		{ column: 'ud.condition', value: condition },
+		{ column: 'u.location', value: location },
+	];
+	const equalFilterParts = equalFilters.filter((f) => !!f.value).map((f) => `${f.column} = ?`);
+	const equalFilterClause = equalFilterParts.length ? ` AND ${equalFilterParts.join(' AND ')}` : '';
+	const equalFilterParams = equalFilters.filter((f) => !!f.value).map((f) => f.value as string);
+
+	const priceFilterParts: string[] = [];
+	const priceFilterParams: string[] = [];
+	if (priceFrom) {
+		priceFilterParts.push('ud.rental_price_per_day >= ?');
+		priceFilterParams.push(priceFrom);
+	}
+	if (priceTo) {
+		priceFilterParts.push('ud.rental_price_per_day <= ?');
+		priceFilterParams.push(priceTo);
+	}
+	const priceFilterClause = priceFilterParts.length ? ` AND ${priceFilterParts.join(' AND ')}` : '';
 
 	const dateParams = (startDate && endDate) ? [endDate, startDate] : [];
 	const baseParams = userId ? [userId] : [];
 	const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
+	const filterClause = `${equalFilterClause}${priceFilterClause}`;
+	const filterParams = [...equalFilterParams, ...priceFilterParams];
 
 	const countQuery = convertQueryPlaceholders(
-		`SELECT COUNT(*) FROM "user_dresses" ud WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}`
+		`SELECT COUNT(*) FROM "user_dresses" ud JOIN "user" u ON ud.user_id_fk = u.id WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}${filterClause}`
 	);
-	const countParams = [...baseParams, ...dateParams, ...searchParams];
+	const countParams = [...baseParams, ...dateParams, ...searchParams, ...filterParams];
 	const countResult = await conn.query(countQuery, countParams);
 	const totalRows = parseInt(countResult.rows[0].count, 10);
 
 	const mainQuery = convertQueryPlaceholders(
-		`SELECT ud.id, ud.user_id_fk, ud.name, ud.brand, ud.style, ud.size, ud.color, ud.condition,
+		`SELECT ud.id, ud.user_id_fk, ud.name, ud.brand, ud.style, ud.dress_type, ud.size, ud.color, ud.condition,
 		        ud.listing_type, ud.is_public, ud.dress_photo_urls[1] as dress_photo_url, ud.rental_price_per_day, ud.created_at,
 		        u.location
 		 FROM "user_dresses" ud
 		 JOIN "user" u ON ud.user_id_fk = u.id
-		 WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}
-		 ORDER BY ud.created_at DESC
+		 WHERE ud.is_public = TRUE${userClause}${availabilityClause}${searchClause}${filterClause}
+		 ORDER BY ${orderByClause}
 		 LIMIT ? OFFSET ?`
 	);
-	const mainParams = [...baseParams, ...dateParams, ...searchParams, limit, offset];
+	const mainParams = [...baseParams, ...dateParams, ...searchParams, ...filterParams, limit, offset];
 	const result = await conn.query(mainQuery, mainParams);
 
 	const dresses = result.rows.map((row: any) => ({
@@ -254,6 +312,7 @@ async function getPublicDresses(
 		name: row.name ?? null,
 		brand: row.brand,
 		style: row.style,
+		dressType: row.dress_type ?? null,
 		size: row.size,
 		color: row.color,
 		condition: row.condition,

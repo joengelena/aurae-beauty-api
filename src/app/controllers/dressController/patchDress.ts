@@ -16,7 +16,7 @@ import {
 
 async function patchDress(req: Request, res: Response): Promise<void> {
 	const vehicleId = parseDressId(req.params.id as string);
-	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, blockedDateRanges: blockedDateRangesStr, ...newVehicleData } = req.body;
+	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, blockedDateRanges: blockedDateRangesStr, recommendedSizes: recommendedSizesStr, ...newVehicleData } = req.body;
 
 	logger.info(`Updating dress with id '${vehicleId}'`);
 
@@ -48,6 +48,10 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 
 	if (blockedDateRangesStr !== undefined) {
 		newVehicleData.blockedDateRanges = JSON.parse(blockedDateRangesStr as string);
+	}
+
+	if (recommendedSizesStr !== undefined) {
+		newVehicleData.recommendedSizes = JSON.parse(recommendedSizesStr as string);
 	}
 
 	if (Object.keys(newVehicleData).length === 0) {

@@ -83,6 +83,7 @@ type UserDress = {
 	name: string | null;
 	brand: string;
 	style: string;
+	dressType: string | null;
 	listingType: 'rent' | 'sell';
 	isPublic: boolean;
 	purchaseYear: number | null;
@@ -90,8 +91,11 @@ type UserDress = {
 	color: string | null;
 	rentalCount: number | null;
 	size: string | null;
+	fitNote: string | null;
+	recommendedSizes: string[];
 	purchasePrice: number | null;
 	rentalPricePerDay: number | null;
+	availableFrom: string | null;
 	condition: string | null;
 	dressPhotoUrls: string[];
 	blockedDateRanges?: { startDate: string; endDate: string }[];
