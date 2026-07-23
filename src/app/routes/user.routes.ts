@@ -17,6 +17,11 @@ import {
 	watchlistRemove,
 	watchlistGet,
 } from '../controllers/watchlistController';
+import {
+	getCart,
+	addToCart,
+	removeFromCart,
+} from '../controllers/cartController';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
 import uploadMulter from '../utils/multerStorage';
@@ -107,6 +112,30 @@ const usersRoutes = (app: Express) => {
 			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 		},
 		asyncHandler(watchlistRemove)
+	);
+
+	app.route(rootUrl + '/user/cart')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getCart)
+		)
+		.post(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.postCartItem);
+			},
+			asyncHandler(addToCart)
+		);
+
+	app.route(rootUrl + '/user/cart/:id').delete(
+		supabaseAuthenticateReq,
+		(req, res, next) => {
+			validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+		},
+		asyncHandler(removeFromCart)
 	);
 };
 

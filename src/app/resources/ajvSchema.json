@@ -713,6 +713,36 @@
     ],
     "additionalProperties": false
   },
+  "postCartItem": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "dressId": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date"
+      }
+    },
+    "required": [
+      "currentUserId",
+      "dressId",
+      "startDate",
+      "endDate"
+    ],
+    "additionalProperties": false
+  },
   "updateBusinessSettings": {
     "type": "object",
     "properties": {
