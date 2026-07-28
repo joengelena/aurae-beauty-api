@@ -3,7 +3,6 @@ import { getPool } from '../../../config/db';
 import { supabaseAdmin, supabaseAuth } from '../../../config/supabase';
 import logger from '../../../config/logger';
 import * as userRepository from '../../repositories/userRepository/userRepository';
-import * as listingRepository from '../../repositories/listingRepository/listingRepository';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import {
 	extractKeyFromUrl,
@@ -15,9 +14,8 @@ import AppError from '../../utils/errors/appError';
  * Delete user using Supabase Auth
  * Requires password confirmation for security
  * Deletes:
- * - All user images from Cloudflare R2 (profile, listings, vehicles)
- * - User listings and listing photos from database (CASCADE)
- * - User vehicles and vehicle services from database (CASCADE)
+ * - All user images from Cloudflare R2 (profile, dresses)
+ * - User dresses and dress bookings from database (CASCADE)
  * - User watchlist entries from database (CASCADE)
  * - User record from database
  * - User from Supabase Auth
@@ -64,20 +62,6 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			// Get user's profile photo URL
 			if (user[0].profilePhotoUrl) {
 				imageUrlsToDelete.push(user[0].profilePhotoUrl);
-			}
-
-			// Get all user's listings and their images
-			const userListings = await listingRepository.getAllListings({
-				userIdFk: currentUserId,
-				limit: '1000', // Get all listings (max 1000)
-				pageNumber: '1',
-			});
-
-			for (const listing of userListings.data) {
-				// Add all listing photos
-				if (listing.imageUrls && Array.isArray(listing.imageUrls)) {
-					imageUrlsToDelete.push(...listing.imageUrls);
-				}
 			}
 
 			// Get all user's vehicles and their images

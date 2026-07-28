@@ -6,7 +6,6 @@ import { getPool } from './db';
 import { rootUrl } from '../app/routes/base.routes';
 import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
-import listingRoutes from '../app/routes/listing.routes';
 import userAuthRoutes from '../app/routes/userAuth.routes';
 import dressRoutes from '../app/routes/dress.routes';
 import { Request, Response, NextFunction } from 'express';
@@ -65,7 +64,6 @@ export default () => {
 
 	// Routes
 	usersRoutes(app);
-	listingRoutes(app);
 	userAuthRoutes(app);
 	dressRoutes(app);
 

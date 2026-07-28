@@ -12,62 +12,10 @@ type User = {
 	deliveryOption?: 'pickup' | 'postal' | 'both' | null;
 };
 
-type ListingPhoto = {
-	dressIdFk: number;
-	photoOrder: number;
-	photoPath: string;
-};
-
-type Listing = {
-	id: number;
-	userIdFk: string;
-	status: 'active' | 'rented' | 'sold';
-	viewCount: number;
-	previewImgUrl: string;
-	imageUrls: string[];
-	location: string;
-	condition: string;
-	pricePerDay: number;
-	uploadDate: Date;
-	description: string;
-	brand: string;
-	style: string;
-	size: string;
-	color: string | null;
-	dressType: string | null;
-	isInWatchlist?: number;
-};
-
 type AppConfiguration = {
 	id: number;
 	name: string;
 	value: string;
-};
-
-type ListingQueryParams = {
-	searchString: string;
-	sortBy:
-		| 'priceDesc'
-		| 'priceAsc'
-		| 'uploadDateDesc'
-		| 'uploadDateAsc';
-	limit: string;
-	pageNumber: string;
-	// Between filters
-	priceFrom: string;
-	priceTo: string;
-	// Equal filters
-	userIdFk: string;
-	location: string;
-	status: string;
-	condition: string;
-	uploadDate: string;
-	brand: string;
-	style: string;
-	size: string;
-	color: string;
-	dressType: string;
-	currentUserId?: string;
 };
 
 type ListingAttribute = {
@@ -198,10 +146,7 @@ type NotificationLog = {
 
 export {
 	User,
-	ListingPhoto,
 	AppConfiguration,
-	Listing,
-	ListingQueryParams,
 	ListingAttribute,
 	UserDress,
 	DressBooking,
