@@ -8,6 +8,7 @@ import {
 	deleteDress,
 	getPublicDresses,
 	getPublicDressById,
+	getDressAttributes,
 } from '../controllers/dressController';
 import { postBooking, postSelfBooking, getBookingsByDressId, deleteBooking, getAllUserBookings, getMyBookings, getPublicDressBookings } from '../controllers/rentalBookingController';
 import validateRequestBody from '../middlewares/validateRequestBody';
@@ -20,6 +21,10 @@ const dressRoutes = (app: Express) => {
 	// Public browse endpoints — no auth required
 	app.route(rootUrl + '/dresses')
 		.get(asyncHandler(getPublicDresses));
+
+	// Must be registered before /dresses/:id so 'attributes' isn't captured as an id
+	app.route(rootUrl + '/dresses/attributes')
+		.get(asyncHandler(getDressAttributes));
 
 	app.route(rootUrl + '/dresses/:id')
 		.get(asyncHandler(getPublicDressById));

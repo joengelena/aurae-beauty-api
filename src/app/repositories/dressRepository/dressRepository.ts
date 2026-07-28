@@ -1,8 +1,9 @@
 import { Pool, PoolClient, QueryResult } from 'pg';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
-import { UserDress } from '../../resources/types';
+import { ListingAttribute, UserDress } from '../../resources/types';
 import mapDressDbToObject from './mapDressDbToObject';
+import mapDressAttributesDbToObject from './mapDressAttributesDbToObject';
 import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 const dressDbFields: Record<keyof UserDress, string> = {
@@ -359,6 +360,16 @@ async function getPublicDressById(
 	};
 }
 
+async function getDressAttributes(): Promise<ListingAttribute[]> {
+	logger.info('Getting dress attributes from the database');
+
+	const connection = getPool();
+	const query = convertQueryPlaceholders('SELECT * FROM "dress_attribute"');
+	const result = await connection.query(query);
+
+	return mapDressAttributesDbToObject(result.rows);
+}
+
 export {
 	getAllDressesByUserId,
 	getDressById,
@@ -368,4 +379,5 @@ export {
 	deleteDressById,
 	getPublicDresses,
 	getPublicDressById,
+	getDressAttributes,
 };
