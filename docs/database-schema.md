@@ -118,18 +118,6 @@ User's saved dresses.
 
 ---
 
-## Legacy Tables (being phased out — Phase 2)
-
-### `dress`
-Original public listing table from the Motorix pivot. Still used by the `PostListingProvider` / `/listings` API routes in Flutter. Not linked to `user_dresses`. **Do not add new features here.**
-
-Key columns: `id`, `user_id_fk`, `status`, `view_count`, `preview_img_url`, `location`, `description`, `price_per_day`, `brand`, `style`, `size`, `color`, `condition`, `dress_type`
-
-### `dress_photo`
-Multiple photos per `dress` listing. Will be retired with `dress`.
-
----
-
 ## Key Relationships
 
 ```

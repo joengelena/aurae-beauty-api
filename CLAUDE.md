@@ -55,7 +55,7 @@ Routes → Middleware (auth, validation, upload) → Controllers → Repositorie
 - **Connection pooling** (max 100 connections) with optional connection parameter for transaction support
 - **No ORM** - raw SQL queries with placeholder conversion (`convertQueryPlaceholders`)
 - **CASCADE deletions** configured at DB level (e.g., user deletion cascades to dresses/bookings)
-- **Active tables**: `user_dresses`, `dress_bookings`, `dress`, `dress_attribute`, `user`, `watchlist`
+- **Active tables**: `user_dresses`, `dress_bookings`, `dress_attribute`, `user`, `watchlist`
 
 ### Image Storage Pattern
 - **Cloudflare R2** for scalability (not local filesystem)
@@ -161,8 +161,7 @@ try {
 ### Route Definitions
 - `src/app/routes/userAuth.routes.ts` - Signup, signin, signout, refresh token
 - `src/app/routes/user.routes.ts` - Profile, password, watchlist management
-- `src/app/routes/listing.routes.ts` - ⚠️ Legacy listing routes (still active, to be retired in Phase 2)
-- `src/app/routes/dress.routes.ts` - Dress routes: public browse (`/dresses`) + owner wardrobe (`/user/dresses`) + bookings
+- `src/app/routes/dress.routes.ts` - Dress routes: public browse (`/dresses`), attributes (`/dresses/attributes`), owner wardrobe (`/user/dresses`) + bookings
 
 ### Core Middleware
 - `src/app/middlewares/supabaseAuthenticateReq.ts` - JWT verification, userId injection (required auth)
@@ -209,7 +208,7 @@ npm run prebuild
 - **No migration files** - schema managed by `postgresql-db-tool` (source of truth: `sql/shine/init/`)
 - **Primary table**: `user_dresses` — owner inventory, drives both Wardrobe and Browse (`is_public = TRUE`)
 - **Bookings**: `dress_bookings` — attached to `user_dresses` via `dress_id_fk`
-- **Legacy**: `dress` table + `/listings` routes — still active via `PostListingProvider`; being phased out in Phase 2
+- The legacy `dress`/`dress_photo` tables and `/listings` routes (from the Motorix pivot) were removed in Phase 2 (2026-07-28)
 - Other tables: `user`, `dress_attribute`, `watchlist`
 - See `docs/database-schema.md` for full schema reference
 
