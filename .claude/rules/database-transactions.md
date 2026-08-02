@@ -39,7 +39,7 @@
    ```
 
 4. **NEVER skip transaction wrapper for multi-step operations**
-   - Listing + photos = transaction
+   - Dress + photos = transaction
    - User creation + profile = transaction
    - Any operation with R2 + database = transaction with rollback
 

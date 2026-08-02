@@ -52,13 +52,13 @@ app.route('/endpoint')
 
 ```typescript
 // After AJV validation passes
-const listing = await listingRepository.getListingById(id);
+const dress = await dressRepository.getDressById(id);
 
-if (listing.length === 0) {
-  throw new AppError(404, 'Listing not found');
+if (dress.length === 0) {
+  throw new AppError(404, 'Dress not found');
 }
 
-if (listing[0].userIdFk !== currentUserId) {
+if (dress[0].userIdFk !== currentUserId) {
   throw new AppError(403, 'Not authorized');
 }
 ```

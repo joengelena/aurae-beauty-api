@@ -9,7 +9,7 @@
 
    // CORRECT
    logger.error(`DB error: ${error.message}`);
-   throw new AppError(500, 'Failed to save listing');
+   throw new AppError(500, 'Failed to save dress');
    ```
 
 2. **NEVER log sensitive data**
@@ -24,7 +24,7 @@
 3. **ALWAYS use AppError class**
    ```typescript
    import AppError from '../../utils/errors/appError';
-   throw new AppError(404, 'Listing not found');
+   throw new AppError(404, 'Dress not found');
    ```
 
 4. **ALWAYS re-throw known AppErrors**

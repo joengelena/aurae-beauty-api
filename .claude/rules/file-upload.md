@@ -50,6 +50,6 @@
 ## Key Format
 
 ```
-motorix/{timestamp}-{random}-{sanitized-filename}
-Example: motorix/1704067200000-a1b2c3d4e5f-image.jpg
+aurae/{timestamp}-{random}-{sanitized-filename}
+Example: aurae/1704067200000-a1b2c3d4e5f-image.jpg
 ```

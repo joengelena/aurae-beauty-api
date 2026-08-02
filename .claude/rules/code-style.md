@@ -27,7 +27,7 @@
 |------|------------|---------|
 | Files/folders | camelCase | `userController/`, `signUpUser.ts` |
 | Variables/functions | camelCase | `currentUserId`, `getUserById` |
-| Types/interfaces | PascalCase | `User`, `ListingQueryParams` |
+| Types/interfaces | PascalCase | `User`, `UserDress`, `DressBooking` |
 | Constants | UPPER_SNAKE_CASE | `MAX_FILE_SIZE` |
 | DB columns | snake_case | `user_id_fk`, `created_at` |
 
@@ -51,13 +51,17 @@ import * as userRepository from '../../repositories/userRepository';
 
 ```
 controllers/
-└── listingController/
+└── dressController/
     ├── index.ts           # Exports all operations
-    ├── postListing.ts     # Single operation
-    ├── getListing.ts
-    ├── updateListing.ts
-    └── deleteListing.ts
+    ├── postDress.ts       # Single operation
+    ├── getDressById.ts
+    ├── patchDress.ts
+    └── deleteDress.ts
 ```
+
+Real controller folders: `cartController/`, `dressController/`,
+`dressDamageIncidentController/`, `rentalBookingController/`,
+`userController/`, `watchlistController/`.
 
 ## TypeScript
 
