@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
@@ -30,12 +31,18 @@ async function deleteBooking(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'Service record not found');
 		}
 
-		// Verify user owns the vehicle that this service belongs to
-		const dress = await dressRepository.getDressByIdAndUserId(
-			booking.dressIdFk,
+		// Verify user belongs to the business that owns this dress
+		const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(
 			userId,
 			connection
 		);
+		const dress = ownerUserId
+			? await dressRepository.getDressByIdAndUserId(
+					booking.dressIdFk,
+					ownerUserId,
+					connection
+				)
+			: null;
 
 		if (!dress) {
 			throw new AppError(

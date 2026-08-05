@@ -680,9 +680,66 @@
       "deliveryOption": {
         "type": "string",
         "enum": ["pickup", "postal", "both"]
+      },
+      "cleaningBufferDays": {
+        "type": "integer",
+        "minimum": 1
       }
     },
     "required": ["currentUserId"],
+    "additionalProperties": false
+  },
+  "createBusiness": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 150
+      }
+    },
+    "required": ["currentUserId", "name"],
+    "additionalProperties": false
+  },
+  "createInvite": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "role": {
+        "type": "string",
+        "enum": ["owner", "staff"]
+      }
+    },
+    "required": ["currentUserId", "role"],
+    "additionalProperties": false
+  },
+  "redeemInvite": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "code": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 32
+      }
+    },
+    "required": ["currentUserId", "code"],
     "additionalProperties": false
   }
 }

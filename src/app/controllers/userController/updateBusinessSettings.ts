@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as userRepository from '../../repositories/userRepository/userRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 
@@ -9,7 +9,20 @@ async function updateBusinessSettings(req: Request, res: Response): Promise<void
 	logger.info(`Updating business settings for user '${currentUserId}'`);
 
 	try {
-		const updated = await userRepository.updateBusinessSettings(currentUserId, settingsFields);
+		const membership = await businessRepository.getMembershipForUser(currentUserId);
+
+		if (!membership) {
+			throw new AppError(403, 'You need to own a business to update these settings');
+		}
+
+		if (membership.role !== 'owner') {
+			throw new AppError(403, 'Only the business owner can update these settings');
+		}
+
+		const updated = await businessRepository.updateBusinessSettings(
+			membership.businessId,
+			settingsFields
+		);
 		res.status(200).send(updated);
 	} catch (error: any) {
 		if (error instanceof AppError) throw error;

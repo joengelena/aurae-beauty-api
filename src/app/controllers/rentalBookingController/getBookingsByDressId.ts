@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 
@@ -10,11 +11,11 @@ async function getBookingsByDressId(req: Request, res: Response): Promise<void> 
 
 	logger.info(`Getting booking records for dress '${vehicleId}'`);
 
-	// Verify user owns the vehicle
-	const dress = await dressRepository.getDressByIdAndUserId(
-		vehicleId,
-		userId
-	);
+	// Verify user belongs to the business that owns this dress
+	const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(userId);
+	const dress = ownerUserId
+		? await dressRepository.getDressByIdAndUserId(vehicleId, ownerUserId)
+		: null;
 
 	if (!dress) {
 		throw new AppError(404, 'Dress not found');

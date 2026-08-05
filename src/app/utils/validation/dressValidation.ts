@@ -1,5 +1,6 @@
 import AppError from '../errors/appError';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import { Pool, PoolClient } from 'pg';
 
 /**
@@ -47,9 +48,20 @@ export async function verifyDressOwnership(
 	userId: string,
 	connection?: Pool | PoolClient
 ): Promise<void> {
+	// A staff member has no dresses of their own — resolve to the business's
+	// owner account (the id dresses are actually keyed under) before checking.
+	const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(
+		userId,
+		connection
+	);
+
+	if (!ownerUserId) {
+		throw new AppError(403, "You don't belong to a business");
+	}
+
 	const dress = await dressRepository.getDressByIdAndUserId(
 		dressId,
-		userId,
+		ownerUserId,
 		connection
 	);
 

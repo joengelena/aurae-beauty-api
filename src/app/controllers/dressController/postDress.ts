@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { UserDress } from '../../resources/types';
@@ -48,8 +49,17 @@ async function postDress(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
+		const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(
+			userId,
+			connection
+		);
+
+		if (!ownerUserId) {
+			throw new AppError(403, "You don't belong to a business");
+		}
+
 		const dressData: Omit<UserDress, 'id' | 'createdAt' | 'updatedAt'> = {
-			userIdFk: userId,
+			userIdFk: ownerUserId,
 			name: name ?? null,
 			brand,
 			style,

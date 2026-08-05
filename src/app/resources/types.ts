@@ -23,6 +23,36 @@ type ListingAttribute = {
 	attributeValues: string[] | number[];
 };
 
+// ===== Business / Profile Types =====
+
+type BusinessRole = 'owner' | 'staff';
+
+type Business = {
+	id: number;
+	name: string;
+	category: 'dress_rental';
+	ownerUserIdFk: string;
+	businessSettings: Record<string, unknown>;
+	createdAt: Date;
+};
+
+type BusinessMember = {
+	id: number;
+	businessIdFk: number;
+	userIdFk: string;
+	role: BusinessRole;
+	createdAt: Date;
+};
+
+type BusinessInvite = {
+	id: number;
+	businessIdFk: number;
+	role: BusinessRole;
+	status: 'pending' | 'redeemed' | 'revoked';
+	expiresAt: Date;
+	createdAt: Date;
+};
+
 // ===== Dress Management Types =====
 
 type UserDress = {
@@ -161,6 +191,10 @@ export {
 	User,
 	AppConfiguration,
 	ListingAttribute,
+	BusinessRole,
+	Business,
+	BusinessMember,
+	BusinessInvite,
 	UserDress,
 	DressBooking,
 	DressDamageIncident,

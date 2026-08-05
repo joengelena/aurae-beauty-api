@@ -91,7 +91,54 @@ User profiles, synced from Supabase Auth on signup.
 | `instagram` | VARCHAR(100) | NULL |
 | `is_email_verified` | SMALLINT | DEFAULT 0 |
 
-**Notes**: Passwords are stored in Supabase Auth only, never here. CASCADE DELETE to `user_dresses` and `watchlist`.
+**Notes**: Passwords are stored in Supabase Auth only, never here. CASCADE DELETE to `user_dresses` and `watchlist`. Previously carried `is_seller`/`business_settings` directly — both moved to `business` below; a user's boutique is now a separate entity, not a flag on their own row.
+
+---
+
+### `business`
+A boutique/business entity — what an Owner profile owns. `category` only supports `'dress_rental'` for now; the column exists so future categories (hair salon, nail salon) don't require a migration.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | SERIAL PK | |
+| `name` | VARCHAR(150) | NOT NULL |
+| `category` | VARCHAR(30) | DEFAULT `'dress_rental'`, CHECK constrained |
+| `owner_user_id_fk` | CHAR(36) | FK → `user(id)`, UNIQUE, CASCADE DELETE. **Founding-owner anchor only** — set once at creation, used solely to resolve which business a dress belongs to (`business.owner_user_id_fk = user_dresses.user_id_fk`). Not the source of truth for who currently has owner access — see `business_member`. |
+| `business_settings` | JSONB | DEFAULT `{"deliveryOption": "pickup"}` — `deliveryOption`, `cleaningBufferDays` |
+| `created_at` | TIMESTAMP | DEFAULT NOW() |
+
+---
+
+### `business_member`
+One row per (user, business) relationship — an Owner or Staff profile. `user_id_fk` is UNIQUE: a person belongs to at most one business at a time, in any role. `role` is **not** unique per business — a business can have multiple owners.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | SERIAL PK | |
+| `business_id_fk` | INTEGER | FK → `business(id)`, CASCADE DELETE |
+| `user_id_fk` | CHAR(36) | FK → `user(id)`, UNIQUE, CASCADE DELETE |
+| `role` | VARCHAR(10) | `'owner'` or `'staff'` |
+| `created_at` | TIMESTAMP | DEFAULT NOW() |
+
+---
+
+### `business_invite`
+Single-use, owner-generated invite code granting `'owner'` (co-owner) or `'staff'` role on redemption. `code_hash` is a sha256 hex digest — the plaintext code is shown to the owner once and never persisted.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | SERIAL PK | |
+| `business_id_fk` | INTEGER | FK → `business(id)`, CASCADE DELETE |
+| `role` | VARCHAR(10) | Role granted on redemption |
+| `code_hash` | CHAR(64) | UNIQUE, sha256 hex |
+| `created_by_user_id_fk` | CHAR(36) | FK → `user(id)` |
+| `status` | VARCHAR(10) | `'pending'` → `'redeemed'` or `'revoked'` |
+| `redeemed_by_user_id_fk` | CHAR(36) | NULL, FK → `user(id)`, SET NULL on delete |
+| `redeemed_at` | TIMESTAMP | NULL |
+| `expires_at` | TIMESTAMP | NOT NULL — 7 days from creation |
+| `created_at` | TIMESTAMP | DEFAULT NOW() |
+
+**API routes**: `POST /business`, `GET /business/mine`, `GET/DELETE /business/:businessId/members[/:userId]`, `POST/GET /business/:businessId/invites`, `DELETE /business/:businessId/invites/:id`, `POST /business/invites/redeem`
 
 ---
 
@@ -123,6 +170,10 @@ User's saved dresses.
 ```
 user (1) ───< (N) user_dresses
 user (1) ───< (N) watchlist
+user (1) ─── (1) business            [owner_user_id_fk — founding-owner anchor]
+user (1) ─── (1) business_member     [one business per person]
+business (1) ───< (N) business_member
+business (1) ───< (N) business_invite
 
 user_dresses (1) ───< (N) dress_bookings
 user_dresses (1) ───< (N) watchlist

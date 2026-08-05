@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 
@@ -15,9 +16,15 @@ async function getDressById(req: Request, res: Response): Promise<void> {
 	logger.info(`Getting dress with id '${vehicleId}' for user '${userId}'`);
 
 	try {
+		const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(userId);
+
+		if (!ownerUserId) {
+			throw new AppError(403, "You don't belong to a business");
+		}
+
 		const dress = await dressRepository.getDressByIdAndUserId(
 			vehicleId,
-			userId
+			ownerUserId
 		);
 
 		if (!dress) {

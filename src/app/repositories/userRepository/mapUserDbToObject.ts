@@ -13,7 +13,7 @@ function mapUserDbToObject(usersDb: any[]): User[] {
 			profilePhotoUrl: user.profile_photo_url,
 			isEmailVerified: user.is_email_verified,
 			isPhoneNumberVerified: user.is_phone_number_verified,
-			deliveryOption: user.business_settings?.deliveryOption ?? null,
+			deliveryOption: user.delivery_option ?? null,
 		};
 	});
 }

@@ -8,6 +8,7 @@ import usersRoutes from '../app/routes/user.routes';
 import cookieParser from 'cookie-parser';
 import userAuthRoutes from '../app/routes/userAuth.routes';
 import dressRoutes from '../app/routes/dress.routes';
+import businessRoutes from '../app/routes/business.routes';
 import { Request, Response, NextFunction } from 'express';
 
 // Never let credentials or tokens reach the log files. The error handler logs
@@ -92,6 +93,7 @@ export default () => {
 	usersRoutes(app);
 	userAuthRoutes(app);
 	dressRoutes(app);
+	businessRoutes(app);
 
 	app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 		logger.error({
