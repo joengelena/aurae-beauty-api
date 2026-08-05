@@ -415,6 +415,13 @@
           "sell"
         ]
       },
+      "status": {
+        "type": "string",
+        "enum": [
+          "active",
+          "sold"
+        ]
+      },
       "isPublic": {
         "type": "boolean"
       },
@@ -610,6 +617,70 @@
       "startDate",
       "endDate",
       "renterName"
+    ],
+    "additionalProperties": false
+  },
+  "patchBooking": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "bookingType": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "startDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "endDate": {
+        "type": "string",
+        "format": "date"
+      },
+      "renterName": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "renterEmail": {
+        "type": "string",
+        "format": "email"
+      },
+      "renterPhone": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "renterInstagram": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "totalCost": {
+        "type": "number",
+        "minimum": 0
+      },
+      "depositPaid": {
+        "type": "number",
+        "minimum": 0
+      },
+      "status": {
+        "type": "string",
+        "enum": ["pending", "confirmed", "active", "returned", "cancelled"]
+      },
+      "notes": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      }
+    },
+    "required": [
+      "currentUserId"
     ],
     "additionalProperties": false
   },

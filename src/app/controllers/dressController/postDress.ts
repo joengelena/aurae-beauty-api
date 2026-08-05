@@ -65,6 +65,7 @@ async function postDress(req: Request, res: Response): Promise<void> {
 			style,
 			dressType: dressType ?? null,
 			listingType: listingType ?? 'rent',
+			status: 'active',
 			isPublic: isPublic ?? false,
 			size: size ?? null,
 			fitNote: fitNote ?? null,

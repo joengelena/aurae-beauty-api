@@ -63,6 +63,7 @@ type UserDress = {
 	style: string;
 	dressType: string | null;
 	listingType: 'rent' | 'sell';
+	status: 'active' | 'sold';
 	isPublic: boolean;
 	purchaseYear: number | null;
 	internalName: string | null;

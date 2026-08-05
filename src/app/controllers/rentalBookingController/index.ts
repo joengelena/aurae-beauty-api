@@ -1,4 +1,5 @@
 export { default as postBooking } from './postBooking';
+export { default as patchBooking } from './patchBooking';
 export { default as postSelfBooking } from './postSelfBooking';
 export { default as getBookingsByDressId } from './getBookingsByDressId';
 export { default as deleteBooking } from './deleteBooking';

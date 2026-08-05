@@ -205,6 +205,16 @@ async function getPublicAvailabilityByDressId(
 
 	const conn = connection || getPool();
 
+	const dressQuery = convertQueryPlaceholders(`
+		SELECT ud.blocked_date_ranges, b.business_settings->>'cleaningBufferDays' AS cleaning_buffer_days
+		FROM "user_dresses" ud
+		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		WHERE ud.id = ?
+	`);
+	const dressResult = await conn.query(dressQuery, [dressId]);
+	const parsedBufferDays = parseInt(dressResult.rows[0]?.cleaning_buffer_days, 10);
+	const bufferDays: number = Number.isNaN(parsedBufferDays) ? 1 : parsedBufferDays;
+
 	const bookingsQuery = convertQueryPlaceholders(`
 		SELECT start_date, end_date, status
 		FROM "dress_bookings"
@@ -219,18 +229,85 @@ async function getPublicAvailabilityByDressId(
 		status: row.status,
 	}));
 
-	const blockedQuery = convertQueryPlaceholders(
-		`SELECT blocked_date_ranges FROM "user_dresses" WHERE id = ?`
-	);
-	const blockedResult = await conn.query(blockedQuery, [dressId]);
+	// Cleaning buffer after each active/upcoming booking, represented as its
+	// own 'blocked' range so existing unavailable-range consumers (calendar
+	// widgets, availability filters) need no changes to treat it as unavailable.
+	const bufferRanges: { startDate: Date; endDate: Date; status: string }[] = [];
+	if (bufferDays > 0) {
+		for (const row of bookingsResult.rows) {
+			const bufferStart = new Date(row.end_date);
+			bufferStart.setDate(bufferStart.getDate() + 1);
+			const bufferEnd = new Date(row.end_date);
+			bufferEnd.setDate(bufferEnd.getDate() + bufferDays);
+			bufferRanges.push({ startDate: bufferStart, endDate: bufferEnd, status: 'blocked' });
+		}
+	}
+
 	const blockedRanges: { startDate: string; endDate: string; status: string }[] =
-		(blockedResult.rows[0]?.blocked_date_ranges ?? []).map((r: any) => ({
+		(dressResult.rows[0]?.blocked_date_ranges ?? []).map((r: any) => ({
 			startDate: r.startDate,
 			endDate: r.endDate,
 			status: 'blocked',
 		}));
 
-	return [...bookingRanges, ...blockedRanges];
+	if (!connection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	return [...bookingRanges, ...bufferRanges, ...blockedRanges];
+}
+
+async function hasBookingConflict(
+	dressId: number,
+	startDate: string,
+	endDate: string,
+	connection?: Pool | PoolClient,
+	excludeBookingId?: number
+): Promise<boolean> {
+	logger.info(`Checking booking conflicts for dress '${dressId}'`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+
+	const excludeClause = excludeBookingId !== undefined ? ' AND db.id != ?' : '';
+	const bookingQuery = convertQueryPlaceholders(`
+		SELECT 1 FROM "dress_bookings" db
+		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
+		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		WHERE db.dress_id_fk = ?
+		  AND db.status NOT IN ('cancelled', 'returned')
+		  ${excludeClause}
+		  AND db.start_date <= ?
+		  AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
+		LIMIT 1
+	`);
+	const bookingParams = excludeBookingId !== undefined
+		? [dressId, excludeBookingId, endDate, startDate]
+		: [dressId, endDate, startDate];
+	const bookingResult = await conn.query(bookingQuery, bookingParams);
+
+	if (bookingResult.rows.length > 0) {
+		if (!useProvidedConnection && 'release' in conn) {
+			(conn as PoolClient).release();
+		}
+		return true;
+	}
+
+	const blockedQuery = convertQueryPlaceholders(`
+		SELECT 1 FROM "user_dresses" ud,
+			jsonb_to_recordset(ud.blocked_date_ranges) AS br("startDate" date, "endDate" date)
+		WHERE ud.id = ?
+		  AND br."startDate" <= ?
+		  AND br."endDate" >= ?
+		LIMIT 1
+	`);
+	const blockedResult = await conn.query(blockedQuery, [dressId, endDate, startDate]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	return blockedResult.rows.length > 0;
 }
 
 export {
@@ -241,4 +318,5 @@ export {
 	deleteBookingById,
 	getAllBookingsByUserId,
 	getPublicAvailabilityByDressId,
+	hasBookingConflict,
 };

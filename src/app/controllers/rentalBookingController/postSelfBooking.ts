@@ -5,7 +5,6 @@ import * as userRepository from '../../repositories/userRepository/userRepositor
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
-import { convertQueryPlaceholders } from '../../utils/database/queryHelper';
 
 async function postSelfBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId as string;
@@ -34,16 +33,15 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 			throw new AppError(403, 'You cannot book your own dress');
 		}
 
-		// Check for date conflicts with existing active bookings
-		const conflictQuery = convertQueryPlaceholders(`
-			SELECT id FROM "dress_bookings"
-			WHERE dress_id_fk = ?
-			  AND status NOT IN ('cancelled', 'returned')
-			  AND start_date <= ?
-			  AND end_date >= ?
-		`);
-		const conflicts = await connection.query(conflictQuery, [dressId, endDate, startDate]);
-		if (conflicts.rows.length > 0) {
+		// Check for date conflicts with existing active bookings, manual blocks,
+		// and the dress's post-rental cleaning buffer
+		const hasConflict = await rentalBookingRepository.hasBookingConflict(
+			dressId,
+			startDate,
+			endDate,
+			connection
+		);
+		if (hasConflict) {
 			throw new AppError(409, 'Those dates are not available');
 		}
 
@@ -73,7 +71,7 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 				renterInstagram: renter.instagram ?? null,
 				totalCost,
 				depositPaid: null,
-				status: 'confirmed',
+				status: 'pending',
 				notes: null,
 			},
 			connection

@@ -24,6 +24,7 @@ const getPublicDresses = async (req: Request, res: Response): Promise<void> => {
 		location: stringParam(req.query.location),
 		priceFrom: stringParam(req.query.priceFrom),
 		priceTo: stringParam(req.query.priceTo),
+		ungrouped: stringParam(req.query.ungrouped) === 'true',
 	};
 
 	try {

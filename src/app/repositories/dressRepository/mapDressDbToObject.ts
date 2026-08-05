@@ -11,7 +11,7 @@ function formatDateToString(date: Date | null): string | null {
 
 function mapDressDbToObject(
 	dressesDb: any[]
-): (UserDress & { unresolvedDamageCount: number })[] {
+): (UserDress & { unresolvedDamageCount: number; pendingBookingCount: number })[] {
 	return dressesDb.map((dress) => {
 		return {
 			id: dress.id,
@@ -21,6 +21,7 @@ function mapDressDbToObject(
 			style: dress.style,
 			dressType: dress.dress_type ?? null,
 			listingType: dress.listing_type ?? 'rent',
+			status: dress.status ?? 'active',
 			isPublic: dress.is_public ?? false,
 			purchaseYear: dress.purchase_year,
 			internalName: dress.internal_name,
@@ -38,6 +39,9 @@ function mapDressDbToObject(
 			notes: dress.notes,
 			unresolvedDamageCount: dress.unresolved_damage_count != null
 				? parseInt(dress.unresolved_damage_count, 10)
+				: 0,
+			pendingBookingCount: dress.pending_booking_count != null
+				? parseInt(dress.pending_booking_count, 10)
 				: 0,
 			createdAt: dress.created_at,
 			updatedAt: dress.updated_at,

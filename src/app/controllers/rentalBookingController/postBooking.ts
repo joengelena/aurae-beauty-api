@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { DressBooking } from '../../resources/types';
@@ -31,15 +32,27 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
-		// Verify user owns the vehicle
-		const dress = await dressRepository.getDressByIdAndUserId(
-			dressIdFk,
+		// Verify user belongs to the business that owns this dress
+		const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(
 			userId,
 			connection
 		);
+		const dress = ownerUserId
+			? await dressRepository.getDressByIdAndUserId(dressIdFk, ownerUserId, connection)
+			: null;
 
 		if (!dress) {
 			throw new AppError(404, 'Dress not found');
+		}
+
+		const hasConflict = await rentalBookingRepository.hasBookingConflict(
+			dressIdFk,
+			startDate,
+			endDate,
+			connection
+		);
+		if (hasConflict) {
+			throw new AppError(409, 'Those dates are not available');
 		}
 
 		// Prepare booking data

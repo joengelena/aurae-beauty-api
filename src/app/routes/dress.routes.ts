@@ -10,7 +10,7 @@ import {
 	getPublicDressById,
 	getDressAttributes,
 } from '../controllers/dressController';
-import { postBooking, postSelfBooking, getBookingsByDressId, deleteBooking, getAllUserBookings, getMyBookings, getPublicDressBookings } from '../controllers/rentalBookingController';
+import { postBooking, patchBooking, postSelfBooking, getBookingsByDressId, deleteBooking, getAllUserBookings, getMyBookings, getPublicDressBookings } from '../controllers/rentalBookingController';
 import { postIncident, getIncidentsByDressId, patchIncident, deleteIncident, getPublicIncidentsByDressId } from '../controllers/dressDamageIncidentController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
@@ -159,6 +159,13 @@ const dressRoutes = (app: Express) => {
 		);
 
 	app.route(rootUrl + '/user/dress-bookings/:id')
+		.patch(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.patchBooking);
+			},
+			asyncHandler(patchBooking)
+		)
 		.delete(
 			supabaseAuthenticateReq,
 			(req, res, next) => {
