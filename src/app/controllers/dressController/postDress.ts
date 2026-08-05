@@ -28,7 +28,6 @@ async function postDress(req: Request, res: Response): Promise<void> {
 		purchasePrice,
 		availableFrom,
 		notes,
-		damageDescription,
 	} = req.body;
 
 	logger.info(`Creating new dress for user '${userId}'`);
@@ -70,8 +69,6 @@ async function postDress(req: Request, res: Response): Promise<void> {
 			availableFrom: availableFrom ?? null,
 			dressPhotoUrls,
 			notes: notes ?? null,
-			damageDescription: damageDescription ?? null,
-			damagePhotoUrls: null,
 		};
 
 		const result = await dressRepository.postDress(dressData, connection);

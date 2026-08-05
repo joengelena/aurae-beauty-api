@@ -11,6 +11,7 @@ import {
 	getDressAttributes,
 } from '../controllers/dressController';
 import { postBooking, postSelfBooking, getBookingsByDressId, deleteBooking, getAllUserBookings, getMyBookings, getPublicDressBookings } from '../controllers/rentalBookingController';
+import { postIncident, getIncidentsByDressId, patchIncident, deleteIncident, getPublicIncidentsByDressId } from '../controllers/dressDamageIncidentController';
 import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
@@ -31,6 +32,9 @@ const dressRoutes = (app: Express) => {
 
 	app.route(rootUrl + '/dresses/:id/bookings')
 		.get(asyncHandler(getPublicDressBookings));
+
+	app.route(rootUrl + '/dresses/:id/damage-incidents')
+		.get(asyncHandler(getPublicIncidentsByDressId));
 
 	app.route(rootUrl + '/dresses/:id/book')
 		.post(
@@ -80,6 +84,41 @@ const dressRoutes = (app: Express) => {
 				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
 			},
 			asyncHandler(deleteDress)
+		);
+
+	// Damage incident history for a specific dress
+	app.route(rootUrl + '/user/dresses/:id/damage-incidents')
+		.get(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(getIncidentsByDressId)
+		)
+		.post(
+			uploadMulter.array('images', 5),
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.postDamageIncident);
+			},
+			asyncHandler(postIncident)
+		);
+
+	app.route(rootUrl + '/user/dresses/:id/damage-incidents/:incidentId')
+		.patch(
+			uploadMulter.array('images', 5),
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.patchDamageIncident);
+			},
+			asyncHandler(patchIncident)
+		)
+		.delete(
+			supabaseAuthenticateReq,
+			(req, res, next) => {
+				validateRequestBody(req, res, next, ajvSchema.userIdOnly);
+			},
+			asyncHandler(deleteIncident)
 		);
 
 	// Get bookings for a specific dress

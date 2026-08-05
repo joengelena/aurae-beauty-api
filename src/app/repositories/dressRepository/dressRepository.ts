@@ -29,22 +29,27 @@ const dressDbFields: Record<keyof UserDress, string> = {
 	dressPhotoUrls: 'dress_photo_urls',
 	blockedDateRanges: 'blocked_date_ranges',
 	notes: 'notes',
-	damageDescription: 'damage_description',
-	damagePhotoUrls: 'damage_photo_urls',
 	createdAt: 'created_at',
 	updatedAt: 'updated_at',
 };
 
+// Correlated subquery — cheap at small-business scale, avoids a denormalized
+// counter column that would need to stay in sync with damage incident CRUD.
+const unresolvedDamageCountSelect = `(
+	SELECT COUNT(*) FROM "dress_damage_incidents" ddi
+	WHERE ddi.dress_id_fk = ud.id AND ddi.resolved = FALSE
+) AS unresolved_damage_count`;
+
 async function getAllDressesByUserId(
 	userId: string,
 	connection?: Pool | PoolClient
-): Promise<UserDress[]> {
+): Promise<(UserDress & { unresolvedDamageCount: number })[]> {
 	logger.info(`Getting all dresses for user '${userId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(
-		`SELECT * FROM "user_dresses" WHERE user_id_fk = ? ORDER BY created_at DESC`
+		`SELECT ud.*, ${unresolvedDamageCountSelect} FROM "user_dresses" ud WHERE ud.user_id_fk = ? ORDER BY ud.created_at DESC`
 	);
 	const result = await conn.query(query, [userId]);
 
@@ -58,13 +63,13 @@ async function getAllDressesByUserId(
 async function getDressById(
 	dressId: number,
 	connection?: Pool | PoolClient
-): Promise<UserDress | null> {
+): Promise<(UserDress & { unresolvedDamageCount: number }) | null> {
 	logger.info(`Getting dress with id '${dressId}' from the database`);
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(
-		'SELECT * FROM "user_dresses" WHERE id = ?'
+		`SELECT ud.*, ${unresolvedDamageCountSelect} FROM "user_dresses" ud WHERE ud.id = ?`
 	);
 	const result = await conn.query(query, [dressId]);
 

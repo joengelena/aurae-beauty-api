@@ -48,8 +48,21 @@ type UserDress = {
 	dressPhotoUrls: string[];
 	blockedDateRanges?: { startDate: string; endDate: string }[];
 	notes: string | null;
-	damageDescription: string | null;
-	damagePhotoUrls: string[] | null;
+	createdAt: Date;
+	updatedAt: Date;
+};
+
+type DressDamageIncident = {
+	id: number;
+	dressIdFk: number;
+	bookingIdFk: number | null;
+	description: string;
+	photoUrls: string[];
+	occurredAt: string;
+	isPublic: boolean;
+	resolved: boolean;
+	resolutionNotes: string | null;
+	resolvedAt: string | null;
 	createdAt: Date;
 	updatedAt: Date;
 };
@@ -150,6 +163,7 @@ export {
 	ListingAttribute,
 	UserDress,
 	DressBooking,
+	DressDamageIncident,
 	ServiceHistory,
 	ServiceReminder,
 	NotificationPreferences,

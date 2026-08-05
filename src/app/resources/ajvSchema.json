@@ -342,11 +342,6 @@
         "minLength": 1,
         "maxLength": 10000
       },
-      "damageDescription": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 10000
-      },
       "name": {
         "type": "string",
         "minLength": 1,
@@ -454,11 +449,6 @@
         "minLength": 1,
         "maxLength": 10000
       },
-      "damageDescription": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 10000
-      },
       "name": {
         "type": "string",
         "minLength": 1,
@@ -468,6 +458,76 @@
         "type": "string"
       },
       "blockedDateRanges": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "currentUserId"
+    ],
+    "additionalProperties": false
+  },
+  "postDamageIncident": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "bookingIdFk": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "occurredAt": {
+        "type": "string",
+        "format": "date"
+      },
+      "isPublic": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "currentUserId",
+      "description"
+    ],
+    "additionalProperties": false
+  },
+  "patchDamageIncident": {
+    "type": "object",
+    "properties": {
+      "currentUserId": {
+        "type": "string",
+        "format": "uuid",
+        "minLength": 36,
+        "maxLength": 36
+      },
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "occurredAt": {
+        "type": "string",
+        "format": "date"
+      },
+      "isPublic": {
+        "type": "boolean"
+      },
+      "resolved": {
+        "type": "boolean"
+      },
+      "resolutionNotes": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      },
+      "keepPhotoUrls": {
         "type": "string"
       }
     },

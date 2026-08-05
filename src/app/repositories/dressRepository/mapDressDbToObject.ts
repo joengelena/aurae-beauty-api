@@ -9,7 +9,9 @@ function formatDateToString(date: Date | null): string | null {
 	return `${year}-${month}-${day}`;
 }
 
-function mapDressDbToObject(dressesDb: any[]): UserDress[] {
+function mapDressDbToObject(
+	dressesDb: any[]
+): (UserDress & { unresolvedDamageCount: number })[] {
 	return dressesDb.map((dress) => {
 		return {
 			id: dress.id,
@@ -34,8 +36,9 @@ function mapDressDbToObject(dressesDb: any[]): UserDress[] {
 			dressPhotoUrls: dress.dress_photo_urls ?? [],
 			blockedDateRanges: dress.blocked_date_ranges ?? [],
 			notes: dress.notes,
-			damageDescription: dress.damage_description,
-			damagePhotoUrls: dress.damage_photo_urls ?? [],
+			unresolvedDamageCount: dress.unresolved_damage_count != null
+				? parseInt(dress.unresolved_damage_count, 10)
+				: 0,
 			createdAt: dress.created_at,
 			updatedAt: dress.updated_at,
 		};
