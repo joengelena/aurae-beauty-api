@@ -44,8 +44,6 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
 		JOIN "user" u ON u.email = db.renter_email
 		WHERE u.id = ?
-		  AND db.status NOT IN ('cancelled', 'returned')
-		  AND db.end_date >= CURRENT_DATE
 		ORDER BY db.start_date ASC
 	`);
 
