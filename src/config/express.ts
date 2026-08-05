@@ -10,6 +10,32 @@ import userAuthRoutes from '../app/routes/userAuth.routes';
 import dressRoutes from '../app/routes/dress.routes';
 import { Request, Response, NextFunction } from 'express';
 
+// Never let credentials or tokens reach the log files. The error handler logs
+// the request body to help debug failed requests, but signin/signup bodies
+// carry a plaintext password — logging those would persist them to
+// logs/app.log and logs/error.log. See .claude/rules/logging.md.
+const SENSITIVE_BODY_FIELDS = [
+	'password',
+	'currentPassword',
+	'newPassword',
+	'confirmPassword',
+	'accessToken',
+	'refreshToken',
+	'token',
+];
+
+const redactSensitiveFields = (body: unknown): unknown => {
+	if (!body || typeof body !== 'object' || Array.isArray(body)) return body;
+
+	const redacted: Record<string, unknown> = {
+		...(body as Record<string, unknown>),
+	};
+	for (const field of SENSITIVE_BODY_FIELDS) {
+		if (field in redacted) redacted[field] = '[REDACTED]';
+	}
+	return redacted;
+};
+
 export default () => {
 	const app = express();
 
@@ -74,7 +100,7 @@ export default () => {
 			stack: err.stack,
 			method: req.method,
 			path: req.originalUrl,
-			body: req.body,
+			body: redactSensitiveFields(req.body),
 		});
 
 		res.status(err.status || 500).send({
