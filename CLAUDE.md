@@ -3,7 +3,22 @@
 Node.js/TypeScript backend for AURAE. Serves both the public dress marketplace and the authenticated boutique-owner Wardrobe (inventory, bookings, damage incidents).
 
 Monorepo context and the `user_dresses` data model rule: `../CLAUDE.md`.
-Enforceable conventions: `.claude/rules/` · Deep references: `docs/`
+Deep references: `docs/`
+
+**Enforceable conventions in `.claude/rules/`:**
+
+| Rule | Covers |
+|---|---|
+| `authentication.md` | Supabase dual-client split, token strategy, `currentUserId` injection |
+| `security.md` | Service role key, ownership validation, trust boundaries |
+| `validation.md` | AJV schemas, `additionalProperties: false`, business-rule checks |
+| `database-transactions.md` | Parameterized SQL, BEGIN/COMMIT/ROLLBACK, connection release |
+| `error-responses.md` | `AppError`, status codes, what never reaches the client |
+| `logging.md` | Winston levels, redaction, the metadata-dropping format trap |
+| `configuration.md` | Env vars, fail-fast validation, `.env.example` discipline |
+| `file-upload.md` | R2 upload-then-rollback, validation, object keys |
+| `api-compatibility.md` | `/api/v1` stability, response shape, deprecation |
+| `code-style.md` | Naming, file organization, import order, TypeScript usage |
 
 **Base URL:** `/api/v1` · **Port:** 4941 (`PORT` env var)
 
@@ -107,6 +122,20 @@ R2 bucket configuration: `CLOUDFLARE_R2_SETUP.md`.
 
 ## Known Issues
 
-- **No automated test suite.** See `docs/testing-strategy.md` for the intended approach.
-- **`motorix-api.yaml`** in the repo root is a stale OpenAPI spec from the pivot — not maintained, don't treat it as a contract.
+**Hardening gaps** (none of these are wired up; all are standard for a production Express API):
+
+- **No `helmet`** — no security response headers (HSTS, X-Content-Type-Options, frame options).
+- **No rate limiting.** `/user/signin`, `/user/signup`, and `/user/forgot-password` accept unlimited attempts. Brute-force and credential-stuffing protection is absent.
+- **TypeScript is not strict.** `tsconfig.json` sets only `noImplicitAny`; there's no `strict: true`. 36 `: any` annotations in `src/`, 18 of them the documented `catch (error: any)` pattern.
+- **No automated test suite.** No test runner installed. `docs/testing-strategy.md` describes the intended approach.
+
+**Logging and error handling:**
+
+- **The Winston format silently drops metadata.** `config/logger.ts` renders only `timestamp`/`status`/`level`/`message`, so the `stack`, `method`, `path`, and `body` fields the global error handler collects never reach disk — **stack traces are not being recorded.** Fixing the format is worthwhile but security-sensitive; read `.claude/rules/logging.md` first.
+- **The error handler has no dev/prod split.** It returns `err.message` to the client whatever the environment, so an unexpected non-`AppError` (a raw Postgres error, say) leaks its message to the caller — contradicting the rule in `error-responses.md`. Wrapping unknown errors in a generic 500 in production would close this.
+
+**Pivot leftovers:**
+
+- **`motorix-api.yaml`** in the repo root is a stale OpenAPI spec — not maintained, don't treat it as a contract.
 - **Cosmetic `vehicle*` naming** survives in `resources/types.ts` (`vehicleIdFk`) and as local variables in `dressController/`. Harmless; rename opportunistically.
+- **`.env.example`** still suggests `R2_BUCKET_NAME=motorix-images`.
