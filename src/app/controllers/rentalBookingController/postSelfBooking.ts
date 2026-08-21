@@ -28,10 +28,12 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'Dress not found');
 		}
 
-		// Can't book your own dress
-		if (dress.userIdFk === userId) {
-			throw new AppError(403, 'You cannot book your own dress');
-		}
+		// Booking your own dress is deliberately allowed. Every account has a
+		// Customer profile alongside any business it owns, and while acting as
+		// a customer an owner is just another renter — including for their own
+		// stock (holding a dress for themselves, a friend, an event). The
+		// booking still lands in their Wardrobe calendar and still consumes
+		// availability, which is the point.
 
 		// Check for date conflicts with existing active bookings, manual blocks,
 		// and the dress's post-rental cleaning buffer
