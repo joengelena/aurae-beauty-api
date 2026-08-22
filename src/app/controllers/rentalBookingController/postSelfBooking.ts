@@ -54,11 +54,17 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 		}
 		const renter = users[0];
 
-		// Calculate total cost server-side (days inclusive of both start and end)
+		// Priced by nights, not by inclusive days: a rental is a whole day that goes
+		// overnight, so the 23rd to the 24th is one night at one day's rate. This has
+		// to match CartItem.nights and DateRangeSelection in the app, which is where
+		// the renter reads the price before she commits to it.
 		const start = new Date(startDate);
 		const end = new Date(endDate);
-		const days = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-		const totalCost = (dress.rentalPricePerDay ?? 0) * days;
+		const nights = Math.max(
+			1,
+			Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+		);
+		const totalCost = (dress.rentalPricePerDay ?? 0) * nights;
 
 		const result = await rentalBookingRepository.postBooking(
 			{

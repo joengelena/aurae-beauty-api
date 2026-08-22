@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import { addToCart as addToCartRepo } from '../../repositories/cartRepository/cartRepository';
 import AppError from '../../utils/errors/appError';
 
@@ -29,6 +30,20 @@ async function addToCart(req: Request, res: Response): Promise<void> {
 		// Can't add your own dress to your cart
 		if (dress.userIdFk === currentUserId) {
 			throw new AppError(403, 'You cannot add your own dress to your cart');
+		}
+
+		// Availability is checked here, not only at checkout. The same shared
+		// hasBookingConflict the booking endpoints use, so the cart can never hold
+		// dates the booking would go on to reject. Adding an unavailable dress and
+		// only finding out at checkout is the worst possible place to discover it.
+		const hasConflict = await rentalBookingRepository.hasBookingConflict(
+			dressId,
+			startDate,
+			endDate,
+			connection
+		);
+		if (hasConflict) {
+			throw new AppError(409, 'Those dates are no longer available');
 		}
 
 		// Price is snapshotted server-side (not trusted from the client) so the
