@@ -4,10 +4,15 @@ import { getUserCart } from '../../repositories/cartRepository/cartRepository';
 import { hasBookingConflict } from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import AppError from '../../utils/errors/appError';
 
-// cart_items stores DATE columns, which come back as Date objects. Re-binding
-// those into the conflict query risks a timezone shift, so narrow to the plain
-// calendar date the rest of the booking code passes around.
+// The cart query already renders its dates as YYYY-MM-DD, so the common path is
+// a pass-through. The Date branch stays for any caller that hands over a raw pg
+// DATE — parsing one back through new Date() would reintroduce the timezone
+// shift this is here to avoid.
 function toDateOnly(value: Date | string): string {
+	if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+		return value;
+	}
+
 	const d = new Date(value);
 	const year = d.getFullYear();
 	const month = String(d.getMonth() + 1).padStart(2, '0');

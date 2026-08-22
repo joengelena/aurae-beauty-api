@@ -55,7 +55,9 @@ async function hasOverlappingCartItem(
 	const query = convertQueryPlaceholders(`
 		SELECT 1 FROM "cart_items" ci
 		JOIN "user_dresses" ud ON ud.id = ci.dress_id_fk
-		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		-- LEFT JOIN for the same reason as hasBookingConflict: a dress with no
+		-- business row must not silently report "no overlap".
+		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE ci.user_id_fk = ?
 		  AND ci.dress_id_fk = ?
 		  AND ci.start_date <= ?
@@ -104,8 +106,11 @@ async function getUserCart(userId: string): Promise<any[]> {
 		SELECT
 			ci.id,
 			ci.dress_id_fk,
-			ci.start_date,
-			ci.end_date,
+			-- Rendered in SQL, not handed back as a pg DATE: a DATE becomes a JS
+			-- Date at the server's local midnight and JSON-serializes as UTC, so
+			-- an API ahead of UTC would show the renter the previous day.
+			to_char(ci.start_date, 'YYYY-MM-DD') AS start_date,
+			to_char(ci.end_date, 'YYYY-MM-DD') AS end_date,
 			ci.price_per_day,
 			ci.created_at,
 			ud.name,

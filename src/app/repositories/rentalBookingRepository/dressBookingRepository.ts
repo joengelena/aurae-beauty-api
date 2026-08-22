@@ -205,24 +205,43 @@ async function getPublicAvailabilityByDressId(
 
 	const conn = connection || getPool();
 
+	// LEFT JOIN: a dress whose owner has no business row still has manual blocks
+	// worth returning, and an INNER JOIN would silently drop them.
 	const dressQuery = convertQueryPlaceholders(`
-		SELECT ud.blocked_date_ranges, b.business_settings->>'cleaningBufferDays' AS cleaning_buffer_days
+		SELECT ud.blocked_date_ranges
 		FROM "user_dresses" ud
-		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE ud.id = ?
 	`);
 	const dressResult = await conn.query(dressQuery, [dressId]);
-	const parsedBufferDays = parseInt(dressResult.rows[0]?.cleaning_buffer_days, 10);
-	const bufferDays: number = Number.isNaN(parsedBufferDays) ? 1 : parsedBufferDays;
 
+	// Every date is rendered as YYYY-MM-DD in SQL rather than handed back as a
+	// pg DATE. A DATE becomes a JS Date at the API server's local midnight, which
+	// JSON then serializes as UTC — so an API running anywhere ahead of UTC sent
+	// the previous day, and the client's calendar blocked the wrong dates.
+	// A calendar date has no timezone; it should never become an instant.
+	//
+	// The buffer arithmetic is in SQL for the same reason: end_date + n is exact,
+	// where JS Date.setDate() drags a timezone along with it.
 	const bookingsQuery = convertQueryPlaceholders(`
-		SELECT start_date, end_date, status
-		FROM "dress_bookings"
-		WHERE dress_id_fk = ?
+		SELECT
+			to_char(db.start_date, 'YYYY-MM-DD') AS start_date,
+			to_char(db.end_date, 'YYYY-MM-DD') AS end_date,
+			db.status,
+			GREATEST(COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1), 0) AS buffer_days,
+			to_char(db.end_date + 1, 'YYYY-MM-DD') AS buffer_start,
+			to_char(
+				db.end_date + GREATEST(COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1), 0),
+				'YYYY-MM-DD'
+			) AS buffer_end
+		FROM "dress_bookings" db
+		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
+		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		WHERE db.dress_id_fk = ?
 		  -- Only a cancelled booking releases its dates. A returned one keeps
 		  -- holding them until its cleaning buffer has run, which is applied below.
-		  AND status <> 'cancelled'
-		ORDER BY start_date ASC
+		  AND db.status <> 'cancelled'
+		ORDER BY db.start_date ASC
 	`);
 	const bookingsResult = await conn.query(bookingsQuery, [dressId]);
 	const bookingRanges = bookingsResult.rows.map((row: any) => ({
@@ -231,17 +250,18 @@ async function getPublicAvailabilityByDressId(
 		status: row.status,
 	}));
 
-	// Cleaning buffer after each active/upcoming booking, represented as its
-	// own 'blocked' range so existing unavailable-range consumers (calendar
-	// widgets, availability filters) need no changes to treat it as unavailable.
-	const bufferRanges: { startDate: Date; endDate: Date; status: string }[] = [];
-	if (bufferDays > 0) {
-		for (const row of bookingsResult.rows) {
-			const bufferStart = new Date(row.end_date);
-			bufferStart.setDate(bufferStart.getDate() + 1);
-			const bufferEnd = new Date(row.end_date);
-			bufferEnd.setDate(bufferEnd.getDate() + bufferDays);
-			bufferRanges.push({ startDate: bufferStart, endDate: bufferEnd, status: 'blocked' });
+	// The turnaround runs from the day AFTER the dress is due back: a booking
+	// ending on the 9th with a one-day buffer blocks the 10th, not the 9th.
+	// Emitted as its own 'blocked' range so every unavailable-range consumer —
+	// calendars, pickers, filters — treats it as unavailable without changes.
+	const bufferRanges: { startDate: string; endDate: string; status: string }[] = [];
+	for (const row of bookingsResult.rows) {
+		if (row.buffer_days > 0) {
+			bufferRanges.push({
+				startDate: row.buffer_start,
+				endDate: row.buffer_end,
+				status: 'blocked',
+			});
 		}
 	}
 
@@ -275,7 +295,11 @@ async function hasBookingConflict(
 	const bookingQuery = convertQueryPlaceholders(`
 		SELECT 1 FROM "dress_bookings" db
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
-		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
+		-- LEFT JOIN, not INNER: an INNER JOIN returned no rows for a dress whose
+		-- owner has no business row, which reads as "no conflict" and lets the
+		-- dress be double-booked. COALESCE below already supplies the default
+		-- buffer, so a missing business degrades to one day rather than to none.
+		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
 		  -- Marking a booking returned must not free the dress. The turnaround
 		  -- buffer below is exactly the window between the dress coming back and
