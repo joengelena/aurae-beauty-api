@@ -219,7 +219,9 @@ async function getPublicAvailabilityByDressId(
 		SELECT start_date, end_date, status
 		FROM "dress_bookings"
 		WHERE dress_id_fk = ?
-		  AND status NOT IN ('cancelled', 'returned')
+		  -- Only a cancelled booking releases its dates. A returned one keeps
+		  -- holding them until its cleaning buffer has run, which is applied below.
+		  AND status <> 'cancelled'
 		ORDER BY start_date ASC
 	`);
 	const bookingsResult = await conn.query(bookingsQuery, [dressId]);
@@ -275,7 +277,10 @@ async function hasBookingConflict(
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
 		JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
-		  AND db.status NOT IN ('cancelled', 'returned')
+		  -- Marking a booking returned must not free the dress. The turnaround
+		  -- buffer below is exactly the window between the dress coming back and
+		  -- it being wearable again, so a returned booking still blocks.
+		  AND db.status <> 'cancelled'
 		  ${excludeClause}
 		  AND db.start_date <= ?
 		  AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
