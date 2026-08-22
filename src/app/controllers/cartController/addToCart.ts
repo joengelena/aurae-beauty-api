@@ -3,7 +3,10 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
-import { addToCart as addToCartRepo } from '../../repositories/cartRepository/cartRepository';
+import {
+	addToCart as addToCartRepo,
+	hasOverlappingCartItem,
+} from '../../repositories/cartRepository/cartRepository';
 import AppError from '../../utils/errors/appError';
 
 async function addToCart(req: Request, res: Response): Promise<void> {
@@ -44,6 +47,20 @@ async function addToCart(req: Request, res: Response): Promise<void> {
 		);
 		if (hasConflict) {
 			throw new AppError(409, 'Those dates are no longer available');
+		}
+
+		// A cart line holds no dates, so the check above can't see the renter's own
+		// other lines — without this, the same dress goes in twice for the same days
+		// and only the first one survives checkout.
+		const alreadyInCart = await hasOverlappingCartItem(
+			currentUserId,
+			dressId,
+			startDate,
+			endDate,
+			connection
+		);
+		if (alreadyInCart) {
+			throw new AppError(409, 'This dress is already in your cart for those dates');
 		}
 
 		// Price is snapshotted server-side (not trusted from the client) so the
