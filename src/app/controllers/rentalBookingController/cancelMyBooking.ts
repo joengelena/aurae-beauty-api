@@ -25,6 +25,14 @@ async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
+		// Same attribution as patchBooking — without it the audit trail records a
+		// cancellation with nobody's name against it, which is half the point of
+		// splitting cancelled into cancelled_by_customer and cancelled_by_owner.
+		await connection.query('SELECT set_config($1, $2, true)', [
+			'app.actor_user_id',
+			userId,
+		]);
+
 		const booking = await rentalBookingRepository.getServiceById(bookingId, connection);
 
 		if (!booking) {
@@ -64,6 +72,14 @@ async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 
 		if (error instanceof AppError) {
 			throw error;
+		}
+
+		// The controller checks cancellableStatuses first, so this should be
+		// unreachable — but if the state machine ever disagrees with that list,
+		// say so rather than reporting a server fault.
+		if (error.code === '23514' || error.code === '23P01') {
+			logger.info(`Rejected cancel of booking '${bookingId}': ${error.message}`);
+			throw new AppError(409, error.message);
 		}
 
 		logger.error(`Unexpected error during cancel booking: ${error.message}`);

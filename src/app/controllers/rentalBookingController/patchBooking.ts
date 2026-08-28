@@ -31,10 +31,19 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
-		// The status-event trigger reads this to attribute the transition. SET
-		// LOCAL keeps it scoped to this transaction, so a pooled connection can
-		// never carry one caller's identity into the next request.
-		await connection.query('SET LOCAL app.actor_user_id = $1', [userId]);
+		// The status-event trigger reads this to attribute the transition.
+		//
+		// set_config rather than SET LOCAL: SET is parsed before parameters are
+		// bound, so it cannot take a placeholder — 'SET LOCAL x = $1' is a syntax
+		// error, and interpolating the id into the string would be an injection
+		// waiting to happen. set_config is an ordinary function call, so the id
+		// binds properly. Its third argument is is_local, which scopes the value
+		// to this transaction so a pooled connection cannot carry one caller's
+		// identity into the next request.
+		await connection.query('SELECT set_config($1, $2, true)', [
+			'app.actor_user_id',
+			userId,
+		]);
 
 		const booking = await rentalBookingRepository.getServiceById(
 			bookingId,
