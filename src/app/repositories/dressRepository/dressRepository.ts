@@ -269,13 +269,13 @@ async function getPublicDresses(
 	const userClause = userId ? ' AND ud.user_id_fk = ?' : '';
 
 	// Exclude dresses with overlapping bookings (including each booking's
-	// post-rental cleaning buffer) or overlapping manual blocks. Only cancelled
-	// bookings are ignored — a returned one still holds its buffer.
+	// post-rental cleaning buffer) or overlapping manual blocks. Which statuses
+	// still hold their dates is booking_holds_dates()'s call, not ours.
 	const availabilityClause = (startDate && endDate)
 		? ` AND NOT EXISTS (
 			SELECT 1 FROM "dress_bookings" db
 			WHERE db.dress_id_fk = ud.id
-			AND db.status <> 'cancelled'
+			AND booking_holds_dates(db.status)
 			AND db.start_date <= ?
 			AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
 		  )

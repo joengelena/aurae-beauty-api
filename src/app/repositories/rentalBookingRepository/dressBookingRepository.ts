@@ -238,9 +238,10 @@ async function getPublicAvailabilityByDressId(
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
 		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
-		  -- Only a cancelled booking releases its dates. A returned one keeps
-		  -- holding them until its cleaning buffer has run, which is applied below.
-		  AND db.status <> 'cancelled'
+		  -- booking_holds_dates() is the one definition of "still spoken for".
+		  -- Never inline the status list here: a copy is exactly what let
+		  -- 'returned' be treated as available in two places at once.
+		  AND booking_holds_dates(db.status)
 		ORDER BY db.start_date ASC
 	`);
 	const bookingsResult = await conn.query(bookingsQuery, [dressId]);
@@ -301,10 +302,9 @@ async function hasBookingConflict(
 		-- buffer, so a missing business degrades to one day rather than to none.
 		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
-		  -- Marking a booking returned must not free the dress. The turnaround
-		  -- buffer below is exactly the window between the dress coming back and
-		  -- it being wearable again, so a returned booking still blocks.
-		  AND db.status <> 'cancelled'
+		  -- See booking_holds_dates() in DressBookings.sql — declined and the two
+		  -- cancelled_by_* statuses release the dates, everything else holds them.
+		  AND booking_holds_dates(db.status)
 		  ${excludeClause}
 		  AND db.start_date <= ?
 		  AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?

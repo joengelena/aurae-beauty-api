@@ -5,7 +5,10 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
 
-const cancellableStatuses = ['pending', 'confirmed'];
+// Once the dress is on its way to her there is no self-service cancel — the
+// owner has already started fulfilling, so that conversation belongs between
+// the two of them.
+const cancellableStatuses = ['pending', 'approved'];
 
 async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId as string;
@@ -41,7 +44,9 @@ async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 
 		await rentalBookingRepository.updateServiceById(
 			bookingId,
-			{ status: 'cancelled' },
+			// Attributed, not anonymous: 'cancelled' recorded no actor, so a customer
+			// changing her mind and an owner pulling the booking were indistinguishable.
+			{ status: 'cancelled_by_customer' },
 			connection
 		);
 

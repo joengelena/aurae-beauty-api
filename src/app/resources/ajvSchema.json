@@ -602,8 +602,21 @@
       },
       "status": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 50
+        "enum": [
+          "pending",
+          "approved",
+          "declined",
+          "cancelled_by_customer",
+          "cancelled_by_owner",
+          "ready_for_pickup",
+          "ready_to_ship",
+          "collected",
+          "shipped",
+          "returned",
+          "inspected",
+          "completed",
+          "completed_with_damage"
+        ]
       },
       "notes": {
         "type": "string",
@@ -671,7 +684,21 @@
       },
       "status": {
         "type": "string",
-        "enum": ["pending", "confirmed", "active", "returned", "cancelled"]
+        "enum": [
+          "pending",
+          "approved",
+          "declined",
+          "cancelled_by_customer",
+          "cancelled_by_owner",
+          "ready_for_pickup",
+          "ready_to_ship",
+          "collected",
+          "shipped",
+          "returned",
+          "inspected",
+          "completed",
+          "completed_with_damage"
+        ]
       },
       "notes": {
         "type": "string",

@@ -31,6 +31,11 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 	try {
 		await connection.query('BEGIN');
 
+		// The status-event trigger reads this to attribute the transition. SET
+		// LOCAL keeps it scoped to this transaction, so a pooled connection can
+		// never carry one caller's identity into the next request.
+		await connection.query('SET LOCAL app.actor_user_id = $1', [userId]);
+
 		const booking = await rentalBookingRepository.getServiceById(
 			bookingId,
 			connection
@@ -98,6 +103,16 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 
 		if (error instanceof AppError) {
 			throw error;
+		}
+
+		// The booking state machine lives in a trigger, so an illegal move
+		// arrives here as a Postgres check_violation. That is a bad request, not
+		// a server fault — returning 500 told the owner to "try again" for
+		// something that will never succeed. The trigger's message already names
+		// both statuses, so it is worth passing through.
+		if (error.code === '23514' || error.code === '23P01') {
+			logger.info(`Rejected booking update '${bookingId}': ${error.message}`);
+			throw new AppError(409, error.message);
 		}
 
 		logger.error(`Unexpected error during patch booking: ${error.message}`);
