@@ -65,6 +65,12 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 			bookingDate: bookingDate || startDate,
 			startDate,
 			endDate,
+			// Owner-created bookings are the offline path: a name and a phone
+			// number taken over DM, with no account behind them. Letting an owner
+			// attach one to an existing customer profile is worth doing, but it
+			// needs a customer picker first — and inferring the profile from a
+			// typed email is exactly the guesswork this column replaced.
+			customerUserIdFk: null,
 			renterName,
 			renterEmail: renterEmail || null,
 			renterPhone: renterPhone || null,

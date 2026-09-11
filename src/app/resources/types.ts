@@ -105,6 +105,9 @@ type DressBooking = {
 	bookingDate: string;
 	startDate: string;
 	endDate: string;
+	// The renter's profile, when she booked it herself. NULL for a booking the
+	// owner took by DM or phone, which carries only the renter_* contact fields.
+	customerUserIdFk: string | null;
 	renterName: string;
 	renterEmail: string | null;
 	renterPhone: string | null;

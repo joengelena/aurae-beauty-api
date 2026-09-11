@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
-import * as userRepository from '../../repositories/userRepository/userRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
@@ -39,10 +38,12 @@ async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'Booking not found');
 		}
 
-		const users = await userRepository.getUserById(userId, connection);
-		const renter = users[0];
-
-		if (!renter || !renter.email || booking.renterEmail !== renter.email) {
+		// Compared on the profile id, not on renter_email. Matching emails meant a
+		// renter who changed hers could no longer cancel her own booking, and it
+		// also meant anyone who happened to hold the address on the booking could.
+		// A NULL id is an owner-taken offline booking — no account owns it, so no
+		// account may cancel it here.
+		if (booking.customerUserIdFk !== userId) {
 			throw new AppError(403, 'You do not have permission to cancel this booking');
 		}
 

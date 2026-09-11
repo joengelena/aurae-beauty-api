@@ -20,6 +20,7 @@ function mapDressBookingDbToObject(
 			bookingDate: formatDateToString(booking.booking_date),
 			startDate: formatDateToString(booking.start_date),
 			endDate: formatDateToString(booking.end_date),
+			customerUserIdFk: booking.customer_user_id_fk ?? null,
 			renterName: booking.renter_name,
 			renterEmail: booking.renter_email ?? null,
 			renterPhone: booking.renter_phone ?? null,

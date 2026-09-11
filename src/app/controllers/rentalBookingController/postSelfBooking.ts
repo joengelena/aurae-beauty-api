@@ -73,6 +73,9 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 				bookingDate: startDate,
 				startDate,
 				endDate,
+				// The identity. renter_* below is contact detail copied from her
+				// profile for the owner's convenience, and is free to go stale.
+				customerUserIdFk: userId,
 				renterName: `${renter.firstName} ${renter.lastName}`,
 				renterEmail: renter.email ?? null,
 				renterPhone: renter.phoneNumber ?? null,

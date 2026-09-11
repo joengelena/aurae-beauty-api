@@ -14,6 +14,7 @@ const dressBookingDbFields: Record<
 	bookingDate: 'booking_date',
 	startDate: 'start_date',
 	endDate: 'end_date',
+	customerUserIdFk: 'customer_user_id_fk',
 	renterName: 'renter_name',
 	renterEmail: 'renter_email',
 	renterPhone: 'renter_phone',

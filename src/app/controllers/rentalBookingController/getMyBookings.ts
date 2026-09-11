@@ -26,6 +26,7 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			db.booking_date,
 			db.start_date,
 			db.end_date,
+			db.customer_user_id_fk,
 			db.renter_name,
 			db.renter_email,
 			db.renter_phone,
@@ -42,8 +43,11 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			ud.internal_name AS dress_internal_name
 		FROM "dress_bookings" db
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
-		JOIN "user" u ON u.email = db.renter_email
-		WHERE u.id = ?
+		-- Keyed on the profile, not on renter_email. The old join meant a renter
+		-- who changed her email lost her entire history, and an owner who typed a
+		-- customer's address into a manual booking silently attached it to that
+		-- account.
+		WHERE db.customer_user_id_fk = ?
 		ORDER BY db.start_date ASC
 	`);
 
@@ -57,6 +61,7 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			bookingDate: formatDate(row.booking_date),
 			startDate: formatDate(row.start_date),
 			endDate: formatDate(row.end_date),
+			customerUserIdFk: row.customer_user_id_fk ?? null,
 			renterName: row.renter_name,
 			renterEmail: row.renter_email ?? null,
 			renterPhone: row.renter_phone ?? null,
