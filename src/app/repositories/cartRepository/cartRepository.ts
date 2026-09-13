@@ -52,19 +52,18 @@ async function hasOverlappingCartItem(
 
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
+	// Two cart lines collide on the same window a pair of bookings would, so it
+	// asks the same question through dress_blocked_period rather than carrying a
+	// third copy of the buffer arithmetic.
 	const query = convertQueryPlaceholders(`
 		SELECT 1 FROM "cart_items" ci
-		JOIN "user_dresses" ud ON ud.id = ci.dress_id_fk
-		-- LEFT JOIN for the same reason as hasBookingConflict: a dress with no
-		-- business row must not silently report "no overlap".
-		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE ci.user_id_fk = ?
 		  AND ci.dress_id_fk = ?
-		  AND ci.start_date <= ?
-		  AND (ci.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
+		  AND dress_blocked_period(ci.dress_id_fk, ci.start_date, ci.end_date)
+		      && dress_blocked_period(ci.dress_id_fk, ?, ?)
 		LIMIT 1
 	`);
-	const result = await conn.query(query, [userId, dressId, endDate, startDate]);
+	const result = await conn.query(query, [userId, dressId, startDate, endDate]);
 
 	if (!useProvidedConnection && 'release' in conn) {
 		(conn as PoolClient).release();

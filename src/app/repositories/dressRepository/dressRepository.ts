@@ -276,8 +276,7 @@ async function getPublicDresses(
 			SELECT 1 FROM "dress_bookings" db
 			WHERE db.dress_id_fk = ud.id
 			AND booking_holds_dates(db.status)
-			AND db.start_date <= ?
-			AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
+			AND db.blocked_period && dress_blocked_period(ud.id, ?, ?)
 		  )
 		  AND NOT EXISTS (
 			SELECT 1 FROM jsonb_to_recordset(ud.blocked_date_ranges) AS br("startDate" date, "endDate" date)
@@ -314,7 +313,13 @@ async function getPublicDresses(
 	}
 	const priceFilterClause = priceFilterParts.length ? ` AND ${priceFilterParts.join(' AND ')}` : '';
 
-	const dateParams = (startDate && endDate) ? [endDate, startDate, endDate, startDate] : [];
+	// Order follows the placeholders in availabilityClause: the booking check now
+	// takes (start, end) for dress_blocked_period, where the old wear-date
+	// comparison took (end, start). The blocked_date_ranges check below it is
+	// unchanged and still takes (end, start).
+	const dateParams = (startDate && endDate)
+		? [startDate, endDate, endDate, startDate]
+		: [];
 	const baseParams = userId ? [userId] : [];
 	const searchParams = search ? [`%${search}%`, `%${search}%`] : [];
 	const filterClause = `${equalFilterClause}${priceFilterClause}`;

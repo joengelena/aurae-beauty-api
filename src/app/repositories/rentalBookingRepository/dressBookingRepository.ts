@@ -229,15 +229,13 @@ async function getPublicAvailabilityByDressId(
 			to_char(db.start_date, 'YYYY-MM-DD') AS start_date,
 			to_char(db.end_date, 'YYYY-MM-DD') AS end_date,
 			db.status,
-			GREATEST(COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1), 0) AS buffer_days,
+			-- Read from the booking's own snapshot rather than recomputed from
+			-- the business's current setting, so the calendar shows the window
+			-- this booking was actually taken under.
+			db.cleaning_days AS buffer_days,
 			to_char(db.end_date + 1, 'YYYY-MM-DD') AS buffer_start,
-			to_char(
-				db.end_date + GREATEST(COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1), 0),
-				'YYYY-MM-DD'
-			) AS buffer_end
+			to_char(db.blocked_to, 'YYYY-MM-DD') AS buffer_end
 		FROM "dress_bookings" db
-		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
-		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
 		  -- booking_holds_dates() is the one definition of "still spoken for".
 		  -- Never inline the status list here: a copy is exactly what let
@@ -294,26 +292,28 @@ async function hasBookingConflict(
 	const conn = connection || getPool();
 
 	const excludeClause = excludeBookingId !== undefined ? ' AND db.id != ?' : '';
+	// Asks the database the same question its no_double_booking constraint asks:
+	// do the two blocked periods overlap. It used to compare each existing
+	// booking's window against the candidate's *wear dates*, which ignored the
+	// candidate's own turnaround — so a booking ending the 6th with a two-day
+	// buffer reached the 8th, collided with a booking starting then, and this
+	// check still said the dates were free. The insert was then rejected by the
+	// constraint, turning a clear "those dates aren't available" into a generic
+	// failure. Same definition on both sides now; this stays as the friendly
+	// pre-flight that answers with a 409 instead of a constraint violation.
 	const bookingQuery = convertQueryPlaceholders(`
 		SELECT 1 FROM "dress_bookings" db
-		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
-		-- LEFT JOIN, not INNER: an INNER JOIN returned no rows for a dress whose
-		-- owner has no business row, which reads as "no conflict" and lets the
-		-- dress be double-booked. COALESCE below already supplies the default
-		-- buffer, so a missing business degrades to one day rather than to none.
-		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE db.dress_id_fk = ?
 		  -- See booking_holds_dates() in DressBookings.sql — declined and the two
 		  -- cancelled_by_* statuses release the dates, everything else holds them.
 		  AND booking_holds_dates(db.status)
 		  ${excludeClause}
-		  AND db.start_date <= ?
-		  AND (db.end_date + (INTERVAL '1 day' * COALESCE((b.business_settings->>'cleaningBufferDays')::int, 1)))::date >= ?
+		  AND db.blocked_period && dress_blocked_period(?, ?, ?)
 		LIMIT 1
 	`);
 	const bookingParams = excludeBookingId !== undefined
-		? [dressId, excludeBookingId, endDate, startDate]
-		: [dressId, endDate, startDate];
+		? [dressId, excludeBookingId, dressId, startDate, endDate]
+		: [dressId, dressId, startDate, endDate];
 	const bookingResult = await conn.query(bookingQuery, bookingParams);
 
 	if (bookingResult.rows.length > 0) {
