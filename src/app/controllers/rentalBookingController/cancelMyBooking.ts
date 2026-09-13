@@ -79,8 +79,14 @@ async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 		// unreachable — but if the state machine ever disagrees with that list,
 		// say so rather than reporting a server fault.
 		if (error.code === '23514' || error.code === '23P01') {
+			// The raw text names the trigger and both statuses, which is what the
+			// log wants and what the client must not see — error-responses.md is
+			// explicit that database detail stays server-side.
 			logger.info(`Rejected cancel of booking '${bookingId}': ${error.message}`);
-			throw new AppError(409, error.message);
+			throw new AppError(
+				409,
+				'That change is not allowed for this booking right now. Reload it to see where it has got to.'
+			);
 		}
 
 		logger.error(`Unexpected error during cancel booking: ${error.message}`);

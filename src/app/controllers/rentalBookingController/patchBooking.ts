@@ -120,8 +120,14 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 		// something that will never succeed. The trigger's message already names
 		// both statuses, so it is worth passing through.
 		if (error.code === '23514' || error.code === '23P01') {
+			// The raw text names the trigger and both statuses, which is what the
+			// log wants and what the client must not see — error-responses.md is
+			// explicit that database detail stays server-side.
 			logger.info(`Rejected booking update '${bookingId}': ${error.message}`);
-			throw new AppError(409, error.message);
+			throw new AppError(
+				409,
+				'That change is not allowed for this booking right now. Reload it to see where it has got to.'
+			);
 		}
 
 		logger.error(`Unexpected error during patch booking: ${error.message}`);
