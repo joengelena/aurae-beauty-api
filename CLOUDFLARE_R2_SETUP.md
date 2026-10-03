@@ -1,10 +1,10 @@
 # Cloudflare R2 Setup Guide
 
-This guide explains how to set up Cloudflare R2 for the Motorix API.
+This guide explains how to set up Cloudflare R2 for the AURAE API.
 
 ## Overview
 
-Cloudflare R2 is used as the image storage solution for the Motorix API. R2 is an S3-compatible object storage service with zero egress fees.
+Cloudflare R2 is used as the image storage solution for the AURAE API. R2 is an S3-compatible object storage service with zero egress fees.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ Cloudflare R2 is used as the image storage solution for the Motorix API. R2 is a
 1. Log in to [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. Navigate to **R2 Object Storage** in the left sidebar
 3. Click **Create bucket**
-4. Enter bucket name: `motorix-images` (or your preferred name)
+4. Enter bucket name: `aurae-images` (or your preferred name)
 5. Choose location: **Automatic** (recommended)
 6. Click **Create bucket**
 
@@ -41,7 +41,7 @@ By default, R2 buckets are private. To allow public image access:
 1. Go to your bucket settings
 2. Click **Settings** > **Custom Domains**
 3. Click **Connect Domain**
-4. Enter your domain (e.g., `images.motorix.com`)
+4. Enter your domain (e.g., `images.aurae.example`)
 5. Follow DNS setup instructions
 6. Use this domain in `R2_PUBLIC_DOMAIN` environment variable
 
@@ -53,11 +53,11 @@ By default, R2 buckets are private. To allow public image access:
 2. Click **Manage R2 API Tokens** (top right)
 3. Click **Create API token**
 4. Configure token:
-   - **Token name**: `motorix-api-token`
+   - **Token name**: `aurae-api-token`
    - **Permissions**:
      - ✅ Object Read & Write
      - ✅ (Optional) Object Delete (for cleanup/rollback)
-   - **Specify bucket**: Select `motorix-images`
+   - **Specify bucket**: Select `aurae-images`
    - **TTL**: Never expire (or set expiration date)
 5. Click **Create API Token**
 6. **IMPORTANT**: Copy the credentials immediately (shown only once):
@@ -76,10 +76,10 @@ Update your `.env` file with the R2 credentials:
 R2_ACCOUNT_ID=your_account_id_here
 R2_ACCESS_KEY_ID=your_access_key_id_here
 R2_SECRET_ACCESS_KEY=your_secret_access_key_here
-R2_BUCKET_NAME=motorix-images
+R2_BUCKET_NAME=aurae-images
 
 # Optional: Custom domain (if using Option B above)
-R2_PUBLIC_DOMAIN=https://images.motorix.com
+R2_PUBLIC_DOMAIN=https://images.aurae.example
 # OR leave empty to use default R2.dev URL:
 R2_PUBLIC_DOMAIN=
 ```
@@ -93,7 +93,7 @@ R2_PUBLIC_DOMAIN=
 Install the AWS SDK (R2 is S3-compatible):
 
 ```bash
-cd motorix-api
+cd shine_api
 npm install
 ```
 
@@ -134,11 +134,11 @@ curl -X POST http://localhost:4941/api/v1/listings \
 
 ### Verify Upload
 
-1. Go to Cloudflare Dashboard > R2 > `motorix-images` bucket
-2. You should see files in the `motorix/` folder with format:
-   - `motorix/1699999999999-abc123xyz-image1.jpg`
+1. Go to Cloudflare Dashboard > R2 > `aurae-images` bucket
+2. You should see files in the `aurae/` folder with format:
+   - `aurae/1699999999999-abc123xyz-image1.jpg`
 3. Test public URL in browser:
-   - `https://pub-abc123.r2.dev/motorix/1699999999999-abc123xyz-image1.jpg`
+   - `https://pub-abc123.r2.dev/aurae/1699999999999-abc123xyz-image1.jpg`
 
 ---
 
@@ -159,7 +159,7 @@ src/app/utils/cloudflare/
 1. **Client** sends multipart form data with images
 2. **Multer** middleware parses files into memory buffers
 3. **uploadImages()** processes each file:
-   - Generates unique key: `motorix/{timestamp}-{random}-{filename}`
+   - Generates unique key: `aurae/{timestamp}-{random}-{filename}`
    - Uploads buffer to R2 via S3 API
    - Returns public URL
 4. **Controller** saves URLs to database
@@ -170,7 +170,7 @@ src/app/utils/cloudflare/
 ✅ **Sequential uploads** - Preserves image order
 ✅ **Automatic rollback** - Deletes images if DB insert fails
 ✅ **Unique filenames** - Prevents collisions
-✅ **Organized storage** - All images in `motorix/` folder
+✅ **Organized storage** - All images in `aurae/` folder
 ✅ **Single-purpose functions** - Clean, reusable code
 ✅ **Comprehensive logging** - Winston logs every step
 ✅ **Type safety** - Full TypeScript support

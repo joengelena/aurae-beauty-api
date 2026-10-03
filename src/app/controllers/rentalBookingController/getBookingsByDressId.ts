@@ -7,23 +7,23 @@ import AppError from '../../utils/errors/appError';
 
 async function getBookingsByDressId(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const vehicleId = parseInt(req.params.id as string, 10);
+	const dressId = parseInt(req.params.id as string, 10);
 
-	logger.info(`Getting booking records for dress '${vehicleId}'`);
+	logger.info(`Getting booking records for dress '${dressId}'`);
 
 	// Verify user belongs to the business that owns this dress
 	const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(userId);
 	const dress = ownerUserId
-		? await dressRepository.getDressByIdAndUserId(vehicleId, ownerUserId)
+		? await dressRepository.getDressByIdAndUserId(dressId, ownerUserId)
 		: null;
 
 	if (!dress) {
 		throw new AppError(404, 'Dress not found');
 	}
 
-	const bookings = await rentalBookingRepository.getAllServicesByVehicleId(vehicleId);
+	const bookings = await rentalBookingRepository.getBookingsByDressId(dressId);
 
-	logger.info(`Retrieved ${bookings.length} booking records for dress '${vehicleId}'`);
+	logger.info(`Retrieved ${bookings.length} booking records for dress '${dressId}'`);
 
 	res.status(200).send(bookings);
 }

@@ -7,10 +7,10 @@ import { parseDressId } from '../../utils/validation/dressValidation';
 
 async function getDressById(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	// Validate vehicleId BEFORE logging to avoid logging invalid data
-	const vehicleId = parseDressId(req.params.id as string);
+	// Validate dressId BEFORE logging to avoid logging invalid data
+	const dressId = parseDressId(req.params.id as string);
 
-	logger.info(`Getting dress with id '${vehicleId}' for user '${userId}'`);
+	logger.info(`Getting dress with id '${dressId}' for user '${userId}'`);
 
 	try {
 		const ownerUserId = await businessRepository.resolveOwnerUserIdForMember(userId);
@@ -20,7 +20,7 @@ async function getDressById(req: Request, res: Response): Promise<void> {
 		}
 
 		const dress = await dressRepository.getDressByIdAndUserId(
-			vehicleId,
+			dressId,
 			ownerUserId
 		);
 

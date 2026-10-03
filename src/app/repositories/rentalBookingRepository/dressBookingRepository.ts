@@ -26,7 +26,7 @@ const dressBookingDbFields: Record<
 	notes: 'notes',
 };
 
-async function getAllServicesByVehicleId(
+async function getBookingsByDressId(
 	dressId: number,
 	connection?: Pool | PoolClient
 ): Promise<DressBooking[]> {
@@ -372,7 +372,7 @@ async function hasBookingConflict(
 }
 
 export {
-	getAllServicesByVehicleId,
+	getBookingsByDressId,
 	getServiceById,
 	postBooking,
 	updateServiceById,

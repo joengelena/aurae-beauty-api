@@ -11,20 +11,20 @@ import { withTransaction } from '../../utils/database/transactionHandler';
 import { deleteR2UrlsBestEffort } from '../../utils/cloudflare/cleanup';
 
 async function deleteDress(req: Request, res: Response): Promise<void> {
-	const vehicleId = parseDressId(req.params.id as string);
+	const dressId = parseDressId(req.params.id as string);
 	const currentUserId = req.body.currentUserId;
 
-	logger.info(`Deleting dress with id '${vehicleId}'`);
+	logger.info(`Deleting dress with id '${dressId}'`);
 
 	let imageUrlsToDelete: string[] = [];
 
 	await withTransaction(
 		async (connection) => {
-			await verifyDressOwnership(vehicleId, currentUserId, connection);
+			await verifyDressOwnership(dressId, currentUserId, connection);
 
 			// Fetch dress data to get image URLs before deletion
 			const dress = await dressRepository.getDressById(
-				vehicleId,
+				dressId,
 				connection
 			);
 
@@ -35,7 +35,7 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 			// Damage incidents cascade-delete with the dress, so their photos
 			// have to be collected now as well.
 			const incidents = await dressDamageIncidentRepository.getIncidentsByDressId(
-				vehicleId,
+				dressId,
 				connection
 			);
 			const incidentPhotoUrls = incidents.flatMap((incident) => incident.photoUrls ?? []);
@@ -46,7 +46,7 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 			);
 
 			const result = await dressRepository.deleteDressById(
-				vehicleId,
+				dressId,
 				connection
 			);
 
@@ -63,7 +63,7 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 	});
 
 	// Delete photos from R2 only after the database deletion has committed
-	await deleteR2UrlsBestEffort(imageUrlsToDelete, `photos of deleted dress '${vehicleId}'`);
+	await deleteR2UrlsBestEffort(imageUrlsToDelete, `photos of deleted dress '${dressId}'`);
 }
 
 export default deleteDress;

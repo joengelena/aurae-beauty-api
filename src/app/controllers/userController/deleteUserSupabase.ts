@@ -78,13 +78,13 @@ async function deleteUserSupabase(req: Request, res: Response): Promise<void> {
 			imageUrlsToDelete.push(userInTransaction[0].profilePhotoUrl);
 		}
 
-		const userVehicles = await dressRepository.getAllDressesByUserId(
+		const userDresses = await dressRepository.getAllDressesByUserId(
 			currentUserId,
 			connection,
 		);
-		for (const vehicle of userVehicles) {
-			if (vehicle.dressPhotoUrls?.length) {
-				imageUrlsToDelete.push(...vehicle.dressPhotoUrls);
+		for (const dress of userDresses) {
+			if (dress.dressPhotoUrls?.length) {
+				imageUrlsToDelete.push(...dress.dressPhotoUrls);
 			}
 		}
 

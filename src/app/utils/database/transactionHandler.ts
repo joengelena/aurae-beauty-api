@@ -10,7 +10,7 @@ import { PoolClient } from 'pg';
  *
  * @param operation - Async function that performs database operations
  * @param res - Express response object
- * @param errorContext - Context string for error logging (e.g., "vehicle update", "listing deletion")
+ * @param errorContext - Context string for error logging (e.g., "dress update", "booking deletion")
  * @returns Promise that resolves when operation completes
  */
 export async function withTransaction<T>(

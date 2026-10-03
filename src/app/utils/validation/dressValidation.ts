@@ -7,7 +7,7 @@ import { Pool, PoolClient } from 'pg';
 /**
  * Validates that a date is not more than 1 year in the past
  * @param date - The date string to validate
- * @param fieldName - The name of the field for error messages (e.g., "Registration expiry date", "WOF expiry date")
+ * @param fieldName - The name of the field for error messages (e.g., "Start date", "Occurred at")
  * @throws AppError if the date is more than 1 year in the past
  */
 export function validateExpiryDate(date: string, fieldName: string): void {

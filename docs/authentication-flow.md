@@ -2,7 +2,7 @@
 
 ## Overview
 
-Motorix API uses **Supabase Auth** as the single source of truth for authentication. User credentials (email, password) are stored and managed by Supabase, while user profile data is synced to PostgreSQL for relational queries.
+AURAE API uses **Supabase Auth** as the single source of truth for authentication. User credentials (email, password) are stored and managed by Supabase, while user profile data is synced to PostgreSQL for relational queries.
 
 ## Key Principles
 

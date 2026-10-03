@@ -21,10 +21,10 @@ import {
 const MAX_DRESS_PHOTOS_PER_REQUEST = 10;
 
 async function patchDress(req: Request, res: Response): Promise<void> {
-	const vehicleId = parseDressId(req.params.id as string);
-	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, blockedDateRanges: blockedDateRangesStr, recommendedSizes: recommendedSizesStr, ...newVehicleData } = req.body;
+	const dressId = parseDressId(req.params.id as string);
+	const { currentUserId, keepPhotoUrls: keepPhotoUrlsStr, blockedDateRanges: blockedDateRangesStr, recommendedSizes: recommendedSizesStr, ...newDressData } = req.body;
 
-	logger.info(`Updating dress with id '${vehicleId}'`);
+	logger.info(`Updating dress with id '${dressId}'`);
 
 	const files = (req.files || []) as Express.Multer.File[];
 
@@ -37,14 +37,14 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 	const hasPhotoChanges = files.length > 0 || keepPhotoUrlsStr !== undefined;
 
 	if (blockedDateRangesStr !== undefined) {
-		newVehicleData.blockedDateRanges = parseDateRangeArrayField(blockedDateRangesStr, 'blockedDateRanges');
+		newDressData.blockedDateRanges = parseDateRangeArrayField(blockedDateRangesStr, 'blockedDateRanges');
 	}
 
 	if (recommendedSizesStr !== undefined) {
-		newVehicleData.recommendedSizes = parseStringArrayField(recommendedSizesStr, 'recommendedSizes');
+		newDressData.recommendedSizes = parseStringArrayField(recommendedSizesStr, 'recommendedSizes');
 	}
 
-	if (!hasPhotoChanges && Object.keys(newVehicleData).length === 0) {
+	if (!hasPhotoChanges && Object.keys(newDressData).length === 0) {
 		res.status(200).send({ message: 'Dress updated successfully' });
 		return;
 	}
@@ -58,7 +58,7 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 
 	// Ownership check before upload, so a caller can't make the server store
 	// files against a dress they don't own. Re-checked inside the transaction.
-	await verifyDressOwnership(vehicleId, currentUserId);
+	await verifyDressOwnership(dressId, currentUserId);
 
 	let newlyUploadedUrls: string[] = [];
 	let newlyUploadedKeys: string[] = [];
@@ -80,10 +80,10 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 	try {
 		await withTransaction(
 			async (connection) => {
-				await verifyDressOwnership(vehicleId, currentUserId, connection);
+				await verifyDressOwnership(dressId, currentUserId, connection);
 
 				if (hasPhotoChanges) {
-					const dress = await dressRepository.getDressById(vehicleId, connection);
+					const dress = await dressRepository.getDressById(dressId, connection);
 					if (!dress) throw new AppError(404, 'Dress not found');
 
 					const oldUrls = dress.dressPhotoUrls ?? [];
@@ -96,17 +96,17 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 					);
 					if (keptUrls.length !== new Set(requestedKeepUrls).size) {
 						logger.warn(
-							`Ignored ${new Set(requestedKeepUrls).size - keptUrls.length} unknown keepPhotoUrls for dress '${vehicleId}' from user '${currentUserId}'`
+							`Ignored ${new Set(requestedKeepUrls).size - keptUrls.length} unknown keepPhotoUrls for dress '${dressId}' from user '${currentUserId}'`
 						);
 					}
 
-					newVehicleData.dressPhotoUrls = [...keptUrls, ...newlyUploadedUrls];
+					newDressData.dressPhotoUrls = [...keptUrls, ...newlyUploadedUrls];
 					urlsToDelete = oldUrls.filter((url: string) => !keptUrls.includes(url));
 				}
 
 				const result = await dressRepository.updateDressById(
-					vehicleId,
-					newVehicleData,
+					dressId,
+					newDressData,
 					connection
 				);
 
@@ -119,14 +119,14 @@ async function patchDress(req: Request, res: Response): Promise<void> {
 		);
 	} catch (error) {
 		// The update never committed: drop the photos uploaded for it
-		await deleteR2KeysBestEffort(newlyUploadedKeys, `roll back photos for dress '${vehicleId}'`);
+		await deleteR2KeysBestEffort(newlyUploadedKeys, `roll back photos for dress '${dressId}'`);
 		throw error;
 	}
 
 	res.status(200).send({ message: 'Dress updated successfully' });
 
 	// Delete removed photos from R2 after successful DB update
-	await deleteR2UrlsBestEffort(urlsToDelete, `removed photos of dress '${vehicleId}'`);
+	await deleteR2UrlsBestEffort(urlsToDelete, `removed photos of dress '${dressId}'`);
 }
 
 export default patchDress;

@@ -16,9 +16,9 @@ async function getAllDresses(req: Request, res: Response): Promise<void> {
 			throw new AppError(403, "You don't belong to a business");
 		}
 
-		const vehicles = await dressRepository.getAllDressesByUserId(ownerUserId);
+		const dresses = await dressRepository.getAllDressesByUserId(ownerUserId);
 
-		res.status(200).send(vehicles);
+		res.status(200).send(dresses);
 	} catch (error: any) {
 		if (error instanceof AppError) {
 			throw error;

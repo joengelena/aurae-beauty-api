@@ -122,77 +122,6 @@ type DressBooking = {
 	updatedAt: Date;
 };
 
-type ServiceHistory = {
-	id: number;
-	vehicleIdFk: number;
-	serviceType: string;
-	serviceName: string | null;
-	serviceDate: string;
-	odometerAtService: number | null;
-	serviceProviderName: string | null;
-	serviceProviderContact: string | null;
-	cost: number | null;
-	receiptUrl: string | null;
-	notes: string | null;
-	createdAt: Date;
-	updatedAt: Date;
-};
-
-type ServiceReminder = {
-	id: number;
-	vehicleIdFk: number;
-	reminderName: string;
-	description: string | null;
-	dueDate: string | null;
-	dueMileage: number | null;
-	notifyDaysBefore: number;
-	notifyKmBefore: number;
-	isRecurring: 0 | 1;
-	recurrenceIntervalMonths: number | null;
-	recurrenceIntervalKm: number | null;
-	isActive: 0 | 1;
-	completedAt: Date | null;
-	createdAt: Date;
-	updatedAt: Date;
-};
-
-type NotificationPreferences = {
-	userIdFk: string;
-	regoRemindAtDays: number[] | null;
-	wofRemindAtDays: number[] | null;
-	pushEnabled: 0 | 1;
-	emailEnabled: 0 | 1;
-	notificationTime: string;
-	timezone: string;
-	createdAt: Date;
-	updatedAt: Date;
-};
-
-type DeviceToken = {
-	id: number;
-	userIdFk: string;
-	token: string;
-	platform: string;
-	deviceName: string | null;
-	isActive: 0 | 1;
-	lastUsedAt: Date;
-	createdAt: Date;
-};
-
-type NotificationLog = {
-	id: number;
-	userIdFk: string;
-	vehicleIdFk: number | null;
-	serviceReminderIdFk: number | null;
-	notificationType: string;
-	title: string | null;
-	message: string | null;
-	sentAt: Date;
-	readAt: Date | null;
-	dismissedAt: Date | null;
-	platform: string | null;
-};
-
 export {
 	User,
 	AppConfiguration,
@@ -204,9 +133,4 @@ export {
 	UserDress,
 	DressBooking,
 	DressDamageIncident,
-	ServiceHistory,
-	ServiceReminder,
-	NotificationPreferences,
-	DeviceToken,
-	NotificationLog,
 };
