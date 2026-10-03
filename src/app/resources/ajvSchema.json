@@ -130,11 +130,6 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 100
-      },
-      "profilePhotoUrl": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 500
       }
     },
     "required": [
@@ -558,8 +553,13 @@
       },
       "bookingType": {
         "type": "string",
-        "minLength": 1,
-        "maxLength": 50
+        "enum": [
+          "rental",
+          "purchase",
+          "event",
+          "photoshoot",
+          "other"
+        ]
       },
       "bookingDate": {
         "type": "string",
@@ -642,11 +642,6 @@
         "minLength": 36,
         "maxLength": 36
       },
-      "bookingType": {
-        "type": "string",
-        "minLength": 1,
-        "maxLength": 50
-      },
       "startDate": {
         "type": "string",
         "format": "date"
@@ -704,6 +699,12 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 10000
+      },
+      "trackingNumber": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100,
+        "pattern": "\\S"
       }
     },
     "required": [

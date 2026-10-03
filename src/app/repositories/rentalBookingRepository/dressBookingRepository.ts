@@ -21,6 +21,7 @@ const dressBookingDbFields: Record<
 	renterInstagram: 'renter_instagram',
 	totalCost: 'total_cost',
 	depositPaid: 'deposit_paid',
+	trackingNumber: 'tracking_number',
 	status: 'status',
 	notes: 'notes',
 };
@@ -198,10 +199,13 @@ async function getAllBookingsByUserId(
 	return mapDressBookingDbToObject(result.rows);
 }
 
+// Returns null when the dress does not exist or is not public. This endpoint is
+// unauthenticated, so a private dress's calendar must be as invisible as the
+// dress itself.
 async function getPublicAvailabilityByDressId(
 	dressId: number,
 	connection?: Pool | PoolClient
-): Promise<{ startDate: string; endDate: string; status: string }[]> {
+): Promise<{ startDate: string; endDate: string; status: string }[] | null> {
 	logger.info(`Getting public availability ranges for dress '${dressId}'`);
 
 	const conn = connection || getPool();
@@ -213,8 +217,16 @@ async function getPublicAvailabilityByDressId(
 		FROM "user_dresses" ud
 		LEFT JOIN business b ON b.owner_user_id_fk = ud.user_id_fk
 		WHERE ud.id = ?
+		  AND ud.is_public = TRUE
 	`);
 	const dressResult = await conn.query(dressQuery, [dressId]);
+
+	if (dressResult.rows.length === 0) {
+		if (!connection && 'release' in conn) {
+			(conn as PoolClient).release();
+		}
+		return null;
+	}
 
 	// Every date is rendered as YYYY-MM-DD in SQL rather than handed back as a
 	// pg DATE. A DATE becomes a JS Date at the API server's local midnight, which
@@ -283,6 +295,7 @@ async function hasBookingConflict(
 	dressId: number,
 	startDate: string,
 	endDate: string,
+	bookingType: string,
 	connection?: Pool | PoolClient,
 	excludeBookingId?: number
 ): Promise<boolean> {
@@ -292,6 +305,24 @@ async function hasBookingConflict(
 	const conn = connection || getPool();
 
 	const excludeClause = excludeBookingId !== undefined ? ' AND db.id != ?' : '';
+
+	// The candidate's window has to be the one the apply_dress_booking_buffers
+	// trigger will actually write, or this check and no_double_booking disagree.
+	//  - A new booking snapshots the live turnaround for its type, which is
+	//    exactly dress_blocked_period(..., booking_type): a purchase keeps no
+	//    buffer, everything else takes the business's current setting.
+	//  - A date edit keeps the booking's own snapshotted cleaning_days (the
+	//    trigger copies OLD.cleaning_days on update), so the live setting is
+	//    irrelevant and would be wrong if the owner has changed it since.
+	const candidatePeriod = excludeBookingId !== undefined
+		? `daterange(?::date, ?::date + (
+				SELECT eb.cleaning_days FROM "dress_bookings" eb WHERE eb.id = ?
+			), '[]')`
+		: 'dress_blocked_period(?, ?::date, ?::date, ?)';
+	const candidateParams = excludeBookingId !== undefined
+		? [startDate, endDate, excludeBookingId]
+		: [dressId, startDate, endDate, bookingType];
+
 	// Asks the database the same question its no_double_booking constraint asks:
 	// do the two blocked periods overlap. It used to compare each existing
 	// booking's window against the candidate's *wear dates*, which ignored the
@@ -308,12 +339,12 @@ async function hasBookingConflict(
 		  -- cancelled_by_* statuses release the dates, everything else holds them.
 		  AND booking_holds_dates(db.status)
 		  ${excludeClause}
-		  AND db.blocked_period && dress_blocked_period(?, ?, ?)
+		  AND db.blocked_period && ${candidatePeriod}
 		LIMIT 1
 	`);
 	const bookingParams = excludeBookingId !== undefined
-		? [dressId, excludeBookingId, dressId, startDate, endDate]
-		: [dressId, dressId, startDate, endDate];
+		? [dressId, excludeBookingId, ...candidateParams]
+		: [dressId, ...candidateParams];
 	const bookingResult = await conn.query(bookingQuery, bookingParams);
 
 	if (bookingResult.rows.length > 0) {

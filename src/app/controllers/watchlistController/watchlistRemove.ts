@@ -39,12 +39,15 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 			throw error;
 		}
 
-		if (error.code === 'ER_DUP_ENTRY') {
+		// Postgres codes, not the MySQL ones this used to check (which Postgres
+		// never emits). A DELETE should raise neither, but map them rather than
+		// let one surface as a 500.
+		if (error.code === '23505') {
 			logger.warn(`Duplicate entry error for user ${currentUserId}, listing ${listingId}`);
 			throw new AppError(409, 'This listing is already in your watchlist.');
 		}
 
-		if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+		if (error.code === '23503') {
 			logger.warn(`Invalid user or listing ID: user ${currentUserId}, listing ${listingId}`);
 			throw new AppError(404, 'This listing no longer exists or has been removed.');
 		}

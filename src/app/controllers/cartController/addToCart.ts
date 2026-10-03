@@ -8,6 +8,7 @@ import {
 	hasOverlappingCartItem,
 } from '../../repositories/cartRepository/cartRepository';
 import AppError from '../../utils/errors/appError';
+import { validateBookingDates } from '../rentalBookingController/bookingDates';
 
 async function addToCart(req: Request, res: Response): Promise<void> {
 	const { currentUserId, dressId, startDate, endDate } = req.body as {
@@ -18,6 +19,10 @@ async function addToCart(req: Request, res: Response): Promise<void> {
 	};
 
 	logger.info(`Adding dress ${dressId} to cart for user ${currentUserId}`);
+
+	// The same date rules as the self-booking this line will turn into at
+	// checkout, so the cart never holds dates checkout would refuse.
+	validateBookingDates(startDate, endDate, { rejectPastStart: true });
 
 	const connection = await getPool().connect();
 
@@ -30,10 +35,9 @@ async function addToCart(req: Request, res: Response): Promise<void> {
 			throw new AppError(404, 'Dress not found');
 		}
 
-		// Can't add your own dress to your cart
-		if (dress.userIdFk === currentUserId) {
-			throw new AppError(403, 'You cannot add your own dress to your cart');
-		}
+		// Adding your own dress is deliberately allowed: the cart is the app's
+		// only path to postSelfBooking, which lets an owner book her own stock
+		// as a customer (see the note there).
 
 		// Availability is checked here, not only at checkout. The same shared
 		// hasBookingConflict the booking endpoints use, so the cart can never hold
@@ -43,6 +47,7 @@ async function addToCart(req: Request, res: Response): Promise<void> {
 			dressId,
 			startDate,
 			endDate,
+			'rental',
 			connection
 		);
 		if (hasConflict) {

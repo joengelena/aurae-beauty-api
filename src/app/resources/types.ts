@@ -114,6 +114,8 @@ type DressBooking = {
 	renterInstagram: string | null;
 	totalCost: number;
 	depositPaid: number | null;
+	// Required by the transition trigger before a booking can move to 'shipped'.
+	trackingNumber: string | null;
 	status: string;
 	notes: string | null;
 	createdAt: Date;

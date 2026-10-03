@@ -6,6 +6,7 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { DressBooking } from '../../resources/types';
 import { getPool } from '../../../config/db';
+import { validateBookingDates } from './bookingDates';
 
 async function postBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -26,6 +27,10 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 	} = req.body;
 
 	logger.info(`Adding booking record for dress '${dressIdFk}'`);
+
+	validateBookingDates(startDate, endDate);
+
+	const effectiveBookingType: string = bookingType || 'rental';
 
 	const connection = await getPool().connect();
 
@@ -49,6 +54,7 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 			dressIdFk,
 			startDate,
 			endDate,
+			effectiveBookingType,
 			connection
 		);
 		if (hasConflict) {
@@ -61,7 +67,7 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 			'id' | 'createdAt' | 'updatedAt'
 		> = {
 			dressIdFk,
-			bookingType: bookingType || 'rental',
+			bookingType: effectiveBookingType,
 			bookingDate: bookingDate || startDate,
 			startDate,
 			endDate,
@@ -77,6 +83,7 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 			renterInstagram: renterInstagram || null,
 			totalCost: totalCost ?? 0,
 			depositPaid: depositPaid || null,
+			trackingNumber: null,
 			status: status || 'pending',
 			notes: notes || null,
 		};
@@ -103,6 +110,14 @@ async function postBooking(req: Request, res: Response): Promise<void> {
 
 		if (error instanceof AppError) {
 			throw error;
+		}
+
+		// no_double_booking caught a booking that slipped in between the
+		// hasBookingConflict pre-flight and this insert. Same answer the
+		// pre-flight would have given.
+		if (error.code === '23P01') {
+			logger.warn(`Booking for dress '${dressIdFk}' rejected by no_double_booking: ${error.message}`);
+			throw new AppError(409, 'Those dates are not available');
 		}
 
 		logger.error(`Unexpected error during post service: ${error.message}`);

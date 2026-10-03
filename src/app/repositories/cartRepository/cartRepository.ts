@@ -117,6 +117,9 @@ async function getUserCart(userId: string): Promise<any[]> {
 			ud.style,
 			ud.size,
 			ud.dress_photo_urls[1] as dress_photo_url,
+			-- Whether the dress can still be booked at all. Used by getCart to
+			-- compute isAvailable; not part of the response.
+			(ud.is_public AND ud.status <> 'sold') AS is_listed,
 			u.location
 		FROM "cart_items" ci
 		INNER JOIN "user_dresses" ud ON ci.dress_id_fk = ud.id
@@ -140,6 +143,7 @@ async function getUserCart(userId: string): Promise<any[]> {
 		size: row.size,
 		dressPhotoUrl: row.dress_photo_url ?? '',
 		location: row.location ?? '',
+		isListed: row.is_listed === true,
 	}));
 }
 

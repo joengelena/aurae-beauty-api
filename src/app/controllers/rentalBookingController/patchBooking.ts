@@ -6,6 +6,7 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { DressBooking } from '../../resources/types';
 import { getPool } from '../../../config/db';
+import { validateBookingDates } from './bookingDates';
 
 async function patchBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
@@ -17,8 +18,17 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 
 	const {
 		currentUserId,
+		bookingType,
 		...updateFields
 	} = req.body;
+
+	// A booking's type is fixed at creation. It picks the branch of the state
+	// machine and the cleaning_days snapshot, so changing it afterwards could
+	// skip the return/inspection cycle or strand the booking mid-flow. The AJV
+	// schema already strips it; this is the backstop.
+	if (bookingType !== undefined) {
+		throw new AppError(400, 'The booking type cannot be changed');
+	}
 
 	if (Object.keys(updateFields).length === 0) {
 		throw new AppError(400, 'No fields provided to update');
@@ -76,10 +86,12 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 		if (updateFields.startDate !== undefined || updateFields.endDate !== undefined) {
 			const effectiveStartDate = updateFields.startDate ?? booking.startDate;
 			const effectiveEndDate = updateFields.endDate ?? booking.endDate;
+			validateBookingDates(effectiveStartDate, effectiveEndDate);
 			const hasConflict = await rentalBookingRepository.hasBookingConflict(
 				booking.dressIdFk,
 				effectiveStartDate,
 				effectiveEndDate,
+				booking.bookingType,
 				connection,
 				bookingId
 			);
@@ -91,7 +103,7 @@ async function patchBooking(req: Request, res: Response): Promise<void> {
 		await rentalBookingRepository.updateServiceById(
 			bookingId,
 			updateFields as Partial<
-				Omit<DressBooking, 'id' | 'dressIdFk' | 'createdAt' | 'updatedAt'>
+				Omit<DressBooking, 'id' | 'dressIdFk' | 'bookingType' | 'createdAt' | 'updatedAt'>
 			>,
 			connection
 		);

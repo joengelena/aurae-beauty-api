@@ -78,6 +78,10 @@ async function getUserWatchlist(userId: string): Promise<any[]> {
 		INNER JOIN "user_dresses" ud ON w.dress_id_fk = ud.id
 		INNER JOIN "user" u ON ud.user_id_fk = u.id
 		WHERE w.user_id_fk = ?
+		  -- A dress that has gone private or been sold drops out of the list
+		  -- rather than leaking its details to whoever watchlisted it.
+		  AND ud.is_public = TRUE
+		  AND ud.status <> 'sold'
 		GROUP BY ud.id, u.location
 		ORDER BY MAX(w.added_at) DESC
 	`);

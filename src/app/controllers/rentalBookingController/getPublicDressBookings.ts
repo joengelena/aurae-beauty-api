@@ -14,6 +14,10 @@ async function getPublicDressBookings(req: Request, res: Response): Promise<void
 
 	const ranges = await rentalBookingRepository.getPublicAvailabilityByDressId(dressId);
 
+	if (ranges === null) {
+		throw new AppError(404, 'Dress not found');
+	}
+
 	res.status(200).json(ranges);
 }
 

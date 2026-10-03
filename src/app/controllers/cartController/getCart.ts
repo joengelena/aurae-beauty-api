@@ -32,13 +32,18 @@ async function getCart(req: Request, res: Response): Promise<void> {
 		// can be taken by the time the renter comes back to it. Flagging it here
 		// lets the cart show the item as unavailable, instead of checkout being the
 		// first thing that notices.
+		//
+		// A dress that has since gone private or been sold cannot be booked
+		// either, whatever its calendar says, so it is unavailable before the
+		// conflict check is even asked.
 		const cartWithAvailability = await Promise.all(
-			cart.map(async (item) => ({
+			cart.map(async ({ isListed, ...item }) => ({
 				...item,
-				isAvailable: !(await hasBookingConflict(
+				isAvailable: isListed && !(await hasBookingConflict(
 					item.dressIdFk,
 					toDateOnly(item.startDate),
-					toDateOnly(item.endDate)
+					toDateOnly(item.endDate),
+					'rental'
 				)),
 			}))
 		);

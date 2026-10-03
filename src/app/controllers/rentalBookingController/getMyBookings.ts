@@ -40,7 +40,9 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			ud.brand AS dress_brand,
 			ud.style AS dress_style,
 			ud.dress_photo_urls[1] as dress_photo_url,
-			ud.internal_name AS dress_internal_name
+			-- The public listing name, never internal_name: that is the owner's
+			-- private label for her own stock and was never meant for renters.
+			ud.name AS dress_name
 		FROM "dress_bookings" db
 		JOIN "user_dresses" ud ON ud.id = db.dress_id_fk
 		-- Keyed on the profile, not on renter_email. The old join meant a renter
@@ -75,7 +77,11 @@ async function getMyBookings(req: Request, res: Response): Promise<void> {
 			dressBrand: row.dress_brand ?? '',
 			dressStyle: row.dress_style ?? '',
 			dressPhotoUrl: row.dress_photo_url ?? null,
-			dressInternalName: row.dress_internal_name ?? null,
+			// Kept under the field name the app already reads
+			// (UpcomingBooking.dressInternalName), but it now carries the public
+			// name.
+			dressInternalName: row.dress_name ?? null,
+			dressName: row.dress_name ?? null,
 		}));
 
 		res.status(200).json(bookings);

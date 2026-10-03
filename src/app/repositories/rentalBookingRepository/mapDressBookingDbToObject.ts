@@ -27,6 +27,7 @@ function mapDressBookingDbToObject(
 			renterInstagram: booking.renter_instagram ?? null,
 			totalCost: booking.total_cost ? parseFloat(booking.total_cost) : 0,
 			depositPaid: booking.deposit_paid ? parseFloat(booking.deposit_paid) : null,
+			trackingNumber: booking.tracking_number ?? null,
 			status: booking.status,
 			notes: booking.notes ?? null,
 			createdAt: booking.created_at,

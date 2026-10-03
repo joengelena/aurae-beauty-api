@@ -5,6 +5,7 @@ import * as userRepository from '../../repositories/userRepository/userRepositor
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
+import { validateBookingDates } from './bookingDates';
 
 async function postSelfBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId as string;
@@ -14,6 +15,8 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 	if (isNaN(dressId)) {
 		throw new AppError(400, 'Invalid dress ID');
 	}
+
+	validateBookingDates(startDate, endDate, { rejectPastStart: true });
 
 	logger.info(`Self-booking dress '${dressId}' for user '${userId}'`);
 
@@ -41,6 +44,7 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 			dressId,
 			startDate,
 			endDate,
+			'rental',
 			connection
 		);
 		if (hasConflict) {
@@ -82,6 +86,7 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 				renterInstagram: renter.instagram ?? null,
 				totalCost,
 				depositPaid: null,
+				trackingNumber: null,
 				status: 'pending',
 				notes: null,
 			},
@@ -101,6 +106,12 @@ async function postSelfBooking(req: Request, res: Response): Promise<void> {
 		await connection.query('ROLLBACK');
 		connection.release();
 		if (error instanceof AppError) throw error;
+		// no_double_booking caught a booking that landed between the
+		// hasBookingConflict pre-flight and this insert.
+		if (error.code === '23P01') {
+			logger.warn(`Self-booking for dress '${dressId}' rejected by no_double_booking: ${error.message}`);
+			throw new AppError(409, 'Those dates are not available');
+		}
 		logger.error(`Unexpected error during self-booking: ${error.message}`);
 		throw new AppError(500, 'Unable to create booking. Please try again.');
 	}
