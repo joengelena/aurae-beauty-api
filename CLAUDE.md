@@ -116,6 +116,26 @@ Copy `.env.example` → `.env`: PostgreSQL credentials, Supabase URL + service-r
 
 ---
 
+## Testing
+
+Jest + ts-jest + supertest. Two Jest projects (`jest.config.js`):
+
+```bash
+npm run test:unit          # tests/unit/**: no database, no network
+npm run test:integration   # tests/integration/**: real Postgres, run in band
+npm test                   # both
+npm run verify             # tsc --noEmit (src + tests) + tslint + all tests
+```
+
+- **Integration tests use their own database, `shine_test`** (override with `SHINE_TEST_DATABASE`; the name must contain "test"). `tests/helpers/globalSetup.ts` DROPS and recreates it on every run, then runs the db-tool's `sql/shine/init`, `base-seed` and `test-seed` scripts in their `index.js` order. The db-tool is found via `SHINE_DB_TOOL_PATH` (default `../postgresql-db-tool`).
+- Connection settings come from `.env.test` (gitignored; see `.env.test.example`), then `.env`. `POSTGRES_DATABASE` is always forced to the test DB, so your dev database is never touched.
+- **Mocked:** `config/supabase.ts` (`supabaseAdmin.auth.getUser` accepts `test-token:<userId>`, everything else is a 401; nothing reaches Supabase) and the network calls in `utils/cloudflare/r2Client.ts` (uploads/deletes are recorded in `tests/helpers/mocks/r2Mock.ts`; key/URL helpers are real, public domain `https://r2.test`). Logging is silenced unless `TEST_LOGS=1`.
+- Helpers: `tests/helpers/app.ts` (`useApi()` builds the app and sends `x-client-type: flutter` on writes), `tests/helpers/db.ts` (direct SQL, fresh-user/business/dress factories, NZ dates), `tests/helpers/seed.ts` (seed user ids). Look seed dresses up by `internal_name`, never by id.
+- Tests assert intended behaviour (docs, schema comments, rules), not what the code happens to do. A failing test is a bug report: fix the code, not the expectation. Each test creates its own businesses/dresses so files are order-independent.
+- Tests live outside `src/`; `tsconfig.json` only includes `src/**`, so nothing test-related reaches `dist/`. `tsconfig.test.json` type-checks both.
+
+---
+
 ## Deep References (`docs/`)
 
 `api-endpoints.md` · `database-schema.md` · `authentication-flow.md` · `transaction-patterns.md` · `repository-patterns.md` · `validation-schema-guide.md` · `error-handling-guide.md` · `supabase-integration.md` · `cloudflare-r2-integration.md` · `testing-strategy.md`
@@ -131,7 +151,6 @@ R2 bucket configuration: `CLOUDFLARE_R2_SETUP.md`.
 - **No `helmet`** — no security response headers (HSTS, X-Content-Type-Options, frame options).
 - **No rate limiting.** `/user/signin`, `/user/signup`, and `/user/forgot-password` accept unlimited attempts. Brute-force and credential-stuffing protection is absent.
 - **TypeScript is not strict.** `tsconfig.json` sets only `noImplicitAny`; there's no `strict: true`. 36 `: any` annotations in `src/`, 18 of them the documented `catch (error: any)` pattern.
-- **No automated test suite.** No test runner installed. `docs/testing-strategy.md` describes the intended approach.
 
 **Logging and error handling:**
 

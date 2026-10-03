@@ -8,5 +8,6 @@
 		"noImplicitAny": true,
 		"resolveJsonModule": true,
 		"sourceMap": true
-	}
+	},
+	"include": ["src/**/*"]
 }
