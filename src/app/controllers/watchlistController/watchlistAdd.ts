@@ -4,14 +4,11 @@ import logger from '../../../config/logger';
 import { addToWatchlist } from '../../repositories/watchlistRepository/watchlistRepository';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import AppError from '../../utils/errors/appError';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function watchlistAdd(req: Request, res: Response): Promise<void> {
 	const { currentUserId } = req.body;
-	const listingId = parseInt(req.params.listingId as string, 10);
-
-	if (isNaN(listingId)) {
-		throw new AppError(400, 'Invalid listing ID');
-	}
+	const listingId = parsePositiveIntId(req.params.listingId as string, 'listing ID');
 
 	logger.info(`Adding listing ${listingId} to watchlist for user ${currentUserId}`);
 

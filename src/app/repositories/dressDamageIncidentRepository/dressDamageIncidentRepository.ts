@@ -51,9 +51,11 @@ async function getPublicIncidentsByDressId(
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
 	const query = convertQueryPlaceholders(`
-		SELECT * FROM "dress_damage_incidents"
-		WHERE dress_id_fk = ? AND is_public = TRUE
-		ORDER BY occurred_at DESC, created_at DESC
+		SELECT i.* FROM "dress_damage_incidents" i
+		JOIN "user_dresses" ud ON ud.id = i.dress_id_fk
+		WHERE i.dress_id_fk = ? AND i.is_public = TRUE
+		  AND ud.is_public = TRUE AND ud.status != 'sold'
+		ORDER BY i.occurred_at DESC, i.created_at DESC
 	`);
 	const result = await conn.query(query, [dressId]);
 

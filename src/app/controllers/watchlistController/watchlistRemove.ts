@@ -3,10 +3,11 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { removeFromWatchlist } from '../../repositories/watchlistRepository/watchlistRepository';
 import AppError from '../../utils/errors/appError';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function watchlistRemove(req: Request, res: Response): Promise<void> {
 	const { currentUserId } = req.body;
-	const listingId = req.params.listingId as string;
+	const listingId = parsePositiveIntId(req.params.listingId as string, 'listing ID');
 
 	logger.info(`Removing listing ${listingId} from watchlist for user ${currentUserId}`);
 
@@ -17,7 +18,7 @@ async function watchlistRemove(req: Request, res: Response): Promise<void> {
 
 		const result = await removeFromWatchlist(
 			currentUserId,
-			Number(listingId),
+			listingId,
 			connection
 		);
 

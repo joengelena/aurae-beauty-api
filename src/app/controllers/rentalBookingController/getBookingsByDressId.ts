@@ -4,10 +4,11 @@ import * as dressRepository from '../../repositories/dressRepository/dressReposi
 import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function getBookingsByDressId(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const dressId = parseInt(req.params.id as string, 10);
+	const dressId = parsePositiveIntId(req.params.id as string, 'dress ID');
 
 	logger.info(`Getting booking records for dress '${dressId}'`);
 

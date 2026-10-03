@@ -8,7 +8,7 @@ import { withTransaction } from '../../utils/database/transactionHandler';
 async function postRedeemInvite(req: Request, res: Response): Promise<void> {
 	const { currentUserId, code } = req.body;
 
-	await withTransaction(
+	const redeemed = await withTransaction(
 		async (connection) => {
 			const existingMembership = await businessRepository.getMembershipForUser(
 				currentUserId,
@@ -60,15 +60,18 @@ async function postRedeemInvite(req: Request, res: Response): Promise<void> {
 				connection
 			);
 
-			res.status(200).send({
-				message: 'Invite redeemed successfully',
-				business,
-				role: invite.role,
-			});
+			return { business, role: invite.role };
 		},
 		res,
 		'redeem invite'
 	);
+
+	// Only after COMMIT, so the new member's next request sees the membership.
+	res.status(200).send({
+		message: 'Invite redeemed successfully',
+		business: redeemed.business,
+		role: redeemed.role,
+	});
 }
 
 export default postRedeemInvite;

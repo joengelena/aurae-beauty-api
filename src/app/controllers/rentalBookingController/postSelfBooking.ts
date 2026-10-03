@@ -6,15 +6,12 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
 import { validateBookingDates } from './bookingDates';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function postSelfBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId as string;
-	const dressId = parseInt(req.params.id as string, 10);
+	const dressId = parsePositiveIntId(req.params.id as string, 'dress ID');
 	const { startDate, endDate } = req.body as { startDate: string; endDate: string };
-
-	if (isNaN(dressId)) {
-		throw new AppError(400, 'Invalid dress ID');
-	}
 
 	validateBookingDates(startDate, endDate, { rejectPastStart: true });
 

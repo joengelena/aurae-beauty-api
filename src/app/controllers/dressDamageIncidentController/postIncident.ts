@@ -8,6 +8,8 @@ import uploadImages from '../../utils/cloudflare/uploadImages';
 import { validateFiles } from '../../utils/cloudflare/validation';
 import { deleteMultipleFilesFromR2 } from '../../utils/cloudflare/r2Client';
 import { parseDressId, verifyDressOwnership } from '../../utils/validation/dressValidation';
+import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
+import { todayInBookingTimeZone } from '../rentalBookingController/bookingDates';
 
 async function postIncident(req: Request, res: Response): Promise<void> {
 	const dressId = parseDressId(req.params.id as string);
@@ -36,12 +38,22 @@ async function postIncident(req: Request, res: Response): Promise<void> {
 
 		await verifyDressOwnership(dressId, userId, connection);
 
+		// An incident can only point at a booking of this same dress. Owning
+		// the dress doesn't entitle you to another boutique's booking.
+		if (bookingIdFk !== undefined && bookingIdFk !== null) {
+			const booking = await rentalBookingRepository.getServiceById(bookingIdFk, connection);
+			if (!booking || booking.dressIdFk !== dressId) {
+				throw new AppError(400, 'That booking is not for this dress');
+			}
+		}
+
 		const incidentData: Omit<DressDamageIncident, 'id' | 'createdAt' | 'updatedAt'> = {
 			dressIdFk: dressId,
 			bookingIdFk: bookingIdFk ?? null,
 			description,
 			photoUrls,
-			occurredAt: occurredAt ?? new Date().toISOString().substring(0, 10),
+			// Today in New Zealand, not UTC: before 1pm NZDT the UTC date is still yesterday.
+			occurredAt: occurredAt ?? todayInBookingTimeZone(),
 			isPublic: isPublic ?? false,
 			resolved: false,
 			resolutionNotes: null,

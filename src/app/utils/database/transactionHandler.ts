@@ -17,14 +17,17 @@ export async function withTransaction<T>(
 	operation: (connection: PoolClient) => Promise<T>,
 	res: Response,
 	errorContext: string
-): Promise<void> {
+): Promise<T> {
 	const connection = await getPool().connect();
 
 	try {
 		await connection.query('BEGIN');
-		await operation(connection);
+		const result = await operation(connection);
 		await connection.query('COMMIT');
 		connection.release();
+		// Callers respond with this AFTER the commit. Responding inside the
+		// operation tells the client "done" before the data is visible.
+		return result;
 	} catch (error) {
 		await connection.query('ROLLBACK');
 		connection.release();

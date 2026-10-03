@@ -217,11 +217,14 @@ async function deleteDressById(
 
 // Sort values are never interpolated from user input directly — only these
 // whitelisted SQL fragments can end up in the ORDER BY clause.
+// Every option ends on id so the order is total: without a tiebreaker, rows
+// sharing a price or created_at come back in arbitrary order per query, and
+// LIMIT/OFFSET paging repeats some dresses and skips others.
 const publicDressSortOptions: Record<string, string> = {
-	priceDesc: 'rental_price_per_day DESC NULLS LAST',
-	priceAsc: 'rental_price_per_day ASC NULLS LAST',
-	uploadDateDesc: 'created_at DESC',
-	uploadDateAsc: 'created_at ASC',
+	priceDesc: 'rental_price_per_day DESC NULLS LAST, id DESC',
+	priceAsc: 'rental_price_per_day ASC NULLS LAST, id ASC',
+	uploadDateDesc: 'created_at DESC, id DESC',
+	uploadDateAsc: 'created_at ASC, id ASC',
 };
 
 // Ranks sizes XXS..XXL first (mirrors the Flutter-side sizeRank in
@@ -416,7 +419,7 @@ async function getPublicDresses(
 async function getPublicDressById(
 	dressId: number,
 	connection?: Pool | PoolClient
-): Promise<(UserDress & { location: string; imageUrls: string[] }) | null> {
+): Promise<(Omit<UserDress, 'internalName' | 'rentalCount'> & { location: string; imageUrls: string[] }) | null> {
 	logger.info(`Getting public dress with id '${dressId}' from the database`);
 
 	const useProvidedConnection = !!connection;
@@ -437,7 +440,16 @@ async function getPublicDressById(
 		return null;
 	}
 
-	const mapped = mapDressDbToObject(result.rows)[0];
+	// The public view of a dress. The owner's stock code, rental count and
+	// pending-booking / unresolved-damage counters are wardrobe information,
+	// not something a renter should see.
+	const {
+		internalName,
+		rentalCount,
+		unresolvedDamageCount,
+		pendingBookingCount,
+		...mapped
+	} = mapDressDbToObject(result.rows)[0];
 	return {
 		...mapped,
 		location: result.rows[0].location ?? '',

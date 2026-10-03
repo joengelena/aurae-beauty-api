@@ -7,14 +7,11 @@ import AppError from '../../utils/errors/appError';
 import { DressBooking } from '../../resources/types';
 import { getPool } from '../../../config/db';
 import { validateBookingDates } from './bookingDates';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function patchBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const bookingId = parseInt(req.params.id as string, 10);
-
-	if (isNaN(bookingId)) {
-		throw new AppError(400, 'Invalid booking ID');
-	}
+	const bookingId = parsePositiveIntId(req.params.id as string, 'booking ID');
 
 	const {
 		currentUserId,

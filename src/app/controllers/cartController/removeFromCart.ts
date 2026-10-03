@@ -3,10 +3,11 @@ import { getPool } from '../../../config/db';
 import logger from '../../../config/logger';
 import { removeFromCart as removeFromCartRepo } from '../../repositories/cartRepository/cartRepository';
 import AppError from '../../utils/errors/appError';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function removeFromCart(req: Request, res: Response): Promise<void> {
 	const { currentUserId } = req.body;
-	const cartItemId = req.params.id as string;
+	const cartItemId = parsePositiveIntId(req.params.id as string, 'cart item ID');
 
 	logger.info(`Removing cart item ${cartItemId} for user ${currentUserId}`);
 
@@ -17,7 +18,7 @@ async function removeFromCart(req: Request, res: Response): Promise<void> {
 
 		const result = await removeFromCartRepo(
 			currentUserId,
-			Number(cartItemId),
+			cartItemId,
 			connection
 		);
 

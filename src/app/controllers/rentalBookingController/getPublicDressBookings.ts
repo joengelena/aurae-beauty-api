@@ -2,13 +2,10 @@ import { Request, Response } from 'express';
 import * as rentalBookingRepository from '../../repositories/rentalBookingRepository/dressBookingRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function getPublicDressBookings(req: Request, res: Response): Promise<void> {
-	const dressId = parseInt(req.params.id as string, 10);
-
-	if (isNaN(dressId)) {
-		throw new AppError(400, 'Invalid dress ID');
-	}
+	const dressId = parsePositiveIntId(req.params.id as string, 'dress ID');
 
 	logger.info(`Getting public availability for dress '${dressId}'`);
 

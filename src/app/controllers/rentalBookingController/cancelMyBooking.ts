@@ -3,6 +3,7 @@ import * as rentalBookingRepository from '../../repositories/rentalBookingReposi
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 // Once the dress is on its way to her there is no self-service cancel — the
 // owner has already started fulfilling, so that conversation belongs between
@@ -11,11 +12,7 @@ const cancellableStatuses = ['pending', 'approved'];
 
 async function cancelMyBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId as string;
-	const bookingId = parseInt(req.params.id as string, 10);
-
-	if (isNaN(bookingId)) {
-		throw new AppError(400, 'Invalid booking ID');
-	}
+	const bookingId = parsePositiveIntId(req.params.id as string, 'booking ID');
 
 	logger.info(`Renter cancelling booking '${bookingId}' for user '${userId}'`);
 

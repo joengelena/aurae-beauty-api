@@ -9,7 +9,7 @@ async function postBusiness(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Creating business '${name}' for user '${currentUserId}'`);
 
-	await withTransaction(
+	const createdBusiness = await withTransaction(
 		async (connection) => {
 			const existingMembership = await businessRepository.getMembershipForUser(
 				currentUserId,
@@ -27,14 +27,18 @@ async function postBusiness(req: Request, res: Response): Promise<void> {
 			);
 			await businessRepository.addMember(business.id, currentUserId, 'owner', connection);
 
-			res.status(201).send({
-				message: 'Business created successfully',
-				business,
-			});
+			return business;
 		},
 		res,
 		'create business'
 	);
+
+	// Only after COMMIT: the client immediately reloads its profile and must
+	// see the new membership.
+	res.status(201).send({
+		message: 'Business created successfully',
+		business: createdBusiness,
+	});
 }
 
 export default postBusiness;

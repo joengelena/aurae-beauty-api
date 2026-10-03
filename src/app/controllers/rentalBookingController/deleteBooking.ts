@@ -5,14 +5,11 @@ import * as businessRepository from '../../repositories/businessRepository/busin
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function deleteBooking(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const serviceId = parseInt(req.params.id as string, 10);
-
-	if (isNaN(serviceId)) {
-		throw new AppError(400, 'Invalid booking ID');
-	}
+	const serviceId = parsePositiveIntId(req.params.id as string, 'booking ID');
 
 	logger.info(`Deleting booking record '${serviceId}' by user '${userId}'`);
 
