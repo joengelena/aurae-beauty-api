@@ -16,7 +16,7 @@ import validateRequestBody from '../middlewares/validateRequestBody';
 import ajvSchema from '../resources/ajvSchema.json';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
-import uploadMulter from '../utils/multerStorage';
+import uploadMulter, { authenticatedUpload } from '../utils/multerStorage';
 
 const dressRoutes = (app: Express) => {
 	// Public browse endpoints — no auth required
@@ -54,8 +54,8 @@ const dressRoutes = (app: Express) => {
 			asyncHandler(getAllDresses)
 		)
 		.post(
-			uploadMulter.array('images', 10),
 			supabaseAuthenticateReq,
+			authenticatedUpload(uploadMulter.array('images', 10)),
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postDress);
 			},
@@ -71,8 +71,8 @@ const dressRoutes = (app: Express) => {
 			asyncHandler(getDressById)
 		)
 		.patch(
-			uploadMulter.array('images', 10),
 			supabaseAuthenticateReq,
+			authenticatedUpload(uploadMulter.array('images', 10)),
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.patchDress);
 			},
@@ -96,8 +96,8 @@ const dressRoutes = (app: Express) => {
 			asyncHandler(getIncidentsByDressId)
 		)
 		.post(
-			uploadMulter.array('images', 5),
 			supabaseAuthenticateReq,
+			authenticatedUpload(uploadMulter.array('images', 5)),
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.postDamageIncident);
 			},
@@ -106,8 +106,8 @@ const dressRoutes = (app: Express) => {
 
 	app.route(rootUrl + '/user/dresses/:id/damage-incidents/:incidentId')
 		.patch(
-			uploadMulter.array('images', 5),
 			supabaseAuthenticateReq,
+			authenticatedUpload(uploadMulter.array('images', 5)),
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.patchDamageIncident);
 			},

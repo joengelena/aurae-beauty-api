@@ -32,13 +32,24 @@ async function postRedeemInvite(req: Request, res: Response): Promise<void> {
 				throw new AppError(410, 'Invite code has expired');
 			}
 
+			// Claim the invite first: the conditional UPDATE is what serialises
+			// concurrent redemptions of the same code.
+			const redeemResult = await businessRepository.markInviteRedeemed(
+				invite.id,
+				currentUserId,
+				connection
+			);
+
+			if (redeemResult.rowCount !== 1) {
+				throw new AppError(409, 'Invite code has already been used');
+			}
+
 			await businessRepository.addMember(
 				invite.businessIdFk,
 				currentUserId,
 				invite.role,
 				connection
 			);
-			await businessRepository.markInviteRedeemed(invite.id, currentUserId, connection);
 
 			logger.info(
 				`User '${currentUserId}' redeemed invite for business '${invite.businessIdFk}' as '${invite.role}'`

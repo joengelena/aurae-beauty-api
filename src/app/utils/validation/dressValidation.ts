@@ -1,4 +1,5 @@
 import AppError from '../errors/appError';
+import { parsePositiveIntId } from './idValidation';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
 import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import { Pool, PoolClient } from 'pg';
@@ -29,11 +30,7 @@ export function validateExpiryDate(date: string, fieldName: string): void {
  * @throws AppError if the ID is not a valid number
  */
 export function parseDressId(idParam: string): number {
-	const dressId = parseInt(idParam, 10);
-	if (isNaN(dressId)) {
-		throw new AppError(400, 'Invalid dress ID');
-	}
-	return dressId;
+	return parsePositiveIntId(idParam, 'dress ID');
 }
 
 /**

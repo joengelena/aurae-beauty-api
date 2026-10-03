@@ -17,6 +17,21 @@ async function deleteBusinessMember(req: Request, res: Response): Promise<void> 
 			throw new AppError(400, 'You cannot remove yourself from a business');
 		}
 
+		// The founding owner anchors the business: dresses are keyed under
+		// business.owner_user_id_fk, so removing them would orphan the wardrobe.
+		const business = await businessRepository.getBusinessById(businessId);
+
+		if (!business) {
+			throw new AppError(404, 'Business not found');
+		}
+
+		if (business.ownerUserIdFk === targetUserId) {
+			logger.warn(
+				`User '${currentUserId}' tried to remove founding owner '${targetUserId}' from business '${businessId}'`
+			);
+			throw new AppError(403, 'The founding owner cannot be removed from the business');
+		}
+
 		const result = await businessRepository.removeMember(businessId, targetUserId);
 
 		if (result.rowCount === 0) {

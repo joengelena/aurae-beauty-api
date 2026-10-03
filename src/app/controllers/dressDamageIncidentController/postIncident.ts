@@ -22,6 +22,8 @@ async function postIncident(req: Request, res: Response): Promise<void> {
 
 	if (files.length > 0) {
 		validateFiles(files);
+		// Ownership check before upload (re-checked in the transaction below)
+		await verifyDressOwnership(dressId, userId);
 		const uploadResult = await uploadImages(files);
 		photoUrls = uploadResult.urls;
 		uploadedKeys = uploadResult.keys;

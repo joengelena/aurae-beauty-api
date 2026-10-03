@@ -71,6 +71,28 @@ async function getUserById(
 	return mapUserDbToObject(result.rows);
 }
 
+/**
+ * Returns the id of the user with this email (case-insensitive), or null.
+ * Supabase normalises emails to lower case, so compare the same way.
+ */
+async function getUserIdByEmail(
+	email: string,
+	connection?: Pool | PoolClient
+): Promise<string | null> {
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(
+		'SELECT id FROM "user" WHERE LOWER(email) = LOWER(?) LIMIT 1'
+	);
+	const result = await conn.query(query, [email]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	return result.rows.length > 0 ? result.rows[0].id : null;
+}
+
 async function updateUser(
 	params: Partial<User>,
 	connection?: Pool | PoolClient
@@ -136,6 +158,7 @@ async function deleteUserWithId(
 export {
 	signUpUser,
 	getUserById,
+	getUserIdByEmail,
 	updateUser,
 	deleteUserWithId,
 };

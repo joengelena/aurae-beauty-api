@@ -16,7 +16,10 @@ const connect = async () => {
 		max: 100, // Maximum number of clients in the pool
 	});
 	logger.info(`Created pool`);
-	await pool.connect(); // Check connection
+	// Check the connection, then hand the client straight back to the pool.
+	// Holding it would permanently shrink the pool by one.
+	const client = await pool.connect();
+	client.release();
 	logger.info(`Successfully connected to database`);
 	return;
 };

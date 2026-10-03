@@ -301,10 +301,14 @@ async function markInviteRedeemed(
 ): Promise<QueryResult> {
 	const useProvidedConnection = !!connection;
 	const conn = connection || getPool();
+	// Conditional on status so two concurrent redemptions of the same code can't
+	// both succeed: the second UPDATE blocks on the row lock, re-checks the WHERE
+	// after the first commits, and matches 0 rows. Callers must check rowCount.
 	const query = convertQueryPlaceholders(`
 		UPDATE business_invite
 		SET status = 'redeemed', redeemed_by_user_id_fk = ?, redeemed_at = CURRENT_TIMESTAMP
-		WHERE id = ?
+		WHERE id = ? AND status = 'pending'
+		RETURNING id
 	`);
 	const result = await conn.query(query, [redeemedByUserId, inviteId]);
 

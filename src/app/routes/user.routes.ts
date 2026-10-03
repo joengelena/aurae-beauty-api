@@ -24,7 +24,7 @@ import {
 } from '../controllers/cartController';
 import supabaseAuthenticateReq from '../middlewares/supabaseAuthenticateReq';
 import { asyncHandler } from '../utils/asyncHandler';
-import uploadMulter from '../utils/multerStorage';
+import uploadMulter, { authenticatedUpload } from '../utils/multerStorage';
 
 const usersRoutes = (app: Express) => {
 	app.route(rootUrl + '/user/forgot-password').post(
@@ -66,8 +66,8 @@ const usersRoutes = (app: Express) => {
 			asyncHandler(deleteUserSupabase)
 		)
 		.patch(
-			uploadMulter.single('image'),
 			supabaseAuthenticateReq,
+			authenticatedUpload(uploadMulter.single('image')),
 			(req, res, next) => {
 				validateRequestBody(req, res, next, ajvSchema.updateUser);
 			},

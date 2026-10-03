@@ -64,6 +64,39 @@ async function getPublicIncidentsByDressId(
 	return mapDressDamageIncidentDbToObject(result.rows);
 }
 
+/**
+ * Returns every damage-incident photo URL across all dresses owned by the user.
+ * Used by account deletion, where incidents cascade-delete with the dresses.
+ */
+async function getIncidentPhotoUrlsByDressOwner(
+	ownerUserId: string,
+	connection?: Pool | PoolClient
+): Promise<string[]> {
+	logger.info(`Getting damage incident photo URLs for dresses owned by '${ownerUserId}'`);
+
+	const useProvidedConnection = !!connection;
+	const conn = connection || getPool();
+	const query = convertQueryPlaceholders(`
+		SELECT ddi.photo_urls
+		FROM "dress_damage_incidents" ddi
+		JOIN "user_dresses" ud ON ud.id = ddi.dress_id_fk
+		WHERE ud.user_id_fk = ?
+	`);
+	const result = await conn.query(query, [ownerUserId]);
+
+	if (!useProvidedConnection && 'release' in conn) {
+		(conn as PoolClient).release();
+	}
+
+	const urls: string[] = [];
+	for (const row of result.rows) {
+		if (Array.isArray(row.photo_urls)) {
+			urls.push(...row.photo_urls.filter((url: unknown): url is string => typeof url === 'string'));
+		}
+	}
+	return urls;
+}
+
 async function getIncidentById(
 	incidentId: number,
 	connection?: Pool | PoolClient
@@ -182,6 +215,7 @@ export {
 	getIncidentsByDressId,
 	getPublicIncidentsByDressId,
 	getIncidentById,
+	getIncidentPhotoUrlsByDressOwner,
 	postIncident,
 	updateIncidentById,
 	deleteIncidentById,

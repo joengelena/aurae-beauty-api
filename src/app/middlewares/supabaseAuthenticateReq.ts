@@ -49,7 +49,13 @@ async function supabaseAuthenticateReq(
 			return;
 		}
 
-		// Attach user ID to request for downstream use
+		// Attach user ID to request for downstream use. res.locals keeps a copy
+		// that survives multer replacing req.body on multipart routes (see
+		// authenticatedUpload in utils/multerStorage.ts).
+		res.locals.currentUserId = user.id;
+		if (!req.body) {
+			req.body = {};
+		}
 		req.body.currentUserId = user.id;
 
 		logger.info(`User authenticated: ${user.id}`);

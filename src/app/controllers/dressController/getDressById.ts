@@ -3,15 +3,12 @@ import * as dressRepository from '../../repositories/dressRepository/dressReposi
 import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
+import { parseDressId } from '../../utils/validation/dressValidation';
 
 async function getDressById(req: Request, res: Response): Promise<void> {
 	const userId = req.body.currentUserId;
-	const vehicleId = parseInt(req.params.id as string, 10);
-
 	// Validate vehicleId BEFORE logging to avoid logging invalid data
-	if (isNaN(vehicleId)) {
-		throw new AppError(400, 'Invalid dress ID');
-	}
+	const vehicleId = parseDressId(req.params.id as string);
 
 	logger.info(`Getting dress with id '${vehicleId}' for user '${userId}'`);
 

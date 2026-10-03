@@ -1,4 +1,5 @@
 import AppError from '../errors/appError';
+import { parsePositiveIntId } from './idValidation';
 import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import { BusinessRole } from '../../resources/types';
 import { Pool, PoolClient } from 'pg';
@@ -10,11 +11,7 @@ import { Pool, PoolClient } from 'pg';
  * @throws AppError if the ID is not a valid number
  */
 export function parseBusinessId(idParam: string): number {
-	const businessId = parseInt(idParam, 10);
-	if (isNaN(businessId)) {
-		throw new AppError(400, 'Invalid business ID');
-	}
-	return businessId;
+	return parsePositiveIntId(idParam, 'business ID');
 }
 
 /**

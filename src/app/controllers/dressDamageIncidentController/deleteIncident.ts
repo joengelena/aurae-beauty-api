@@ -4,16 +4,13 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import { getPool } from '../../../config/db';
 import { parseDressId, verifyDressOwnership } from '../../utils/validation/dressValidation';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 import { extractKeyFromUrl, deleteMultipleFilesFromR2 } from '../../utils/cloudflare/r2Client';
 
 async function deleteIncident(req: Request, res: Response): Promise<void> {
 	const dressId = parseDressId(req.params.id as string);
-	const incidentId = parseInt(req.params.incidentId as string, 10);
+	const incidentId = parsePositiveIntId(req.params.incidentId as string, 'damage incident ID');
 	const userId = req.body.currentUserId;
-
-	if (isNaN(incidentId)) {
-		throw new AppError(400, 'Invalid damage incident ID');
-	}
 
 	logger.info(`Deleting damage incident '${incidentId}' for dress '${dressId}'`);
 

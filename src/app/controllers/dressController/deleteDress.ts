@@ -1,16 +1,14 @@
 import { Request, Response } from 'express';
 import logger from '../../../config/logger';
 import * as dressRepository from '../../repositories/dressRepository/dressRepository';
+import * as dressDamageIncidentRepository from '../../repositories/dressDamageIncidentRepository/dressDamageIncidentRepository';
 import AppError from '../../utils/errors/appError';
 import {
 	parseDressId,
 	verifyDressOwnership,
 } from '../../utils/validation/dressValidation';
 import { withTransaction } from '../../utils/database/transactionHandler';
-import {
-	extractKeyFromUrl,
-	deleteFileFromR2,
-} from '../../utils/cloudflare/r2Client';
+import { deleteR2UrlsBestEffort } from '../../utils/cloudflare/cleanup';
 
 async function deleteDress(req: Request, res: Response): Promise<void> {
 	const vehicleId = parseDressId(req.params.id as string);
@@ -18,7 +16,7 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 
 	logger.info(`Deleting dress with id '${vehicleId}'`);
 
-	let dressPhotoUrls: string[] = [];
+	let imageUrlsToDelete: string[] = [];
 
 	await withTransaction(
 		async (connection) => {
@@ -34,9 +32,17 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 				throw new AppError(404, 'Dress not found');
 			}
 
-			dressPhotoUrls = dress.dressPhotoUrls ?? [];
+			// Damage incidents cascade-delete with the dress, so their photos
+			// have to be collected now as well.
+			const incidents = await dressDamageIncidentRepository.getIncidentsByDressId(
+				vehicleId,
+				connection
+			);
+			const incidentPhotoUrls = incidents.flatMap((incident) => incident.photoUrls ?? []);
+
+			imageUrlsToDelete = [...(dress.dressPhotoUrls ?? []), ...incidentPhotoUrls];
 			logger.info(
-				`Dress has ${dressPhotoUrls.length} image(s) to delete`
+				`Dress has ${imageUrlsToDelete.length} image(s) to delete (including damage incident photos)`
 			);
 
 			const result = await dressRepository.deleteDressById(
@@ -47,30 +53,17 @@ async function deleteDress(req: Request, res: Response): Promise<void> {
 			if (result.rowCount === 0) {
 				throw new AppError(404, 'Dress not found');
 			}
-
-			res.status(200).send({
-				message: 'Dress deleted successfully',
-			});
 		},
 		res,
 		'delete dress'
 	);
 
-	// Delete photos from R2 after successful database deletion
-	for (const url of dressPhotoUrls) {
-		try {
-			const key = extractKeyFromUrl(url);
-			if (key) {
-				logger.info(`Deleting dress photo from R2: ${key}`);
-				await deleteFileFromR2(key);
-			}
-		} catch (r2Error) {
-			const errorMessage =
-				r2Error instanceof Error ? r2Error.message : 'Unknown error';
-			logger.error(`Failed to delete dress photo from R2: ${errorMessage}`);
-			logger.warn('Dress deleted from database but photo remains in R2 storage');
-		}
-	}
+	res.status(200).send({
+		message: 'Dress deleted successfully',
+	});
+
+	// Delete photos from R2 only after the database deletion has committed
+	await deleteR2UrlsBestEffort(imageUrlsToDelete, `photos of deleted dress '${vehicleId}'`);
 }
 
 export default deleteDress;

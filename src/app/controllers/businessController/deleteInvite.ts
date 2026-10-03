@@ -3,15 +3,12 @@ import logger from '../../../config/logger';
 import AppError from '../../utils/errors/appError';
 import * as businessRepository from '../../repositories/businessRepository/businessRepository';
 import { parseBusinessId, verifyBusinessRole } from '../../utils/validation/businessValidation';
+import { parsePositiveIntId } from '../../utils/validation/idValidation';
 
 async function deleteInvite(req: Request, res: Response): Promise<void> {
 	const businessId = parseBusinessId(req.params.businessId as string);
-	const inviteId = parseInt(req.params.id as string, 10);
+	const inviteId = parsePositiveIntId(req.params.id as string, 'invite ID');
 	const currentUserId = req.body.currentUserId;
-
-	if (isNaN(inviteId)) {
-		throw new AppError(400, 'Invalid invite ID');
-	}
 
 	try {
 		await verifyBusinessRole(businessId, currentUserId, ['owner']);
