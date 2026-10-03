@@ -79,7 +79,7 @@ src/
 | `user.routes.ts` | profile, password, watchlist, cart, `PATCH /user/settings` (business settings) |
 | `dress.routes.ts` | public browse `/dresses`, `/dresses/attributes`, `/dresses/:id`, `/dresses/:id/damage-incidents`, owner wardrobe `/user/dresses` + nested bookings |
 
-`GET /dresses` supports `userId`, `brand`, `style`, `size`, `color`, `condition`, `dressType`, `location`, `priceFrom`, `priceTo`, `search`, `sortBy`, plus date-availability filtering and pagination.
+`GET /dresses` supports `userId`, `brand`, `style`, `size`, `color`, `condition`, `dressType`, `location`, `priceFrom`, `priceTo`, `q` (search on name and brand), `sortBy`, plus date-availability filtering and pagination.
 
 Full endpoint reference: `docs/api-endpoints.md`.
 
