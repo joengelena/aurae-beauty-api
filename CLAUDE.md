@@ -67,7 +67,7 @@ src/
 
 **Upload-then-rollback for images.** Files go to R2 first; if the DB write fails, the uploaded objects are deleted. R2 object keys are `aurae/{timestamp}-{random}-{sanitized-filename}` (`utils/cloudflare/r2Client.ts`).
 
-**Multer is memory storage, applied per-route** — `uploadMulter` from `utils/multerStorage.ts`, not a global middleware. Dress photos allow 10 files (`uploadMulter.array('images', 10)`), damage incident photos 5, profile image 1 (`.single('image')`).
+**Multer is memory storage, applied per-route, after auth** — routes run `supabaseAuthenticateReq` first, then `authenticatedUpload(uploadMulter.array(...))` from `utils/multerStorage.ts`, which re-injects the verified `currentUserId` after multer replaces `req.body`. Limits: 10MB per file. Never put multer before auth. Dress photos allow 10 files (`uploadMulter.array('images', 10)`), damage incident photos 5, profile image 1 (`.single('image')`).
 
 ---
 
@@ -90,6 +90,10 @@ Full endpoint reference: `docs/api-endpoints.md`.
 All three booking write paths — owner-created, renter self-book, and owner date edits — go through **`hasBookingConflict` in `repositories/rentalBookingRepository/dressBookingRepository.ts`**. It validates against existing bookings, the business-wide cleaning buffer, and the dress's `blocked_date_ranges` in one place.
 
 **Never add a fourth booking write path with its own validation.** `postBooking.ts` previously had zero conflict checking; this consolidation is what fixed it.
+
+The database is the real guarantee: the `no_double_booking` exclusion constraint on `dress_bookings.blocked_period` rejects overlaps (Postgres `23P01`, mapped to 409). `hasBookingConflict(dressId, start, end, bookingType, connection?, excludeBookingId?)` is the friendly pre-check and asks the same question via `dress_blocked_period`. Each booking snapshots its own `cleaning_days` at creation; `bookingType` can't change after creation. Status transitions are enforced by the trigger in `99_triggers.sql`.
+
+**CSRF guard:** every POST/PUT/PATCH/DELETE under `/api/v1` must send `x-client-type: web|flutter` (`middlewares/requireClientType.ts`). The Flutter `ApiClient` always does.
 
 The cleaning buffer lives in `user.business_settings.cleaningBufferDays` (JSONB, min 1, default 1) — business-wide, not per-dress. `PATCH /user/settings` **merges** into that blob rather than replacing it.
 
@@ -132,10 +136,9 @@ R2 bucket configuration: `CLOUDFLARE_R2_SETUP.md`.
 **Logging and error handling:**
 
 - **The Winston format silently drops metadata.** `config/logger.ts` renders only `timestamp`/`status`/`level`/`message`, so the `stack`, `method`, `path`, and `body` fields the global error handler collects never reach disk — **stack traces are not being recorded.** Fixing the format is worthwhile but security-sensitive; read `.claude/rules/logging.md` first.
-- **The error handler has no dev/prod split.** It returns `err.message` to the client whatever the environment, so an unexpected non-`AppError` (a raw Postgres error, say) leaks its message to the caller — contradicting the rule in `error-responses.md`. Wrapping unknown errors in a generic 500 in production would close this.
+- **Unknown errors are generic.** The global handler returns `AppError` messages as-is, multer limit errors as 400, and anything else as a generic 500 (the real error is logged).
 
-**Pivot leftovers:**
+**Docs:**
 
-- **`motorix-api.yaml`** in the repo root is a stale OpenAPI spec — not maintained, don't treat it as a contract.
-- **Cosmetic `vehicle*` naming** survives in `resources/types.ts` (`vehicleIdFk`) and as local variables in `dressController/`. Harmless; rename opportunistically.
-- **`.env.example`** still suggests `R2_BUCKET_NAME=motorix-images`.
+- **`docs/api-endpoints.md` is stale** — large parts still describe Motorix vehicle/service/listing endpoints. Trust `src/app/routes/` until it is rewritten.
+- **No migration for the booking schema changes.** `sql/shine/migrate` stops at 1.0.1; existing databases need a reset (`npm run reset && npm run seed` in `postgresql-db-tool`).
