@@ -55,6 +55,9 @@ npm install
 npm run dev     # Development with hot reload (ts-node)
 npm run build   # Compile TypeScript to dist/
 npm start       # Build then run from dist/
+npm run verify             # type-check + lint + all tests (run this before pushing)
+npm run test:unit          # fast, no database needed
+npm run test:integration   # real HTTP against a real Postgres
 ```
 
 ## Summary
